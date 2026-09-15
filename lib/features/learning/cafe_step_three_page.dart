@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
+import 'cafe_order_mission.dart';
 import 'learning_progress_provider.dart';
 import 'widgets/learning_widgets.dart';
 
@@ -10,8 +11,32 @@ class CafeStepThreePage extends StatelessWidget {
   const CafeStepThreePage({super.key});
 
   void _select(BuildContext context, String temperature) {
-    context.read<LearningProgressProvider>().selectTemperature(temperature);
+    final progress = context.read<LearningProgressProvider>();
+    if (progress.isSoloMode &&
+        !CafeOrderMission.today.isCorrect(
+          CafeOrderStep.temperature,
+          temperature,
+        )) {
+      _showMissionReminder(context);
+      return;
+    }
+
+    progress.selectTemperature(temperature);
     context.go(AppRoutes.cafeStepFour);
+  }
+
+  void _showMissionReminder(BuildContext context) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text(
+            '괜찮아요. 오늘의 주문을 다시 확인해볼까요?\n'
+            '힌트 보기를 누르면 주문 내용을 확인할 수 있어요.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   void _restart(BuildContext context) {
@@ -30,12 +55,14 @@ class CafeStepThreePage extends StatelessWidget {
       onBack: () => context.go(AppRoutes.cafeStepTwo),
       onPrevious: () => context.go(AppRoutes.cafeStepTwo),
       onRestart: () => _restart(context),
+      onHint: isSolo ? () => showCafeMissionHint(context) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           LearningChoiceCard(
             label: '차갑게 먹을게요',
             icon: Icons.ac_unit_outlined,
+            highlighted: !isSolo,
             onPressed: () => _select(context, '차갑게'),
           ),
           const SizedBox(height: 16),
@@ -43,6 +70,7 @@ class CafeStepThreePage extends StatelessWidget {
             label: '따뜻하게 먹을게요',
             icon: Icons.local_fire_department_outlined,
             secondary: true,
+            highlighted: !isSolo,
             onPressed: () => _select(context, '따뜻하게'),
           ),
         ],

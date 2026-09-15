@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
             onPressed: () => context.go(AppRoutes.cafeStart),
           ),
           const SizedBox(height: 16),
-          _HomeMessageCard(
+          _HomeFeatureCard(
             title: '나의 디지털 걸음',
             message:
                 '현재 포인트: ${progress.totalPoints}점\n'
@@ -54,6 +54,7 @@ class HomePage extends StatelessWidget {
                 '카페 혼자 해보기: ${progress.soloCompletionCount}회\n\n'
                 '한 번씩 연습할수록 디지털 자신감이 자라요.',
             icon: Icons.emoji_events_outlined,
+            onPressed: () => context.go(AppRoutes.progress),
           ),
           const SizedBox(height: 26),
           Text(

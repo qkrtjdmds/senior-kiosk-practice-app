@@ -1,17 +1,44 @@
-# han_geoleum_digital
+# 한걸음 디지털
 
-A new Flutter project.
+키오스크와 디지털 기기 사용이 어려운 어르신이 실제 상황처럼 단계별로 연습할 수 있도록 돕는 Flutter 앱입니다.
 
-## Getting Started
+## 현재 구현 기능
 
-This project is a starting point for a Flutter application.
+- 홈 화면과 오늘의 연습 안내
+- 카페 키오스크 연습 시작 화면
+- 4단계 학습 진행 표시
+- 1단계: 매장 이용 또는 포장 선택
+- 선택 후 완료·격려 화면
+- 이전 버튼과 처음부터 다시 하기
+- 따라 해보기와 혼자 해보기 학습 모드
+- 포인트, 완료 횟수, 배지 등 학습 기록 저장
+- 병원 접수와 사진 보내기 기능은 준비 중 표시
 
-A few resources to get you started if this is your first Flutter project:
+## UX 방향
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- 어르신이 읽기 편한 큰 글씨와 큰 버튼
+- 밝고 편안한 색상
+- 모든 화면을 한국어 중심의 쉬운 안내로 구성
+- 부담 없이 천천히 연습할 수 있는 긍정적인 경험
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 기술 스택
+
+- Flutter
+- Dart
+- Material 3
+
+## 실행 방법
+
+```bash
+flutter pub get
+flutter run
+```
+
+Android 에뮬레이터 또는 연결된 기기에서 실행할 수 있습니다.
+
+## 앞으로 구현할 기능
+
+- 실제 카페·햄버거·KTX 키오스크와 유사한 연습 화면
+- 단계별 피드백
+- 학습 기록 확장
+- 다양한 디지털 기기 연습

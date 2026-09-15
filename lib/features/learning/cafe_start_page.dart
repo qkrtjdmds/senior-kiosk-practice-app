@@ -11,7 +11,11 @@ class CafeStartPage extends StatelessWidget {
 
   void _selectMode(BuildContext context, CafeLearningMode mode) {
     context.read<LearningProgressProvider>().selectMode(mode);
-    context.go(AppRoutes.cafeStepOne);
+    context.go(
+      mode == CafeLearningMode.solo
+          ? AppRoutes.cafeMission
+          : AppRoutes.cafeStepOne,
+    );
   }
 
   @override

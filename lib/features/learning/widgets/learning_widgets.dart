@@ -9,6 +9,7 @@ class LearningStepLayout extends StatelessWidget {
     required this.onPrevious,
     required this.onRestart,
     required this.child,
+    this.onHint,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class LearningStepLayout extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onRestart;
   final Widget child;
+  final VoidCallback? onHint;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,17 @@ class LearningStepLayout extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   KioskPanel(child: child),
+                  if (onHint != null) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: onHint,
+                        icon: const Icon(Icons.lightbulb_outline_rounded),
+                        label: const Text('힌트 보기'),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -193,6 +206,7 @@ class LearningChoiceCard extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.secondary = false,
+    this.highlighted = false,
     super.key,
   });
 
@@ -200,14 +214,19 @@ class LearningChoiceCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final bool secondary;
+  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor = secondary
+    final backgroundColor = highlighted
+        ? colorScheme.primaryContainer
+        : secondary
         ? colorScheme.surfaceContainerHighest
         : colorScheme.primaryContainer;
-    final foregroundColor = secondary
+    final foregroundColor = highlighted
+        ? colorScheme.onPrimaryContainer
+        : secondary
         ? colorScheme.onSurface
         : colorScheme.onPrimaryContainer;
 
@@ -222,18 +241,38 @@ class LearningChoiceCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
+            border: Border.all(
+              color: highlighted
+                  ? colorScheme.primary
+                  : colorScheme.outlineVariant,
+              width: highlighted ? 2.5 : 1.5,
+            ),
           ),
           child: Row(
             children: [
               Icon(icon, size: 38, color: foregroundColor),
               const SizedBox(width: 18),
               Expanded(
-                child: Text(
-                  label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelLarge?.copyWith(color: foregroundColor),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge?.copyWith(color: foregroundColor),
+                    ),
+                    if (highlighted) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        '여기를 눌러보세요',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
+                          color: foregroundColor,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               Icon(

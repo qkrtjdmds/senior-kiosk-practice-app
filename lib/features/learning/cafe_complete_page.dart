@@ -15,11 +15,18 @@ class CafeCompletePage extends StatefulWidget {
 }
 
 class _CafeCompletePageState extends State<CafeCompletePage> {
+  bool _showFirstBadge = false;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LearningProgressProvider>().completeCafeLearning();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final firstBadge = await context
+          .read<LearningProgressProvider>()
+          .completeCafeLearning();
+      if (mounted && firstBadge) {
+        setState(() => _showFirstBadge = true);
+      }
     });
   }
 
@@ -31,9 +38,7 @@ class _CafeCompletePageState extends State<CafeCompletePage> {
     final progress = context.watch<LearningProgressProvider>();
     final isSolo = progress.isSoloMode;
     final title = isSolo ? '혼자서도 잘하셨어요!' : '잘하셨어요!';
-    final message = isSolo
-        ? '배운 순서를 떠올리며 주문을 완성했어요.'
-        : '카페 주문 순서를 천천히 잘 따라오셨어요.';
+    final message = isSolo ? '오늘의 주문 미션을 완성했어요.' : '카페 주문 순서를 천천히 잘 따라오셨어요.';
     final reward = isSolo ? '용기 포인트 +20점' : '한걸음 포인트 +10점';
 
     return PageScaffold(
@@ -82,6 +87,45 @@ class _CafeCompletePageState extends State<CafeCompletePage> {
             ),
           ),
           const SizedBox(height: 20),
+          if (_showFirstBadge) ...[
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiaryContainer,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.tertiary,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.workspace_premium_outlined,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '혼자 주문 첫걸음',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '처음으로 혼자 주문 미션을 완성했어요.',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             decoration: BoxDecoration(
