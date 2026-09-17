@@ -1,27 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
-import '../learning/learning_progress_provider.dart';
 import '../../shared/widgets/page_scaffold.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('이 기능은 준비 중이에요.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final progress = context.watch<LearningProgressProvider>();
-
     return PageScaffold(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,11 +35,7 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _HomeFeatureCard(
             title: '나의 디지털 걸음',
-            message:
-                '현재 포인트: ${progress.totalPoints}점\n'
-                '카페 따라 해보기: ${progress.guidedCompletionCount}회\n'
-                '카페 혼자 해보기: ${progress.soloCompletionCount}회\n\n'
-                '한 번씩 연습할수록 디지털 자신감이 자라요.',
+            message: '연습한 기록과 모은 포인트를 확인해요.',
             icon: Icons.emoji_events_outlined,
             onPressed: () => context.go(AppRoutes.progress),
           ),
@@ -64,18 +47,26 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 14),
           _HomeFeatureCard(
             title: '병원 접수 연습하기',
-            message: '이 기능은 준비 중이에요.',
+            message: '병원에서 접수하는 순서를 연습해요.',
             icon: Icons.local_hospital_outlined,
             secondary: true,
-            onPressed: () => _showComingSoon(context),
+            onPressed: () => context.go(AppRoutes.hospitalStart),
           ),
           const SizedBox(height: 12),
           _HomeFeatureCard(
             title: '사진 보내기 연습하기',
-            message: '이 기능은 준비 중이에요.',
+            message: '사진을 보내는 순서를 연습해요.',
             icon: Icons.photo_outlined,
             secondary: true,
-            onPressed: () => _showComingSoon(context),
+            onPressed: () => context.go(AppRoutes.photoStart),
+          ),
+          const SizedBox(height: 12),
+          _HomeFeatureCard(
+            title: '기차표 예매 연습하기',
+            message: '기차를 탈 때 표를 예매하는 순서를 연습해요.',
+            icon: Icons.confirmation_number_outlined,
+            secondary: true,
+            onPressed: () => context.go(AppRoutes.trainStart),
           ),
         ],
       ),

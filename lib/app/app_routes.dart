@@ -8,4 +8,26 @@ abstract final class AppRoutes {
   static const cafeStepThree = '/cafe/practice/step-3';
   static const cafeStepFour = '/cafe/practice/step-4';
   static const cafeComplete = '/cafe/complete';
+  static const hospitalStart = '/hospital';
+  static const hospitalMission = '/hospital/mission';
+  static const hospitalStepOne = '/hospital/practice';
+  static const hospitalStepTwo = '/hospital/practice/step-2';
+  static const hospitalStepThree = '/hospital/practice/step-3';
+  static const hospitalStepFour = '/hospital/practice/step-4';
+  static const hospitalComplete = '/hospital/complete';
+  static const photoStart = '/photo';
+  static const photoMission = '/photo/mission';
+  static const photoStepOne = '/photo/practice';
+  static const photoStepTwo = '/photo/practice/step-2';
+  static const photoStepThree = '/photo/practice/step-3';
+  static const photoStepFour = '/photo/practice/step-4';
+  static const photoComplete = '/photo/complete';
+  static const trainStart = '/train';
+  static const trainMission = '/train/mission';
+  static const trainStepOne = '/train/practice';
+  static const trainStepTwo = '/train/practice/step-2';
+  static const trainStepThree = '/train/practice/step-3';
+  static const trainStepFour = '/train/practice/step-4';
+  static const trainStepFive = '/train/practice/step-5';
+  static const trainComplete = '/train/complete';
 }

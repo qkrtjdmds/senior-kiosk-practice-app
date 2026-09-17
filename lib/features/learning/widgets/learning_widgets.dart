@@ -9,6 +9,9 @@ class LearningStepLayout extends StatelessWidget {
     required this.onPrevious,
     required this.onRestart,
     required this.child,
+    this.title = '카페 주문 연습',
+    this.phonePanel = false,
+    this.totalSteps = 4,
     this.onHint,
     super.key,
   });
@@ -20,6 +23,9 @@ class LearningStepLayout extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onRestart;
   final Widget child;
+  final String title;
+  final bool phonePanel;
+  final int totalSteps;
   final VoidCallback? onHint;
 
   @override
@@ -27,7 +33,7 @@ class LearningStepLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('카페 주문 연습'),
+        title: Text(title),
         leading: IconButton(
           onPressed: onBack,
           icon: const Icon(Icons.arrow_back_rounded),
@@ -43,7 +49,7 @@ class LearningStepLayout extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ProgressHeader(step: step),
+                  ProgressHeader(step: step, totalSteps: totalSteps),
                   const SizedBox(height: 22),
                   GuidanceCard(message: guidance),
                   const SizedBox(height: 24),
@@ -53,7 +59,9 @@ class LearningStepLayout extends StatelessWidget {
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 24),
-                  KioskPanel(child: child),
+                  phonePanel
+                      ? PhonePanel(child: child)
+                      : KioskPanel(child: child),
                   if (onHint != null) ...[
                     const SizedBox(height: 12),
                     Align(
@@ -102,9 +110,10 @@ class LearningStepLayout extends StatelessWidget {
 }
 
 class ProgressHeader extends StatelessWidget {
-  const ProgressHeader({required this.step, super.key});
+  const ProgressHeader({required this.step, this.totalSteps = 4, super.key});
 
   final int step;
+  final int totalSteps;
 
   @override
   Widget build(BuildContext context) {
@@ -117,14 +126,17 @@ class ProgressHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('천천히 한 단계씩', style: Theme.of(context).textTheme.titleLarge),
-            Text('$step / 4 단계', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              '$step / $totalSteps 단계',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ],
         ),
         const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: LinearProgressIndicator(
-            value: step / 4,
+            value: step / totalSteps,
             minHeight: 14,
             backgroundColor: colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
@@ -196,6 +208,40 @@ class KioskPanel extends StatelessWidget {
         ],
       ),
       child: child,
+    );
+  }
+}
+
+class PhonePanel extends StatelessWidget {
+  const PhonePanel({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 20, 14, 20),
+      decoration: BoxDecoration(
+        color: colorScheme.onSurface,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x18000000),
+            blurRadius: 16,
+            offset: Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: child,
+      ),
     );
   }
 }

@@ -10,6 +10,28 @@ import '../features/learning/cafe_start_page.dart';
 import '../features/learning/cafe_step_four_page.dart';
 import '../features/learning/cafe_step_three_page.dart';
 import '../features/learning/cafe_step_two_page.dart';
+import '../features/hospital/hospital_complete_page.dart';
+import '../features/hospital/hospital_mission_page.dart';
+import '../features/hospital/hospital_start_page.dart';
+import '../features/hospital/hospital_step_four_page.dart';
+import '../features/hospital/hospital_step_one_page.dart';
+import '../features/hospital/hospital_step_three_page.dart';
+import '../features/hospital/hospital_step_two_page.dart';
+import '../features/photo/photo_complete_page.dart';
+import '../features/photo/photo_mission_page.dart';
+import '../features/photo/photo_start_page.dart';
+import '../features/photo/photo_step_four_page.dart';
+import '../features/photo/photo_step_one_page.dart';
+import '../features/photo/photo_step_three_page.dart';
+import '../features/photo/photo_step_two_page.dart';
+import '../features/train/train_complete_page.dart';
+import '../features/train/train_mission_page.dart';
+import '../features/train/train_start_page.dart';
+import '../features/train/train_step_five_page.dart';
+import '../features/train/train_step_four_page.dart';
+import '../features/train/train_step_one_page.dart';
+import '../features/train/train_step_three_page.dart';
+import '../features/train/train_step_two_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
@@ -49,6 +71,94 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.cafeComplete,
       builder: (context, state) => const CafeCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalStart,
+      builder: (context, state) => const HospitalStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalMission,
+      builder: (context, state) => const HospitalMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalStepOne,
+      builder: (context, state) => const HospitalStepOnePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalStepTwo,
+      builder: (context, state) => const HospitalStepTwoPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalStepThree,
+      builder: (context, state) => const HospitalStepThreePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalStepFour,
+      builder: (context, state) => const HospitalStepFourPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalComplete,
+      builder: (context, state) => const HospitalCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoStart,
+      builder: (context, state) => const PhotoStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoMission,
+      builder: (context, state) => const PhotoMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoStepOne,
+      builder: (context, state) => const PhotoStepOnePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoStepTwo,
+      builder: (context, state) => const PhotoStepTwoPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoStepThree,
+      builder: (context, state) => const PhotoStepThreePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoStepFour,
+      builder: (context, state) => const PhotoStepFourPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.photoComplete,
+      builder: (context, state) => const PhotoCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStart,
+      builder: (context, state) => const TrainStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainMission,
+      builder: (context, state) => const TrainMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStepOne,
+      builder: (context, state) => const TrainStepOnePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStepTwo,
+      builder: (context, state) => const TrainStepTwoPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStepThree,
+      builder: (context, state) => const TrainStepThreePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStepFour,
+      builder: (context, state) => const TrainStepFourPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainStepFive,
+      builder: (context, state) => const TrainStepFivePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.trainComplete,
+      builder: (context, state) => const TrainCompletePage(),
     ),
   ],
 );
