@@ -11,8 +11,10 @@ class LearningStepLayout extends StatelessWidget {
     required this.child,
     this.title = '카페 주문 연습',
     this.phonePanel = false,
+    this.customPanel = false,
     this.totalSteps = 4,
     this.onHint,
+    this.onHome,
     super.key,
   });
 
@@ -25,19 +27,30 @@ class LearningStepLayout extends StatelessWidget {
   final Widget child;
   final String title;
   final bool phonePanel;
+  final bool customPanel;
   final int totalSteps;
   final VoidCallback? onHint;
+  final VoidCallback? onHome;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(title),
+        toolbarHeight:
+            56 +
+            (MediaQuery.textScalerOf(context).scale(1) - 1).clamp(0, 0.5) * 64,
+        title: Text(
+          title,
+          softWrap: true,
+          maxLines: 2,
+          overflow: TextOverflow.fade,
+        ),
         leading: IconButton(
           onPressed: onBack,
-          icon: const Icon(Icons.arrow_back_rounded),
-          tooltip: '이전 화면',
+          icon: const Icon(Icons.arrow_back),
+          tooltip: '이전 화면으로 돌아가기',
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         ),
       ),
       body: SafeArea(
@@ -61,6 +74,8 @@ class LearningStepLayout extends StatelessWidget {
                   const SizedBox(height: 24),
                   phonePanel
                       ? PhonePanel(child: child)
+                      : customPanel
+                      ? child
                       : KioskPanel(child: child),
                   if (onHint != null) ...[
                     const SizedBox(height: 12),
@@ -74,36 +89,90 @@ class LearningStepLayout extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: onPrevious,
-                          icon: const Icon(Icons.chevron_left_rounded),
-                          label: const Text('이전'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(58),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: onRestart,
-                          icon: const Icon(Icons.refresh_rounded),
-                          label: const Text('처음부터 다시 하기'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(58),
-                          ),
-                        ),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final useColumn =
+                          constraints.maxWidth < 500 ||
+                          MediaQuery.textScalerOf(context).scale(1) > 1.15;
+                      final previousButton = _LearningFooterButton(
+                        label: '이전',
+                        icon: Icons.chevron_left_rounded,
+                        onPressed: onPrevious,
+                      );
+                      final restartButton = _LearningFooterButton(
+                        label: '처음부터 다시 하기',
+                        icon: Icons.refresh_rounded,
+                        onPressed: onRestart,
+                      );
+                      if (useColumn) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            previousButton,
+                            const SizedBox(height: 12),
+                            restartButton,
+                          ],
+                        );
+                      }
+                      return Row(
+                        children: [
+                          Expanded(child: previousButton),
+                          const SizedBox(width: 12),
+                          Expanded(child: restartButton),
+                        ],
+                      );
+                    },
                   ),
+                  if (onHome != null) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: onHome,
+                      icon: const Icon(Icons.home_outlined),
+                      label: const Text('홈으로 돌아가기'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(58),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LearningFooterButton extends StatelessWidget {
+  const _LearningFooterButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(58),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(label, textAlign: TextAlign.center, softWrap: true),
+          ),
+        ],
       ),
     );
   }
@@ -122,15 +191,32 @@ class ProgressHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('천천히 한 단계씩', style: Theme.of(context).textTheme.titleLarge),
-            Text(
-              '$step / $totalSteps 단계',
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final useColumn =
+                constraints.maxWidth < 420 ||
+                MediaQuery.textScalerOf(context).scale(1) > 1.15;
+            final prompt = Text(
+              '천천히 한 단계씩',
+              softWrap: true,
               style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ],
+            );
+            final count = Text(
+              '$step / $totalSteps 단계',
+              softWrap: true,
+              style: Theme.of(context).textTheme.titleLarge,
+            );
+            if (useColumn) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [prompt, const SizedBox(height: 6), count],
+              );
+            }
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [prompt, count],
+            );
+          },
         ),
         const SizedBox(height: 12),
         ClipRRect(

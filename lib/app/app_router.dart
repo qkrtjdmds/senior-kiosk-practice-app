@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'app_routes.dart';
 import '../features/home/home_page.dart';
 import '../features/progress/progress_page.dart';
+import '../features/settings/accessibility_settings_page.dart';
 import '../features/learning/cafe_complete_page.dart';
 import '../features/learning/cafe_mission_page.dart';
 import '../features/learning/cafe_practice_page.dart';
@@ -32,6 +33,18 @@ import '../features/train/train_step_four_page.dart';
 import '../features/train/train_step_one_page.dart';
 import '../features/train/train_step_three_page.dart';
 import '../features/train/train_step_two_page.dart';
+import '../features/hamburger/hamburger_complete_page.dart';
+import '../features/hamburger/hamburger_mission_page.dart';
+import '../features/hamburger/hamburger_practice_page.dart';
+import '../features/hamburger/hamburger_start_page.dart';
+import '../features/atm/atm_complete_page.dart';
+import '../features/atm/atm_mission_page.dart';
+import '../features/atm/atm_practice_page.dart';
+import '../features/atm/atm_start_page.dart';
+import '../features/civil_document/civil_document_complete_page.dart';
+import '../features/civil_document/civil_document_mission_page.dart';
+import '../features/civil_document/civil_document_practice_page.dart';
+import '../features/civil_document/civil_document_start_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
@@ -43,6 +56,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.progress,
       builder: (context, state) => const ProgressPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.accessibilitySettings,
+      builder: (context, state) => const AccessibilitySettingsPage(),
     ),
     GoRoute(
       path: AppRoutes.cafeStart,
@@ -159,6 +176,54 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.trainComplete,
       builder: (context, state) => const TrainCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hamburgerStart,
+      builder: (context, state) => const HamburgerStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hamburgerMission,
+      builder: (context, state) => const HamburgerMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hamburgerPractice,
+      builder: (context, state) => const HamburgerPracticePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.hamburgerComplete,
+      builder: (context, state) => const HamburgerCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.atmStart,
+      builder: (context, state) => const AtmStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.atmMission,
+      builder: (context, state) => const AtmMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.atmPractice,
+      builder: (context, state) => const AtmPracticePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.atmComplete,
+      builder: (context, state) => const AtmCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.civilDocumentStart,
+      builder: (context, state) => const CivilDocumentStartPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.civilDocumentMission,
+      builder: (context, state) => const CivilDocumentMissionPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.civilDocumentPractice,
+      builder: (context, state) => const CivilDocumentPracticePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.civilDocumentComplete,
+      builder: (context, state) => const CivilDocumentCompletePage(),
     ),
   ],
 );

@@ -17,6 +17,7 @@ class CafeMissionPage extends StatelessWidget {
 
     return PageScaffold(
       title: '혼자 해보기',
+      backRoute: AppRoutes.cafeStart,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

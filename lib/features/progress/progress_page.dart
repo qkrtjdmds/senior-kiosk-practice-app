@@ -80,6 +80,60 @@ class ProgressPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
+          _SectionCard(
+            title: '햄버거 주문 연습',
+            icon: Icons.lunch_dining_outlined,
+            child: Column(
+              children: [
+                _RecordRow(
+                  label: '따라 해보기',
+                  value: '${progress.hamburgerCompletionCount}회',
+                ),
+                const SizedBox(height: 12),
+                _RecordRow(
+                  label: '혼자 해보기',
+                  value: '${progress.hamburgerSoloCompletionCount}회',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          _SectionCard(
+            title: 'ATM 출금 연습',
+            icon: Icons.local_atm_outlined,
+            child: Column(
+              children: [
+                _RecordRow(
+                  label: '따라 해보기',
+                  value: '${progress.atmCompletionCount}회',
+                ),
+                const SizedBox(height: 12),
+                _RecordRow(
+                  label: '혼자 해보기',
+                  value: '${progress.atmSoloCompletionCount}회',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          _SectionCard(
+            title: '무인민원발급기 연습',
+            icon: Icons.print_outlined,
+            child: Column(
+              children: [
+                _RecordRow(
+                  label: '따라 해보기',
+                  value: '${progress.civilDocumentCompletionCount}회',
+                ),
+                const SizedBox(height: 12),
+                _RecordRow(
+                  label: '혼자 해보기',
+                  value: '${progress.civilDocumentSoloCompletionCount}회',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
           _BadgeCard(progress: progress),
           const SizedBox(height: 18),
           _RecentPracticeSection(records: progress.recentPracticeRecords),
@@ -118,7 +172,8 @@ class _RecentPracticeSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '카페, 병원, 사진 보내기, 기차표 예매 중 하나를\n'
+                  '카페, 병원, 사진 보내기, 기차표 예매, 햄버거 주문, ATM 출금, '
+                  '무인민원발급기 중 하나를\n'
                   '천천히 시작해볼까요?',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -174,6 +229,15 @@ class _RecentPracticeCard extends StatelessWidget {
             '${record.learningName} · ${record.modeName}',
             style: Theme.of(context).textTheme.titleLarge,
           ),
+          if (record.detail != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              record.detail!,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
           const SizedBox(height: 6),
           Text(
             formatRecentPracticeTime(record.completedAt, DateTime.now()),
@@ -325,6 +389,33 @@ class _BadgeCard extends StatelessWidget {
             emptyTitle: '사진 보내기 첫걸음을 시작해볼까요?',
             emptyDescription: '혼자 해보기를 한 번 완료하면 받을 수 있어요.',
           ),
+          const SizedBox(height: 16),
+          _BadgeItem(
+            icon: Icons.lunch_dining_outlined,
+            name: '혼자 햄버거 주문 첫걸음',
+            description: '처음으로 혼자 햄버거 주문 미션을 완성했어요.',
+            earned: progress.hamburgerSoloFirstBadgeEarned,
+            emptyTitle: '햄버거 주문 첫걸음을 시작해볼까요?',
+            emptyDescription: '혼자 해보기를 한 번 완료하면 받을 수 있어요.',
+          ),
+          const SizedBox(height: 16),
+          _BadgeItem(
+            icon: Icons.local_atm_outlined,
+            name: '혼자 ATM 출금 첫걸음',
+            description: '처음으로 혼자 ATM 출금 미션을 완성했어요.',
+            earned: progress.atmSoloFirstBadgeEarned,
+            emptyTitle: 'ATM 출금 첫걸음을 시작해볼까요?',
+            emptyDescription: '혼자 해보기를 한 번 완료하면 받을 수 있어요.',
+          ),
+          const SizedBox(height: 16),
+          _BadgeItem(
+            icon: Icons.print_outlined,
+            name: '혼자 서류 발급 첫걸음',
+            description: '처음으로 혼자 서류 발급 미션을 완성했어요.',
+            earned: progress.civilDocumentSoloFirstBadgeEarned,
+            emptyTitle: '서류 발급 첫걸음을 시작해볼까요?',
+            emptyDescription: '혼자 해보기를 한 번 완료하면 받을 수 있어요.',
+          ),
         ],
       ),
     );
@@ -362,7 +453,13 @@ class _SectionCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 12),
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              Expanded(
+                child: Text(
+                  title,
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 20),

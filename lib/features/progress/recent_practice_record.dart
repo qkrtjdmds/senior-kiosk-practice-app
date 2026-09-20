@@ -4,12 +4,14 @@ class RecentPracticeRecord {
     required this.modeName,
     required this.points,
     required this.completedAt,
+    this.detail,
   });
 
   final String learningName;
   final String modeName;
   final int points;
   final DateTime completedAt;
+  final String? detail;
 
   Map<String, Object> toJson() {
     return {
@@ -17,6 +19,7 @@ class RecentPracticeRecord {
       'modeName': modeName,
       'points': points,
       'completedAt': completedAt.toIso8601String(),
+      'detail': ?detail,
     };
   }
 
@@ -28,6 +31,7 @@ class RecentPracticeRecord {
       completedAt:
           DateTime.tryParse(json['completedAt'] as String? ?? '') ??
           DateTime.now(),
+      detail: json['detail'] as String?,
     );
   }
 }

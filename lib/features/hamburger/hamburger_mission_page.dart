@@ -7,19 +7,24 @@ import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../learning/learning_progress_provider.dart';
 
-class TrainMissionPage extends StatelessWidget {
-  const TrainMissionPage({super.key});
+class HamburgerMissionPage extends StatelessWidget {
+  const HamburgerMissionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final mission = context
+        .watch<LearningProgressProvider>()
+        .currentHamburgerMission;
+
     return PageScaffold(
       title: '혼자 해보기',
-      backRoute: AppRoutes.trainStart,
+      backRoute: AppRoutes.hamburgerStart,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '오늘의 기차표 예매 미션',
+            '오늘의 햄버거 주문 미션',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
@@ -27,37 +32,35 @@ class TrainMissionPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(26),
+              color: colors.secondaryContainer,
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.25),
+                color: colors.secondary.withValues(alpha: 0.25),
                 width: 1.5,
               ),
             ),
             child: Column(
               children: [
                 Icon(
-                  Icons.confirmation_number_outlined,
+                  Icons.assignment_outlined,
                   size: 76,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colors.secondary,
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  '서울역에서 부산역까지',
+                  mission.title,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  '내일 오전 · 창가 자리',
+                  mission.displayText,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  '예매 내용을 기억하고 직접 선택해보세요.',
+                  '주문 내용을 기억하고 직접 선택해보세요.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -66,18 +69,18 @@ class TrainMissionPage extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           LargeActionButton(
-            label: '혼자 예매해보기',
+            label: '혼자 주문해보기',
             icon: Icons.play_arrow_rounded,
-            onPressed: () => context.go(AppRoutes.trainStepOne),
+            onPressed: () => context.go(AppRoutes.hamburgerPractice),
           ),
           const SizedBox(height: 16),
           LargeActionButton(
-            label: '기차표 예매 연습으로 돌아가기',
+            label: '햄버거 주문 연습으로 돌아가기',
             icon: Icons.arrow_back_rounded,
             secondary: true,
             onPressed: () {
-              context.read<LearningProgressProvider>().resetTrainLearning();
-              context.go(AppRoutes.trainStart);
+              context.read<LearningProgressProvider>().resetHamburgerLearning();
+              context.go(AppRoutes.hamburgerStart);
             },
           ),
         ],

@@ -1,6 +1,7 @@
 abstract final class AppRoutes {
   static const home = '/';
   static const progress = '/progress';
+  static const accessibilitySettings = '/settings/display';
   static const cafeStart = '/cafe';
   static const cafeMission = '/cafe/mission';
   static const cafeStepOne = '/cafe/practice';
@@ -30,4 +31,16 @@ abstract final class AppRoutes {
   static const trainStepFour = '/train/practice/step-4';
   static const trainStepFive = '/train/practice/step-5';
   static const trainComplete = '/train/complete';
+  static const hamburgerStart = '/hamburger';
+  static const hamburgerMission = '/hamburger/mission';
+  static const hamburgerPractice = '/hamburger/practice';
+  static const hamburgerComplete = '/hamburger/complete';
+  static const atmStart = '/atm';
+  static const atmMission = '/atm/mission';
+  static const atmPractice = '/atm/practice';
+  static const atmComplete = '/atm/complete';
+  static const civilDocumentStart = '/civil-document';
+  static const civilDocumentMission = '/civil-document/mission';
+  static const civilDocumentPractice = '/civil-document/practice';
+  static const civilDocumentComplete = '/civil-document/complete';
 }

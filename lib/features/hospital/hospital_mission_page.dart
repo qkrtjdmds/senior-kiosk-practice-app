@@ -14,6 +14,7 @@ class HospitalMissionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageScaffold(
       title: '혼자 해보기',
+      backRoute: AppRoutes.hospitalStart,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
