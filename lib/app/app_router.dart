@@ -4,6 +4,9 @@ import 'app_routes.dart';
 import '../features/home/home_page.dart';
 import '../features/progress/progress_page.dart';
 import '../features/settings/accessibility_settings_page.dart';
+import '../features/tabs/main_tab_scaffold.dart';
+import '../features/tabs/mission_tab_page.dart';
+import '../features/tabs/practice_tab_page.dart';
 import '../features/learning/cafe_complete_page.dart';
 import '../features/learning/cafe_mission_page.dart';
 import '../features/learning/cafe_practice_page.dart';
@@ -49,13 +52,27 @@ import '../features/civil_document/civil_document_start_page.dart';
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
   routes: [
-    GoRoute(
-      path: AppRoutes.home,
-      builder: (context, state) => const HomePage(),
-    ),
-    GoRoute(
-      path: AppRoutes.progress,
-      builder: (context, state) => const ProgressPage(),
+    ShellRoute(
+      builder: (context, state, child) =>
+          MainTabScaffold(location: state.uri.path, child: child),
+      routes: [
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: AppRoutes.practice,
+          builder: (context, state) => const PracticeTabPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.missions,
+          builder: (context, state) => const MissionTabPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.progress,
+          builder: (context, state) => const ProgressPage(isTabPage: true),
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.accessibilitySettings,

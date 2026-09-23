@@ -76,6 +76,9 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
       onPrevious: _previous,
       onRestart: _restart,
       onHint: isSolo ? () => showHamburgerMissionHint(context, mission) : null,
+      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면의 안내를 보고 선택해보세요.',
+      questionInGuidance: true,
+      calmKioskStyle: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -99,13 +102,17 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
             LearningChoiceCard(
               label: '매장에서 먹을게요',
               icon: Icons.restaurant_outlined,
-              highlighted: !progress.isHamburgerSoloMode,
+              calmStyle: true,
+              visualState: progress.isHamburgerSoloMode
+                  ? LearningChoiceVisualState.normal
+                  : LearningChoiceVisualState.guided,
               onPressed: () => _selectDineOption(progress, '매장 식사'),
             ),
             const SizedBox(height: 14),
             LearningChoiceCard(
               label: '포장할게요',
               icon: Icons.shopping_bag_outlined,
+              calmStyle: true,
               onPressed: () => _selectDineOption(progress, '포장'),
             ),
           ],
@@ -113,24 +120,24 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
       case 2:
         return Column(
           children: [
-            _MenuChoice(
+            LearningChoiceCard(
               label: '치즈버거',
-              icon: Icons.lunch_dining,
-              color: const Color(0xFFFFD166),
+              icon: Icons.lunch_dining_outlined,
+              calmStyle: true,
               onPressed: () => _selectMenu(progress, '치즈버거'),
             ),
             const SizedBox(height: 14),
-            _MenuChoice(
+            LearningChoiceCard(
               label: '불고기버거',
-              icon: Icons.lunch_dining,
-              color: const Color(0xFFEF8354),
+              icon: Icons.lunch_dining_outlined,
+              calmStyle: true,
               onPressed: () => _selectMenu(progress, '불고기버거'),
             ),
             const SizedBox(height: 14),
-            _MenuChoice(
+            LearningChoiceCard(
               label: '새우버거',
-              icon: Icons.lunch_dining,
-              color: const Color(0xFF6CC4A1),
+              icon: Icons.lunch_dining_outlined,
+              calmStyle: true,
               onPressed: () => _selectMenu(progress, '새우버거'),
             ),
           ],
@@ -150,6 +157,7 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
                 LearningChoiceCard(
                   label: drink.$1,
                   icon: drink.$2,
+                  calmStyle: true,
                   onPressed: () => _selectDrink(progress, drink.$1),
                 ),
                 const SizedBox(height: 14),
@@ -167,13 +175,17 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
             LearningChoiceCard(
               label: '세트로 주문할게요',
               icon: Icons.fastfood_outlined,
-              highlighted: !progress.isHamburgerSoloMode,
+              calmStyle: true,
+              visualState: progress.isHamburgerSoloMode
+                  ? LearningChoiceVisualState.normal
+                  : LearningChoiceVisualState.guided,
               onPressed: () => _selectOrderType(progress, true),
             ),
             const SizedBox(height: 14),
             LearningChoiceCard(
               label: '햄버거만 주문할게요',
               icon: Icons.lunch_dining_outlined,
+              calmStyle: true,
               onPressed: () => _selectOrderType(progress, false),
             ),
           ],
@@ -182,7 +194,12 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _OrderSummary(progress: progress),
+            LearningSummaryCard(
+              title: '내 장바구니',
+              icon: Icons.shopping_cart_outlined,
+              items: _summaryItems(progress),
+              footer: '연습용 주문이에요',
+            ),
             const SizedBox(height: 22),
             FilledButton.icon(
               onPressed: _isCompleting ? null : _complete,
@@ -195,6 +212,34 @@ class _HamburgerPracticePageState extends State<HamburgerPracticePage> {
           ],
         );
     }
+  }
+
+  List<LearningSummaryItem> _summaryItems(LearningProgressProvider progress) {
+    final mission = progress.currentHamburgerMission;
+    final isSolo = progress.isHamburgerSoloMode;
+    return [
+      LearningSummaryItem(
+        label: '주문 방식',
+        value: isSolo ? mission.dineLabel : progress.hamburgerDineOption ?? '',
+      ),
+      LearningSummaryItem(label: '햄버거', value: progress.hamburgerMenu ?? ''),
+      LearningSummaryItem(
+        label: '세트 / 단품',
+        value: isSolo
+            ? mission.orderLabel
+            : progress.hamburgerIsSet == true
+            ? '세트'
+            : '햄버거만',
+      ),
+      LearningSummaryItem(
+        label: '음료',
+        value: isSolo
+            ? mission.drink ?? '선택하지 않음'
+            : progress.hamburgerIsSet == true
+            ? progress.hamburgerDrink ?? ''
+            : '선택하지 않음',
+      ),
+    ];
   }
 
   void _selectMenu(LearningProgressProvider progress, String menu) {
@@ -319,134 +364,6 @@ class _MiniCart extends StatelessWidget {
             child: Text(
               items.isEmpty ? '장바구니가 비어 있어요' : items.join(' · '),
               style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MenuChoice extends StatelessWidget {
-  const _MenuChoice({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onPressed,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: color.withValues(alpha: 0.22),
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 104),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: color, width: 2),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 62,
-                height: 62,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                child: Icon(icon, size: 38),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const Icon(Icons.add_shopping_cart_outlined, size: 30),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OrderSummary extends StatelessWidget {
-  const _OrderSummary({required this.progress});
-
-  final LearningProgressProvider progress;
-
-  @override
-  Widget build(BuildContext context) {
-    final mission = progress.currentHamburgerMission;
-    final isSolo = progress.isHamburgerSoloMode;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Column(
-        children: [
-          _SummaryRow(
-            label: '이용 방법',
-            value: isSolo
-                ? mission.dineLabel
-                : progress.hamburgerDineOption ?? '',
-          ),
-          _SummaryRow(label: '햄버거', value: progress.hamburgerMenu ?? ''),
-          _SummaryRow(
-            label: '세트 여부',
-            value: isSolo
-                ? mission.orderLabel
-                : progress.hamburgerIsSet == true
-                ? '세트'
-                : '햄버거만',
-          ),
-          _SummaryRow(
-            label: '음료',
-            value: isSolo
-                ? mission.drink ?? '선택하지 않음'
-                : progress.hamburgerIsSet == true
-                ? progress.hamburgerDrink ?? ''
-                : '선택하지 않음',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         ],

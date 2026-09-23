@@ -1,5 +1,93 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/large_action_button.dart';
+import '../../../shared/widgets/page_scaffold.dart';
+
+enum LearningChoiceVisualState { normal, guided, selected }
+
+class LearningModeCard extends StatelessWidget {
+  const LearningModeCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.onPressed,
+    this.secondary = false,
+    super.key,
+  });
+
+  final String title;
+  final String description;
+  final IconData icon;
+  final VoidCallback onPressed;
+  final bool secondary;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final background = secondary
+        ? colors.surfaceContainerLowest
+        : colors.primary;
+    final foreground = secondary ? colors.onSurface : colors.onPrimary;
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 112),
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: secondary ? const Color(0xFF9FCBB4) : colors.primary,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: secondary
+                      ? const Color(0xFFE4F3EA)
+                      : colors.onPrimary.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, size: 34, color: foreground),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      softWrap: true,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge?.copyWith(color: foreground),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      description,
+                      softWrap: true,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: foreground),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class LearningStepLayout extends StatelessWidget {
   const LearningStepLayout({
     required this.step,
@@ -15,6 +103,9 @@ class LearningStepLayout extends StatelessWidget {
     this.totalSteps = 4,
     this.onHint,
     this.onHome,
+    this.guidanceDetail,
+    this.questionInGuidance = false,
+    this.calmKioskStyle = false,
     super.key,
   });
 
@@ -31,6 +122,9 @@ class LearningStepLayout extends StatelessWidget {
   final int totalSteps;
   final VoidCallback? onHint;
   final VoidCallback? onHome;
+  final String? guidanceDetail;
+  final bool questionInGuidance;
+  final bool calmKioskStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -64,31 +158,33 @@ class LearningStepLayout extends StatelessWidget {
                 children: [
                   ProgressHeader(step: step, totalSteps: totalSteps),
                   const SizedBox(height: 22),
-                  GuidanceCard(message: guidance),
-                  const SizedBox(height: 24),
-                  Text(
-                    question,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                  GuidanceCard(
+                    message: questionInGuidance ? question : guidance,
+                    detail: guidanceDetail,
                   ),
+                  if (!questionInGuidance) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      question,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   phonePanel
                       ? PhonePanel(child: child)
                       : customPanel
                       ? child
-                      : KioskPanel(child: child),
-                  if (onHint != null) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: onHint,
-                        icon: const Icon(Icons.lightbulb_outline_rounded),
-                        label: const Text('힌트 보기'),
-                      ),
-                    ),
-                  ],
+                      : KioskPanel(calmStyle: calmKioskStyle, child: child),
                   const SizedBox(height: 24),
+                  if (onHint != null) ...[
+                    _LearningFooterButton(
+                      label: '힌트 보기',
+                      icon: Icons.lightbulb_outline_rounded,
+                      onPressed: onHint!,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final useColumn =
@@ -234,9 +330,10 @@ class ProgressHeader extends StatelessWidget {
 }
 
 class GuidanceCard extends StatelessWidget {
-  const GuidanceCard({required this.message, super.key});
+  const GuidanceCard({required this.message, this.detail, super.key});
 
   final String message;
+  final String? detail;
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +358,16 @@ class GuidanceCard extends StatelessWidget {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(message, style: Theme.of(context).textTheme.bodyLarge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(message, style: Theme.of(context).textTheme.titleLarge),
+                if (detail != null) ...[
+                  const SizedBox(height: 8),
+                  Text(detail!, style: Theme.of(context).textTheme.bodyLarge),
+                ],
+              ],
+            ),
           ),
         ],
       ),
@@ -270,28 +376,33 @@ class GuidanceCard extends StatelessWidget {
 }
 
 class KioskPanel extends StatelessWidget {
-  const KioskPanel({required this.child, super.key});
+  const KioskPanel({required this.child, this.calmStyle = false, super.key});
 
   final Widget child;
+  final bool calmStyle;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        color: calmStyle
+            ? Theme.of(context).colorScheme.surfaceContainerLowest
+            : Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(calmStyle ? 16 : 24),
         border: Border.all(
           color: Theme.of(context).colorScheme.outlineVariant,
-          width: 2,
+          width: calmStyle ? 1.5 : 2,
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 16,
-            offset: Offset(0, 7),
-          ),
-        ],
+        boxShadow: calmStyle
+            ? null
+            : const [
+                BoxShadow(
+                  color: Color(0x12000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 7),
+                ),
+              ],
       ),
       child: child,
     );
@@ -339,6 +450,8 @@ class LearningChoiceCard extends StatelessWidget {
     required this.onPressed,
     this.secondary = false,
     this.highlighted = false,
+    this.calmStyle = false,
+    this.visualState,
     super.key,
   });
 
@@ -347,16 +460,29 @@ class LearningChoiceCard extends StatelessWidget {
   final VoidCallback onPressed;
   final bool secondary;
   final bool highlighted;
+  final bool calmStyle;
+  final LearningChoiceVisualState? visualState;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor = highlighted
+    final state =
+        visualState ??
+        (highlighted
+            ? LearningChoiceVisualState.guided
+            : LearningChoiceVisualState.normal);
+    final isEmphasized = state != LearningChoiceVisualState.normal;
+    final isSelected = state == LearningChoiceVisualState.selected;
+    final backgroundColor = calmStyle
+        ? isEmphasized
+              ? const Color(0xFFE4F3EA)
+              : colorScheme.surfaceContainerLowest
+        : isEmphasized
         ? colorScheme.primaryContainer
         : secondary
         ? colorScheme.surfaceContainerHighest
         : colorScheme.primaryContainer;
-    final foregroundColor = highlighted
+    final foregroundColor = isEmphasized
         ? colorScheme.onPrimaryContainer
         : secondary
         ? colorScheme.onSurface
@@ -374,15 +500,29 @@ class LearningChoiceCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: highlighted
+              color: isEmphasized
                   ? colorScheme.primary
                   : colorScheme.outlineVariant,
-              width: highlighted ? 2.5 : 1.5,
+              width: isEmphasized ? 2.5 : 1.5,
             ),
           ),
           child: Row(
             children: [
-              Icon(icon, size: 38, color: foregroundColor),
+              Container(
+                width: 54,
+                height: 54,
+                decoration: calmStyle
+                    ? BoxDecoration(
+                        color: const Color(0xFFE4F3EA),
+                        borderRadius: BorderRadius.circular(14),
+                      )
+                    : null,
+                child: Icon(
+                  isSelected ? Icons.check_rounded : icon,
+                  size: 34,
+                  color: foregroundColor,
+                ),
+              ),
               const SizedBox(width: 18),
               Expanded(
                 child: Column(
@@ -394,7 +534,7 @@ class LearningChoiceCard extends StatelessWidget {
                         context,
                       ).textTheme.labelLarge?.copyWith(color: foregroundColor),
                     ),
-                    if (highlighted) ...[
+                    if (state == LearningChoiceVisualState.guided) ...[
                       const SizedBox(height: 4),
                       Text(
                         '여기를 눌러보세요',
@@ -407,14 +547,128 @@ class LearningChoiceCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 32,
-                color: foregroundColor,
-              ),
+              if (!calmStyle)
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 32,
+                  color: foregroundColor,
+                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LearningCompletionLayout extends StatelessWidget {
+  const LearningCompletionLayout({
+    required this.title,
+    required this.message,
+    required this.reward,
+    required this.onRestart,
+    required this.onHome,
+    this.badge,
+    this.summary,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
+    this.pageTitle = '연습 완료',
+    super.key,
+  });
+
+  final String title;
+  final String message;
+  final String reward;
+  final VoidCallback onRestart;
+  final VoidCallback onHome;
+  final Widget? badge;
+  final Widget? summary;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
+  final String pageTitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return PageScaffold(
+      title: pageTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(22, 28, 22, 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE4F3EA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF9FCBB4)),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 76,
+                  color: colors.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colors.outlineVariant),
+                  ),
+                  child: Text(
+                    reward,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (badge != null) ...[const SizedBox(height: 18), badge!],
+          if (summary != null) ...[const SizedBox(height: 18), summary!],
+          const SizedBox(height: 36),
+          LargeActionButton(
+            label: '처음부터 다시 하기',
+            icon: Icons.refresh_rounded,
+            onPressed: onRestart,
+          ),
+          if (secondaryActionLabel != null && onSecondaryAction != null) ...[
+            const SizedBox(height: 16),
+            LargeActionButton(
+              label: secondaryActionLabel!,
+              icon: Icons.swap_horiz_rounded,
+              secondary: true,
+              onPressed: onSecondaryAction!,
+            ),
+          ],
+          const SizedBox(height: 16),
+          LargeActionButton(
+            label: '홈으로 돌아가기',
+            icon: Icons.home_outlined,
+            secondary: true,
+            onPressed: onHome,
+          ),
+        ],
       ),
     );
   }
@@ -434,30 +688,93 @@ class OrderReceiptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LearningSummaryCard(
+      title: '주문 연습 내역',
+      items: [
+        LearningSummaryItem(label: '주문 방식', value: dineOption),
+        LearningSummaryItem(label: '음료', value: drink),
+        LearningSummaryItem(label: '온도', value: temperature),
+      ],
+      footer: '연습용 주문이에요',
+    );
+  }
+}
+
+class LearningSummaryItem {
+  const LearningSummaryItem({required this.label, required this.value});
+
+  final String label;
+  final String value;
+}
+
+class LearningSummaryCard extends StatelessWidget {
+  const LearningSummaryCard({
+    required this.title,
+    required this.items,
+    this.icon = Icons.receipt_long_outlined,
+    this.footer,
+    super.key,
+  });
+
+  final String title;
+  final List<LearningSummaryItem> items;
+  final IconData icon;
+  final String? footer;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1.5,
+        ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               Icon(
-                Icons.receipt_long_outlined,
+                icon,
                 size: 32,
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 12),
-              Text('주문 연습 내역', style: Theme.of(context).textTheme.titleLarge),
+              Expanded(
+                child: Text(
+                  title,
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
             ],
           ),
           const Divider(height: 28),
-          _ReceiptRow(label: '매장/포장', value: dineOption),
-          _ReceiptRow(label: '음료', value: drink),
-          _ReceiptRow(label: '차가움/따뜻함', value: temperature),
+          for (final item in items)
+            _ReceiptRow(label: item.label, value: item.value),
+          if (footer != null) ...[
+            const Divider(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE4F3EA),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                footer!,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -474,13 +791,36 @@ class _ReceiptRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final useColumn =
+              constraints.maxWidth < 360 ||
+              MediaQuery.textScalerOf(context).scale(1) > 1.15;
+          final labelText = Text(
+            label,
+            softWrap: true,
+            style: Theme.of(context).textTheme.bodyLarge,
+          );
+          final valueText = Text(
+            value,
+            softWrap: true,
+            textAlign: useColumn ? TextAlign.start : TextAlign.end,
+            style: Theme.of(context).textTheme.titleLarge,
+          );
+          if (useColumn) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [labelText, const SizedBox(height: 4), valueText],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(child: labelText),
+              const SizedBox(width: 16),
+              Flexible(child: valueText),
+            ],
+          );
+        },
       ),
     );
   }

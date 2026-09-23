@@ -3,17 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
-import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../learning/learning_progress_provider.dart';
+import '../learning/widgets/learning_widgets.dart';
 
 class AtmStartPage extends StatelessWidget {
   const AtmStartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return PageScaffold(
       title: 'ATM 출금 연습',
       child: Column(
@@ -27,53 +25,30 @@ class AtmStartPage extends StatelessWidget {
           ),
           const SizedBox(height: 28),
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: colors.outlineVariant, width: 2),
+              color: const Color(0xFFE4F3EA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF9FCBB4)),
             ),
             child: Column(
               children: [
                 Container(
-                  width: 190,
-                  padding: const EdgeInsets.all(16),
+                  width: 82,
+                  height: 82,
                   decoration: BoxDecoration(
-                    color: colors.secondaryContainer,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: colors.secondary, width: 2),
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.local_atm_outlined,
-                        size: 72,
-                        color: colors.secondary,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.credit_card_outlined, size: 34),
-                          const SizedBox(width: 18),
-                          Icon(
-                            Icons.payments_outlined,
-                            size: 34,
-                            color: colors.primary,
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: Icon(
+                    Icons.local_atm_outlined,
+                    size: 46,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  '안전한 연습용 ATM',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '카드를 넣고 화면의 순서를 따라가 보세요.',
+                  'ATM에서 돈을 찾는 순서를 천천히 연습해요.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -84,7 +59,7 @@ class AtmStartPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: colors.tertiaryContainer,
+              color: Theme.of(context).colorScheme.secondaryContainer,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
@@ -92,7 +67,7 @@ class AtmStartPage extends StatelessWidget {
                 Icon(
                   Icons.info_outline_rounded,
                   size: 30,
-                  color: colors.tertiary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -105,9 +80,9 @@ class AtmStartPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 30),
-          _ModeCard(
+          LearningModeCard(
             title: '따라 해보기',
-            description: '안내를 보며 순서대로 연습해요.',
+            description: '화면의 안내를 보며 하나씩 연습해요.',
             icon: Icons.menu_book_outlined,
             onPressed: () async {
               await context.read<LearningProgressProvider>().startAtmLearning(
@@ -117,9 +92,9 @@ class AtmStartPage extends StatelessWidget {
             },
           ),
           const SizedBox(height: 18),
-          _ModeCard(
+          LearningModeCard(
             title: '혼자 해보기',
-            description: '오늘의 출금 미션을 기억하고 직접 순서를 선택해봐요.',
+            description: '오늘의 출금 미션을 기억하고 직접 해봐요.',
             icon: Icons.self_improvement_outlined,
             secondary: true,
             onPressed: () async {
@@ -130,74 +105,15 @@ class AtmStartPage extends StatelessWidget {
             },
           ),
           const SizedBox(height: 18),
-          LargeActionButton(
-            label: '홈으로 돌아가기',
-            icon: Icons.home_outlined,
-            secondary: true,
+          OutlinedButton.icon(
             onPressed: () => context.go(AppRoutes.home),
+            icon: const Icon(Icons.home_outlined),
+            label: const Text('홈으로 돌아가기'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(62),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.onPressed,
-    this.secondary = false,
-  });
-
-  final String title;
-  final String description;
-  final IconData icon;
-  final VoidCallback onPressed;
-  final bool secondary;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Material(
-      color: secondary
-          ? colors.surfaceContainerHighest
-          : colors.primaryContainer,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 112),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colors.outlineVariant, width: 1.5),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 42, color: colors.primary),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 6),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.chevron_right_rounded, size: 32),
-            ],
-          ),
-        ),
       ),
     );
   }

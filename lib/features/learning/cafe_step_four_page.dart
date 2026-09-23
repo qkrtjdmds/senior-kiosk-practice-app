@@ -54,9 +54,15 @@ class CafeStepFourPage extends StatelessWidget {
         : '좋아요! 마지막으로 주문 내용을 확인해볼까요?';
 
     return LearningStepLayout(
+      title: '카페 키오스크 연습',
       step: 4,
       guidance: guidance,
       question: '주문 내용을 확인해볼까요?',
+      guidanceDetail: progress.isSoloMode
+          ? '미션을 기억하고 주문서를 확인해보세요.'
+          : '선택한 내용이 맞는지 천천히 확인해보세요.',
+      questionInGuidance: true,
+      calmKioskStyle: true,
       onBack: () => context.go(AppRoutes.cafeStepThree),
       onPrevious: () => context.go(AppRoutes.cafeStepThree),
       onRestart: () => _restart(context),

@@ -8,14 +8,17 @@ import '../../shared/widgets/page_scaffold.dart';
 import 'recent_practice_record.dart';
 
 class ProgressPage extends StatelessWidget {
-  const ProgressPage({super.key});
+  const ProgressPage({this.isTabPage = false, super.key});
+
+  final bool isTabPage;
 
   @override
   Widget build(BuildContext context) {
     final progress = context.watch<LearningProgressProvider>();
 
     return PageScaffold(
-      title: '나의 디지털 걸음',
+      title: isTabPage ? '내 정보' : '나의 디지털 걸음',
+      showBackButton: !isTabPage,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -138,15 +141,91 @@ class ProgressPage extends StatelessWidget {
           const SizedBox(height: 18),
           _RecentPracticeSection(records: progress.recentPracticeRecords),
           const SizedBox(height: 28),
-          OutlinedButton.icon(
-            onPressed: () => context.go(AppRoutes.home),
-            icon: const Icon(Icons.home_outlined),
-            label: const Text('홈으로 돌아가기'),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(66),
+          if (isTabPage) ...[
+            _InfoLinkCard(
+              title: '화면 설정',
+              description: '글씨 크기와 화면 대비를 편하게 바꿔요.',
+              icon: Icons.settings_outlined,
+              onPressed: () => context.push(AppRoutes.accessibilitySettings),
             ),
-          ),
+            const SizedBox(height: 14),
+            _InfoLinkCard(
+              title: '연습 기록 관리',
+              description: '기록 초기화 기능을 확인해요.',
+              icon: Icons.manage_history_outlined,
+              onPressed: () => context.push(AppRoutes.accessibilitySettings),
+            ),
+          ] else
+            OutlinedButton.icon(
+              onPressed: () => context.go(AppRoutes.home),
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('홈으로 돌아가기'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(66),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _InfoLinkCard extends StatelessWidget {
+  const _InfoLinkCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String title;
+  final String description;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 88),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colors.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 36, color: colors.primary),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      softWrap: true,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 20,
+                color: colors.primary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

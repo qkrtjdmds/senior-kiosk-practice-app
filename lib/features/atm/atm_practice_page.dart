@@ -76,6 +76,8 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
       onPrevious: _previous,
       onRestart: _restart,
       onHint: isSolo ? () => AtmMission.showHint(context) : null,
+      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면의 안내를 보고 선택해보세요.',
+      questionInGuidance: true,
       child: _AtmPanel(child: _buildStep(progress)),
     );
   }
@@ -88,7 +90,10 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
             LearningChoiceCard(
               label: '카드를 넣을게요',
               icon: Icons.credit_card_outlined,
-              highlighted: !progress.isAtmSoloMode,
+              calmStyle: true,
+              visualState: progress.isAtmSoloMode
+                  ? LearningChoiceVisualState.normal
+                  : LearningChoiceVisualState.guided,
               onPressed: () => _moveToStep(2),
             ),
             const SizedBox(height: 14),
@@ -96,6 +101,7 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
               label: '도움이 필요해요',
               icon: Icons.help_outline_rounded,
               secondary: true,
+              calmStyle: true,
               onPressed: () => _showCardGuide(progress),
             ),
           ],
@@ -106,7 +112,10 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
             LearningChoiceCard(
               label: '돈을 찾을게요',
               icon: Icons.payments_outlined,
-              highlighted: !progress.isAtmSoloMode,
+              calmStyle: true,
+              visualState: progress.isAtmSoloMode
+                  ? LearningChoiceVisualState.normal
+                  : LearningChoiceVisualState.guided,
               onPressed: () => _moveToStep(3),
             ),
             const SizedBox(height: 14),
@@ -114,6 +123,7 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
               label: '잔액을 확인할게요',
               icon: Icons.account_balance_wallet_outlined,
               secondary: true,
+              calmStyle: true,
               onPressed: () => _showWithdrawalGuide(progress),
             ),
           ],
@@ -125,8 +135,11 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
               LearningChoiceCard(
                 label: amount,
                 icon: Icons.payments_outlined,
-                highlighted:
-                    !progress.isAtmSoloMode && amount == AtmMission.amount,
+                calmStyle: true,
+                visualState:
+                    !progress.isAtmSoloMode && amount == AtmMission.amount
+                    ? LearningChoiceVisualState.guided
+                    : LearningChoiceVisualState.normal,
                 onPressed: () => _selectAmount(progress, amount),
               ),
               const SizedBox(height: 14),
@@ -137,7 +150,22 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _WithdrawalSummary(amount: progress.atmAmount ?? ''),
+            LearningSummaryCard(
+              title: '출금 내용',
+              icon: Icons.receipt_long_outlined,
+              items: [
+                LearningSummaryItem(
+                  label: '출금 금액',
+                  value: progress.atmAmount ?? '',
+                ),
+                const LearningSummaryItem(label: '수수료', value: '없음'),
+                LearningSummaryItem(
+                  label: '받을 금액',
+                  value: progress.atmAmount ?? '',
+                ),
+              ],
+              footer: '실제 거래가 아닌 연습용 화면이에요.',
+            ),
             const SizedBox(height: 22),
             if (progress.isAtmSoloMode)
               FilledButton.icon(
@@ -182,6 +210,7 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
           return LearningChoiceCard(
             label: '카드와 현금을 챙길게요',
             icon: Icons.wallet_outlined,
+            calmStyle: true,
             onPressed: _finish,
           );
         }
@@ -190,7 +219,8 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
             LearningChoiceCard(
               label: '카드와 돈을 챙겼어요',
               icon: Icons.wallet_outlined,
-              highlighted: true,
+              calmStyle: true,
+              visualState: LearningChoiceVisualState.guided,
               onPressed: _finish,
             ),
             const SizedBox(height: 14),
@@ -198,6 +228,7 @@ class _AtmPracticePageState extends State<AtmPracticePage> {
               label: '카드만 챙겼어요',
               icon: Icons.credit_card_outlined,
               secondary: true,
+              calmStyle: true,
               onPressed: _showCashGuide,
             ),
           ],
@@ -269,16 +300,16 @@ class _AtmPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.secondary, width: 3),
+        color: colors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.local_atm_outlined, size: 34, color: colors.secondary),
+              Icon(Icons.local_atm_outlined, size: 34, color: colors.primary),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -293,7 +324,7 @@ class _AtmPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: colors.surface,
+              color: const Color(0xFFF6FBF8),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: colors.outlineVariant),
             ),
@@ -315,52 +346,6 @@ class _AtmPanel extends StatelessWidget {
               const Icon(Icons.credit_card_outlined, size: 30),
             ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _WithdrawalSummary extends StatelessWidget {
-  const _WithdrawalSummary({required this.amount});
-
-  final String amount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          _SummaryRow(label: '출금 금액', value: amount),
-          const _SummaryRow(label: '수수료', value: '없음'),
-          _SummaryRow(label: '받을 금액', value: amount),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
         ],
       ),
     );

@@ -46,9 +46,13 @@ class CafePracticePage extends StatelessWidget {
     final isSolo = context.watch<LearningProgressProvider>().isSoloMode;
 
     return LearningStepLayout(
+      title: '카페 키오스크 연습',
       step: 1,
       guidance: isSolo ? '주문 방식을 선택해보세요.' : '첫 번째로, 어디에서 드실지 골라볼까요?',
       question: '매장에서 드시나요, 포장하시나요?',
+      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면의 안내를 보고 선택해보세요.',
+      questionInGuidance: true,
+      calmKioskStyle: true,
       onBack: () => context.go(AppRoutes.cafeStart),
       onPrevious: () => context.go(AppRoutes.cafeStart),
       onRestart: () => _restart(context),
@@ -59,7 +63,10 @@ class CafePracticePage extends StatelessWidget {
           LearningChoiceCard(
             label: '매장에서 먹을게요',
             icon: Icons.restaurant_outlined,
-            highlighted: !isSolo,
+            visualState: isSolo
+                ? LearningChoiceVisualState.normal
+                : LearningChoiceVisualState.guided,
+            calmStyle: true,
             onPressed: () => _select(context, '매장'),
           ),
           const SizedBox(height: 16),
@@ -67,7 +74,10 @@ class CafePracticePage extends StatelessWidget {
             label: '포장할게요',
             icon: Icons.takeout_dining_outlined,
             secondary: true,
-            highlighted: !isSolo,
+            visualState: isSolo
+                ? LearningChoiceVisualState.normal
+                : LearningChoiceVisualState.guided,
+            calmStyle: true,
             onPressed: () => _select(context, '포장'),
           ),
         ],

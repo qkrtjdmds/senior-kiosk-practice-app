@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import 'learning_progress_provider.dart';
+import 'widgets/learning_widgets.dart';
 
 class CafeStartPage extends StatelessWidget {
   const CafeStartPage({super.key});
@@ -28,40 +29,35 @@ class CafeStartPage extends StatelessWidget {
           Text('카페 키오스크 연습', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 18),
           Text(
-            '실제 주문 전에 화면을 보며 천천히 연습해볼 수 있어요.',
+            '음료를 주문하는 순서를 천천히 연습해요.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-                width: 2,
-              ),
+              color: const Color(0xFFE4F3EA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF9FCBB4)),
             ),
             child: Column(
               children: [
                 Container(
-                  width: 128,
-                  height: 128,
+                  width: 82,
+                  height: 82,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
-                    Icons.touch_app_rounded,
-                    size: 72,
+                    Icons.local_cafe_outlined,
+                    size: 46,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 18),
-                Text('연습용 키오스크', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 8),
                 Text(
-                  '화면을 천천히 보고\n원하는 곳을 눌러보세요.',
+                  '주문 화면을 보며 차근차근 연습해볼까요?',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -69,16 +65,16 @@ class CafeStartPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 30),
-          _ModeCard(
+          LearningModeCard(
             title: '따라 해보기',
-            description: '화면의 안내를 보며 천천히 연습해요.',
+            description: '화면의 안내를 보며 하나씩 연습해요.',
             icon: Icons.menu_book_outlined,
             onPressed: () => _selectMode(context, CafeLearningMode.guided),
           ),
           const SizedBox(height: 18),
-          _ModeCard(
+          LearningModeCard(
             title: '혼자 해보기',
-            description: '배운 순서를 떠올리며 직접 주문해봐요.',
+            description: '오늘의 미션을 기억하고 직접 골라봐요.',
             icon: Icons.self_improvement_outlined,
             secondary: true,
             onPressed: () => _selectMode(context, CafeLearningMode.solo),
@@ -93,70 +89,6 @@ class CafeStartPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.onPressed,
-    this.secondary = false,
-  });
-
-  final String title;
-  final String description;
-  final IconData icon;
-  final VoidCallback onPressed;
-  final bool secondary;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor = secondary
-        ? colorScheme.surfaceContainerHighest
-        : colorScheme.primaryContainer;
-
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(22),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 46, color: colorScheme.primary),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 6),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 34,
-                color: colorScheme.primary,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -1,5 +1,7 @@
 abstract final class AppRoutes {
   static const home = '/';
+  static const practice = '/practice';
+  static const missions = '/missions';
   static const progress = '/progress';
   static const accessibilitySettings = '/settings/display';
   static const cafeStart = '/cafe';

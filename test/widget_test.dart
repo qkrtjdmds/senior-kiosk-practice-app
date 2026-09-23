@@ -106,8 +106,8 @@ void main() {
     await tester.tap(find.text('결제하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('혼자서도 잘하셨어요!'), findsOneWidget);
-    expect(find.text('오늘의 주문 미션을 완성했어요.'), findsOneWidget);
+    expect(find.text('잘하셨어요! 카페 주문 연습을 마쳤어요.'), findsOneWidget);
+    expect(find.text('다음에도 천천히 연습해보세요.'), findsOneWidget);
     expect(find.text('용기 포인트 +20점'), findsOneWidget);
     expect(find.text('혼자 주문 첫걸음'), findsOneWidget);
   });
@@ -174,7 +174,7 @@ void main() {
       ),
     );
 
-    expect(find.text('나의 디지털 걸음'), findsOneWidget);
+    expect(find.text('내 정보'), findsWidgets);
     expect(find.text('70점'), findsOneWidget);
     expect(find.text('따라 해보기'), findsNWidgets(7));
     expect(find.text('3회'), findsNWidgets(2));
@@ -195,8 +195,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('병원 접수 연습'));
-    await tester.tap(find.text('병원 접수 연습'));
+    await tester.ensureVisible(find.text('병원 접수'));
+    await tester.tap(find.text('병원 접수'));
     await tester.pumpAndSettle();
     expect(find.text('병원 접수 연습'), findsNWidgets(2));
 
@@ -243,8 +243,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('사진 보내기 연습'));
-    await tester.tap(find.text('사진 보내기 연습'));
+    await tester.ensureVisible(find.text('사진 보내기'));
+    await tester.tap(find.text('사진 보내기'));
     await tester.pumpAndSettle();
     expect(find.text('사진 보내기 연습'), findsWidgets);
 
@@ -292,8 +292,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('기차표 예매 연습'));
-    await tester.tap(find.text('기차표 예매 연습'));
+    await tester.ensureVisible(find.text('기차표 예매'));
+    await tester.tap(find.text('기차표 예매'));
     await tester.pumpAndSettle();
     expect(find.text('기차표 예매 연습'), findsWidgets);
 
@@ -350,8 +350,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('기차표 예매 연습'));
-    await tester.tap(find.text('기차표 예매 연습'));
+    await tester.ensureVisible(find.text('기차표 예매'));
+    await tester.tap(find.text('기차표 예매'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -422,8 +422,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('병원 접수 연습'));
-    await tester.tap(find.text('병원 접수 연습'));
+    await tester.ensureVisible(find.text('병원 접수'));
+    await tester.tap(find.text('병원 접수'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -490,8 +490,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('사진 보내기 연습'));
-    await tester.tap(find.text('사진 보내기 연습'));
+    await tester.ensureVisible(find.text('사진 보내기'));
+    await tester.tap(find.text('사진 보내기'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -579,8 +579,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('햄버거 주문 연습'));
-    await tester.tap(find.text('햄버거 주문 연습'));
+    await tester.ensureVisible(find.text('햄버거 주문'));
+    await tester.tap(find.text('햄버거 주문'));
     await tester.pumpAndSettle();
     expect(find.text('햄버거 주문 연습'), findsNWidgets(2));
 
@@ -644,8 +644,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('햄버거 주문 연습'));
-    await tester.tap(find.text('햄버거 주문 연습'));
+    await tester.ensureVisible(find.text('햄버거 주문'));
+    await tester.tap(find.text('햄버거 주문'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -766,8 +766,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('ATM 출금 연습'));
-    await tester.tap(find.text('ATM 출금 연습'));
+    await tester.ensureVisible(find.text('ATM 출금'));
+    await tester.tap(find.text('ATM 출금'));
     await tester.pumpAndSettle();
     expect(find.text('ATM 출금 연습'), findsNWidgets(2));
     expect(find.text('실제 돈이 나가지 않는 연습 화면이에요.'), findsOneWidget);
@@ -851,8 +851,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('무인민원발급기 연습'));
-    await tester.tap(find.text('무인민원발급기 연습'));
+    await tester.ensureVisible(find.text('서류 발급'));
+    await tester.tap(find.text('서류 발급'));
     await tester.pumpAndSettle();
     expect(find.text('무인민원발급기 연습'), findsNWidgets(2));
     expect(find.text('이 화면은 실제 서류를 발급하지 않는 연습용 화면이에요.'), findsOneWidget);

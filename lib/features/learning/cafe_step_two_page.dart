@@ -46,9 +46,13 @@ class CafeStepTwoPage extends StatelessWidget {
     final isSolo = context.watch<LearningProgressProvider>().isSoloMode;
 
     return LearningStepLayout(
+      title: '카페 키오스크 연습',
       step: 2,
       guidance: isSolo ? '음료를 선택해보세요.' : '좋아요! 이제 마시고 싶은 음료를 골라볼까요?',
       question: '어떤 음료를 선택할까요?',
+      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면의 안내를 보고 선택해보세요.',
+      questionInGuidance: true,
+      calmKioskStyle: true,
       onBack: () => context.go(AppRoutes.cafeStepOne),
       onPrevious: () => context.go(AppRoutes.cafeStepOne),
       onRestart: () => _restart(context),
@@ -59,7 +63,10 @@ class CafeStepTwoPage extends StatelessWidget {
           LearningChoiceCard(
             label: '아메리카노',
             icon: Icons.coffee_outlined,
-            highlighted: !isSolo,
+            visualState: isSolo
+                ? LearningChoiceVisualState.normal
+                : LearningChoiceVisualState.guided,
+            calmStyle: true,
             onPressed: () => _select(context, '아메리카노'),
           ),
           const SizedBox(height: 16),
@@ -67,7 +74,10 @@ class CafeStepTwoPage extends StatelessWidget {
             label: '카페라떼',
             icon: Icons.local_cafe_outlined,
             secondary: true,
-            highlighted: !isSolo,
+            visualState: isSolo
+                ? LearningChoiceVisualState.normal
+                : LearningChoiceVisualState.guided,
+            calmStyle: true,
             onPressed: () => _select(context, '카페라떼'),
           ),
           const SizedBox(height: 16),
@@ -75,7 +85,10 @@ class CafeStepTwoPage extends StatelessWidget {
             label: '따뜻한 차',
             icon: Icons.emoji_food_beverage_outlined,
             secondary: true,
-            highlighted: !isSolo,
+            visualState: isSolo
+                ? LearningChoiceVisualState.normal
+                : LearningChoiceVisualState.guided,
+            calmStyle: true,
             onPressed: () => _select(context, '따뜻한 차'),
           ),
         ],
