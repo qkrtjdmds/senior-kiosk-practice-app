@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_routes.dart';
@@ -51,6 +52,7 @@ import '../features/civil_document/civil_document_start_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
+  errorBuilder: (context, state) => const _RouteNotFoundPage(),
   routes: [
     ShellRoute(
       builder: (context, state, child) =>
@@ -244,3 +246,66 @@ final appRouter = GoRouter(
     ),
   ],
 );
+
+class _RouteNotFoundPage extends StatelessWidget {
+  const _RouteNotFoundPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('페이지 안내')),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(
+                    Icons.home_outlined,
+                    size: 56,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    '이 화면을 열 수 없어요.',
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '홈으로 돌아가서 연습을 다시 선택해 주세요.',
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 28),
+                  FilledButton.icon(
+                    onPressed: () => context.go(AppRoutes.home),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(64),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                    ),
+                    icon: const Icon(Icons.home_outlined),
+                    label: const Text(
+                      '홈으로 돌아가기',
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
 
+const _sageSurface = Color(0xFFEDF2EA);
+const _sageBorder = Color(0xFFBAC9B7);
+const _deepGreen = Color(0xFF214C3F);
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -28,22 +32,18 @@ class HomePage extends StatelessWidget {
             '오늘도 천천히 연습해 볼까요?',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const SizedBox(height: 20),
-          _HomeMessageCard(
-            title: '오늘의 연습',
-            message: '한 단계씩 따라 해보세요.',
-            icon: Icons.eco_outlined,
-          ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 18),
+          const _HomeMessageCard(),
+          const SizedBox(height: 24),
           _HomeFeatureCard(
             title: '카페 키오스크 연습',
             message: '화면을 보며 주문 순서를 연습해요',
             icon: Icons.local_cafe_outlined,
             onPressed: () => context.go(AppRoutes.cafeStart),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           _ProgressCard(onPressed: () => context.go(AppRoutes.progress)),
-          const SizedBox(height: 30),
+          const SizedBox(height: 28),
           Text('다른 연습', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 14),
           _PracticeGrid(
@@ -80,6 +80,7 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -87,36 +88,32 @@ class HomePage extends StatelessWidget {
 }
 
 class _HomeMessageCard extends StatelessWidget {
-  const _HomeMessageCard({
-    required this.title,
-    required this.message,
-    required this.icon,
-  });
-
-  final String title;
-  final String message;
-  final IconData icon;
+  const _HomeMessageCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      constraints: const BoxConstraints(minHeight: 82),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
       decoration: BoxDecoration(
-        color: const Color(0xFFE4F3EA),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF9FCBB4)),
+        color: _sageSurface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _sageBorder),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 36, color: const Color(0xFF286A5B)),
-          const SizedBox(width: 16),
+          const Icon(Icons.eco_outlined, size: 34, color: _deepGreen),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 5),
-                Text(message, style: Theme.of(context).textTheme.bodyLarge),
+                Text('오늘의 연습', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 3),
+                Text(
+                  '한 단계씩 따라 해보세요.',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ],
             ),
           ),
@@ -141,58 +138,84 @@ class _HomeFeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: colorScheme.surfaceContainerLowest,
+      color: Colors.white,
       borderRadius: BorderRadius.circular(16),
-      elevation: 1,
-      shadowColor: colorScheme.shadow.withValues(alpha: 0.12),
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 96),
+          constraints: const BoxConstraints(minHeight: 104),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(color: _sageBorder, width: 1.5),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE4F3EA),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, size: 34, color: const Color(0xFF286A5B)),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      softWrap: true,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(fontSize: 22),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final largeText =
+                  MediaQuery.textScalerOf(context).scale(1) > 1.15;
+              final compact = constraints.maxWidth < 360 || largeText;
+              final details = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontSize: largeText
+                          ? 17
+                          : compact
+                          ? 20
+                          : 22,
                     ),
-                    const SizedBox(height: 4),
-                    Text(message, style: Theme.of(context).textTheme.bodyLarge),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    message,
+                    maxLines: 2,
+                    softWrap: true,
+                    overflow: TextOverflow.fade,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              );
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _HomeIconBox(icon: icon, size: 48),
+                        const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 20,
+                          color: _deepGreen,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    details,
                   ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 22,
-                color: colorScheme.primary,
-              ),
-            ],
+                );
+              }
+              return Row(
+                children: [
+                  _HomeIconBox(icon: icon, size: 56),
+                  const SizedBox(width: 14),
+                  Expanded(child: details),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 22,
+                    color: _deepGreen,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -207,70 +230,75 @@ class _ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: colorScheme.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(12),
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 76),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          constraints: const BoxConstraints(minHeight: 88),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border(
-              top: BorderSide(color: colorScheme.outlineVariant),
-              bottom: BorderSide(color: colorScheme.outlineVariant),
-            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _sageBorder),
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final useColumn =
-                  constraints.maxWidth < 340 ||
-                  MediaQuery.textScalerOf(context).scale(1) > 1.15;
-              final title = Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.emoji_events_outlined,
-                    size: 34,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(width: 12),
-                  Flexible(
-                    child: Text(
+          child: Row(
+            children: [
+              const _HomeIconBox(icon: Icons.emoji_events_outlined, size: 54),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       '나의 디지털 걸음',
-                      softWrap: true,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(
                         context,
                       ).textTheme.titleLarge?.copyWith(fontSize: 22),
                     ),
-                  ),
-                ],
-              );
-              final detail = Text(
-                '기록과 포인트 보기',
-                softWrap: true,
-                style: Theme.of(context).textTheme.bodyLarge,
-              );
-              if (useColumn) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [title, const SizedBox(height: 8), detail],
-                );
-              }
-              return Row(
-                children: [
-                  Expanded(child: title),
-                  const SizedBox(width: 16),
-                  Flexible(child: detail),
-                ],
-              );
-            },
+                    const SizedBox(height: 3),
+                    Text(
+                      '기록과 포인트 보기',
+                      softWrap: true,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 20,
+                color: _deepGreen,
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HomeIconBox extends StatelessWidget {
+  const _HomeIconBox({required this.icon, required this.size});
+
+  final IconData icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: _sageSurface,
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Icon(icon, size: size * 0.56, color: _deepGreen),
     );
   }
 }
@@ -296,15 +324,11 @@ class _PracticeGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final oneColumn =
-            constraints.maxWidth < 430 ||
-            MediaQuery.textScalerOf(context).scale(1) > 1.15;
-        final cardWidth = oneColumn
-            ? constraints.maxWidth
-            : (constraints.maxWidth - 12) / 2;
+        const spacing = 12.0;
+        final cardWidth = (constraints.maxWidth - spacing) / 2;
         return Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: spacing,
+          runSpacing: spacing,
           children: [
             for (final item in items)
               SizedBox(
@@ -325,47 +349,44 @@ class _CompactPracticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: colorScheme.surfaceContainerLowest,
+      color: Colors.white,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: item.onPressed,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 82),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          constraints: const BoxConstraints(minHeight: 112),
+          padding: const EdgeInsets.fromLTRB(12, 14, 10, 13),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(color: _sageBorder),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE4F3EA),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(item.icon, size: 28, color: colorScheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  item.title,
-                  softWrap: true,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  _HomeIconBox(icon: item.icon, size: 46),
+                  const Spacer(),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 17,
+                    color: _deepGreen,
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 6),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 18,
-                color: colorScheme.primary,
+              const SizedBox(height: 10),
+              Text(
+                item.title,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
+                ),
               ),
             ],
           ),

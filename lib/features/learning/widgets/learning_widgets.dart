@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/large_action_button.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 
+const learningSageSurface = Color(0xFFEDF2EA);
+const learningSageBorder = Color(0xFFBAC9B7);
+
 enum LearningChoiceVisualState { normal, guided, selected }
 
 class LearningModeCard extends StatelessWidget {
@@ -25,9 +28,9 @@ class LearningModeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final background = secondary
-        ? colors.surfaceContainerLowest
-        : colors.primary;
-    final foreground = secondary ? colors.onSurface : colors.onPrimary;
+        ? learningSageSurface
+        : colors.surfaceContainerLowest;
+    final foreground = colors.onSurface;
     return Material(
       color: background,
       borderRadius: BorderRadius.circular(16),
@@ -40,7 +43,7 @@ class LearningModeCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: secondary ? const Color(0xFF9FCBB4) : colors.primary,
+              color: secondary ? learningSageBorder : colors.primary,
               width: 1.5,
             ),
           ),
@@ -50,12 +53,10 @@ class LearningModeCard extends StatelessWidget {
                 width: 58,
                 height: 58,
                 decoration: BoxDecoration(
-                  color: secondary
-                      ? const Color(0xFFE4F3EA)
-                      : colors.onPrimary.withValues(alpha: 0.14),
+                  color: learningSageSurface,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, size: 34, color: foreground),
+                child: Icon(icon, size: 34, color: colors.primary),
               ),
               const SizedBox(width: 18),
               Expanded(
@@ -106,6 +107,7 @@ class LearningStepLayout extends StatelessWidget {
     this.guidanceDetail,
     this.questionInGuidance = false,
     this.calmKioskStyle = false,
+    this.panelLabel,
     super.key,
   });
 
@@ -125,6 +127,7 @@ class LearningStepLayout extends StatelessWidget {
   final String? guidanceDetail;
   final bool questionInGuidance;
   final bool calmKioskStyle;
+  final String? panelLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -158,24 +161,32 @@ class LearningStepLayout extends StatelessWidget {
                 children: [
                   ProgressHeader(step: step, totalSteps: totalSteps),
                   const SizedBox(height: 22),
-                  GuidanceCard(
-                    message: questionInGuidance ? question : guidance,
-                    detail: guidanceDetail,
-                  ),
-                  if (!questionInGuidance) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      question,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium,
+                  if (panelLabel == null) ...[
+                    GuidanceCard(
+                      message: questionInGuidance ? question : guidance,
+                      detail: guidanceDetail,
                     ),
+                    if (!questionInGuidance) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        question,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
                   ],
-                  const SizedBox(height: 24),
                   phonePanel
                       ? PhonePanel(child: child)
                       : customPanel
                       ? child
-                      : KioskPanel(calmStyle: calmKioskStyle, child: child),
+                      : KioskPanel(
+                          calmStyle: calmKioskStyle,
+                          label: panelLabel,
+                          question: panelLabel == null ? null : question,
+                          detail: panelLabel == null ? null : guidanceDetail,
+                          child: child,
+                        ),
                   const SizedBox(height: 24),
                   if (onHint != null) ...[
                     _LearningFooterButton(
@@ -320,7 +331,7 @@ class ProgressHeader extends StatelessWidget {
           child: LinearProgressIndicator(
             value: step / totalSteps,
             minHeight: 14,
-            backgroundColor: colorScheme.surfaceContainerHighest,
+            backgroundColor: learningSageSurface,
             valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
           ),
         ),
@@ -340,13 +351,9 @@ class GuidanceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
+        color: learningSageSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(
-            context,
-          ).colorScheme.secondary.withValues(alpha: 0.25),
-        ),
+        border: Border.all(color: learningSageBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,7 +361,7 @@ class GuidanceCard extends StatelessWidget {
           Icon(
             Icons.lightbulb_outline_rounded,
             size: 30,
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -376,15 +383,25 @@ class GuidanceCard extends StatelessWidget {
 }
 
 class KioskPanel extends StatelessWidget {
-  const KioskPanel({required this.child, this.calmStyle = false, super.key});
+  const KioskPanel({
+    required this.child,
+    this.calmStyle = false,
+    this.label,
+    this.question,
+    this.detail,
+    super.key,
+  });
 
   final Widget child;
   final bool calmStyle;
+  final String? label;
+  final String? question;
+  final String? detail;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(label == null ? 20 : 16),
       decoration: BoxDecoration(
         color: calmStyle
             ? Theme.of(context).colorScheme.surfaceContainerLowest
@@ -404,7 +421,36 @@ class KioskPanel extends StatelessWidget {
                 ),
               ],
       ),
-      child: child,
+      child: label == null
+          ? child
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  label!,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  question!,
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                if (detail != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    detail!,
+                    softWrap: true,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+                const Divider(height: 30, color: learningSageBorder),
+                child,
+              ],
+            ),
     );
   }
 }
@@ -451,6 +497,7 @@ class LearningChoiceCard extends StatelessWidget {
     this.secondary = false,
     this.highlighted = false,
     this.calmStyle = false,
+    this.insideKioskPanel = false,
     this.visualState,
     super.key,
   });
@@ -461,6 +508,7 @@ class LearningChoiceCard extends StatelessWidget {
   final bool secondary;
   final bool highlighted;
   final bool calmStyle;
+  final bool insideKioskPanel;
   final LearningChoiceVisualState? visualState;
 
   @override
@@ -475,7 +523,7 @@ class LearningChoiceCard extends StatelessWidget {
     final isSelected = state == LearningChoiceVisualState.selected;
     final backgroundColor = calmStyle
         ? isEmphasized
-              ? const Color(0xFFE4F3EA)
+              ? learningSageSurface
               : colorScheme.surfaceContainerLowest
         : isEmphasized
         ? colorScheme.primaryContainer
@@ -490,70 +538,95 @@ class LearningChoiceCard extends StatelessWidget {
 
     return Material(
       color: backgroundColor,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(insideKioskPanel ? 14 : 18),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(insideKioskPanel ? 14 : 18),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 92),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          constraints: BoxConstraints(minHeight: insideKioskPanel ? 88 : 92),
+          padding: EdgeInsets.symmetric(
+            horizontal: insideKioskPanel ? 14 : 20,
+            vertical: insideKioskPanel ? 14 : 16,
+          ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(insideKioskPanel ? 14 : 18),
             border: Border.all(
               color: isEmphasized
                   ? colorScheme.primary
                   : colorScheme.outlineVariant,
-              width: isEmphasized ? 2.5 : 1.5,
+              width: insideKioskPanel
+                  ? isEmphasized
+                        ? 1.5
+                        : 1
+                  : isEmphasized
+                  ? 2.5
+                  : 1.5,
             ),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 54,
-                height: 54,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final vertical =
+                  insideKioskPanel &&
+                  (constraints.maxWidth < 300 ||
+                      MediaQuery.textScalerOf(context).scale(1) > 1.15);
+              final iconBox = Container(
+                width: insideKioskPanel ? 44 : 54,
+                height: insideKioskPanel ? 44 : 54,
                 decoration: calmStyle
                     ? BoxDecoration(
-                        color: const Color(0xFFE4F3EA),
+                        color: learningSageSurface,
                         borderRadius: BorderRadius.circular(14),
                       )
                     : null,
                 child: Icon(
                   isSelected ? Icons.check_rounded : icon,
-                  size: 34,
+                  size: insideKioskPanel ? 28 : 34,
                   color: foregroundColor,
                 ),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelLarge?.copyWith(color: foregroundColor),
+              );
+              final text = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    softWrap: true,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: foregroundColor,
+                      fontSize: insideKioskPanel ? 20 : null,
                     ),
-                    if (state == LearningChoiceVisualState.guided) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        '여기를 눌러보세요',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                          color: foregroundColor,
-                        ),
+                  ),
+                  if (state == LearningChoiceVisualState.guided) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '여기를 눌러보세요',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: 16,
+                        color: foregroundColor,
                       ),
-                    ],
+                    ),
                   ],
-                ),
-              ),
-              if (!calmStyle)
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 32,
-                  color: foregroundColor,
-                ),
-            ],
+                ],
+              );
+              if (vertical) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [iconBox, const SizedBox(height: 10), text],
+                );
+              }
+              return Row(
+                children: [
+                  iconBox,
+                  SizedBox(width: insideKioskPanel ? 12 : 18),
+                  Expanded(child: text),
+                  if (!calmStyle)
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 32,
+                      color: foregroundColor,
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -598,9 +671,9 @@ class LearningCompletionLayout extends StatelessWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(22, 28, 22, 24),
             decoration: BoxDecoration(
-              color: const Color(0xFFE4F3EA),
+              color: colors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF9FCBB4)),
+              border: Border.all(color: learningSageBorder),
             ),
             child: Column(
               children: [
@@ -630,7 +703,7 @@ class LearningCompletionLayout extends StatelessWidget {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: colors.surfaceContainerLowest,
+                    color: learningSageSurface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: colors.outlineVariant),
                   ),
@@ -761,7 +834,7 @@ class LearningSummaryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE4F3EA),
+                color: learningSageSurface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

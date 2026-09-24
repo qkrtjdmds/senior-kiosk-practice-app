@@ -18,7 +18,7 @@ class LargeActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final buttonStyle = FilledButton.styleFrom(
       minimumSize: const Size(double.infinity, 82),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       backgroundColor: secondary
           ? Theme.of(context).colorScheme.secondaryContainer
           : Theme.of(context).colorScheme.primary,
@@ -31,27 +31,45 @@ class LargeActionButton extends StatelessWidget {
     return FilledButton(
       onPressed: onPressed,
       style: buttonStyle,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 28),
-            const SizedBox(width: 12),
-          ],
-          Flexible(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              softWrap: true,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: secondary
-                    ? Theme.of(context).colorScheme.onSecondaryContainer
-                    : Theme.of(context).colorScheme.onPrimary,
-              ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final vertical =
+              icon != null &&
+              label.length > 10 &&
+              MediaQuery.textScalerOf(context).scale(1) > 1.15;
+          final labelText = Text(
+            label,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontSize: vertical ? 20 : null,
+              color: secondary
+                  ? Theme.of(context).colorScheme.onSecondaryContainer
+                  : Theme.of(context).colorScheme.onPrimary,
             ),
-          ),
-        ],
+          );
+          if (vertical) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 26),
+                const SizedBox(height: 8),
+                labelText,
+              ],
+            );
+          }
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 28),
+                const SizedBox(width: 10),
+              ],
+              Flexible(child: labelText),
+            ],
+          );
+        },
       ),
     );
   }

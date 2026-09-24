@@ -26,10 +26,11 @@ class MainTabScaffold extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
+        backgroundColor: const Color(0xFFFFFDF7),
         selectedIndex: _selectedIndex,
         height: 76 + (scale - 1).clamp(0, 0.5) * 34,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        indicatorColor: const Color(0xFFDDF2E7),
+        indicatorColor: const Color(0xFFDFE8DC),
         onDestinationSelected: (index) {
           final route = switch (index) {
             1 => AppRoutes.practice,

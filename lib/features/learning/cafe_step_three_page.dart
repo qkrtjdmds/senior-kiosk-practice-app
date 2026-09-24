@@ -49,13 +49,14 @@ class CafeStepThreePage extends StatelessWidget {
     final isSolo = context.watch<LearningProgressProvider>().isSoloMode;
 
     return LearningStepLayout(
-      title: '카페 키오스크 연습',
+      title: '카페 주문 연습',
       step: 3,
       guidance: isSolo ? '음료 온도를 선택해보세요.' : '좋아요! 음료 온도를 고르는 화면이에요.',
       question: '차갑게 드실까요, 따뜻하게 드실까요?',
-      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면의 안내를 보고 선택해보세요.',
+      guidanceDetail: isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면을 보며 하나씩 선택해 볼까요?',
       questionInGuidance: true,
       calmKioskStyle: true,
+      panelLabel: '카페 주문',
       onBack: () => context.go(AppRoutes.cafeStepTwo),
       onPrevious: () => context.go(AppRoutes.cafeStepTwo),
       onRestart: () => _restart(context),
@@ -70,6 +71,7 @@ class CafeStepThreePage extends StatelessWidget {
                 ? LearningChoiceVisualState.normal
                 : LearningChoiceVisualState.guided,
             calmStyle: true,
+            insideKioskPanel: true,
             onPressed: () => _select(context, '차갑게'),
           ),
           const SizedBox(height: 16),
@@ -81,6 +83,7 @@ class CafeStepThreePage extends StatelessWidget {
                 ? LearningChoiceVisualState.normal
                 : LearningChoiceVisualState.guided,
             calmStyle: true,
+            insideKioskPanel: true,
             onPressed: () => _select(context, '따뜻하게'),
           ),
         ],

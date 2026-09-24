@@ -41,9 +41,7 @@ class _AtmCompletePageState extends State<AtmCompletePage> {
 
     return LearningCompletionLayout(
       title: isSolo ? '혼자서도 잘하셨어요!' : '잘하셨어요! ATM 출금 연습을 마쳤어요.',
-      message: isSolo
-          ? '오늘의 ATM 출금 미션을 완성했어요.'
-          : '실제 ATM에서도 카드와 돈을 함께 챙기는 것을 기억해보세요.',
+      message: isSolo ? '오늘의 ATM 출금 미션을 완성했어요.' : '실제 ATM에서도 카드와 돈을 함께 챙겨보세요.',
       reward: isSolo ? '용기 포인트 +20점' : '+10점',
       badge: _showFirstBadge ? _buildBadge(context, colors) : null,
       summary: LearningSummaryCard(

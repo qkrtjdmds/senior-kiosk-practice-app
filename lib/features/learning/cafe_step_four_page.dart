@@ -54,7 +54,7 @@ class CafeStepFourPage extends StatelessWidget {
         : '좋아요! 마지막으로 주문 내용을 확인해볼까요?';
 
     return LearningStepLayout(
-      title: '카페 키오스크 연습',
+      title: '카페 주문 연습',
       step: 4,
       guidance: guidance,
       question: '주문 내용을 확인해볼까요?',
@@ -63,22 +63,36 @@ class CafeStepFourPage extends StatelessWidget {
           : '선택한 내용이 맞는지 천천히 확인해보세요.',
       questionInGuidance: true,
       calmKioskStyle: true,
+      panelLabel: '주문 확인',
       onBack: () => context.go(AppRoutes.cafeStepThree),
       onPrevious: () => context.go(AppRoutes.cafeStepThree),
       onRestart: () => _restart(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OrderReceiptCard(
-            dineOption: progress.dineOption ?? '선택하지 않았어요',
-            drink: progress.drink ?? '선택하지 않았어요',
-            temperature: progress.temperature ?? '선택하지 않았어요',
+          LearningSummaryCard(
+            title: '주문 내용을 확인해 볼까요?',
+            items: [
+              LearningSummaryItem(
+                label: '매장 / 포장',
+                value: progress.dineOption ?? '선택하지 않았어요',
+              ),
+              LearningSummaryItem(
+                label: '메뉴',
+                value: progress.drink ?? '선택하지 않았어요',
+              ),
+              LearningSummaryItem(
+                label: '온도',
+                value: progress.temperature ?? '선택하지 않았어요',
+              ),
+            ],
+            footer: '실제 결제가 아닌 연습용 주문이에요.',
           ),
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () => _pay(context, progress),
-            icon: const Icon(Icons.credit_card_outlined, size: 30),
-            label: const Text('결제하기'),
+            icon: const Icon(Icons.check_circle_outline_rounded, size: 30),
+            label: const Text('주문 완료하기'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(78),
               textStyle: Theme.of(context).textTheme.labelLarge,

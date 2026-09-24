@@ -36,8 +36,8 @@ class _CafeCompletePageState extends State<CafeCompletePage> {
         .cafeCompletionCount;
     final progress = context.watch<LearningProgressProvider>();
     final isSolo = progress.isSoloMode;
-    const title = '잘하셨어요! 카페 주문 연습을 마쳤어요.';
-    const message = '다음에도 천천히 연습해보세요.';
+    const title = '잘하셨어요!';
+    const message = '카페 주문 순서를 한 걸음 더 익혔어요.';
     final reward = isSolo ? '용기 포인트 +20점' : '한걸음 포인트 +10점';
 
     return LearningCompletionLayout(
@@ -45,7 +45,14 @@ class _CafeCompletePageState extends State<CafeCompletePage> {
       message: message,
       reward: reward,
       badge: _showFirstBadge ? const _CafeFirstBadgeCard() : null,
-      summary: _CafeCompletionSummary(completionCount: completionCount),
+      summary: LearningSummaryCard(
+        title: '연습 기록',
+        icon: Icons.check_circle_outline_rounded,
+        items: [
+          LearningSummaryItem(label: '카페 연습 완료', value: '$completionCount회'),
+        ],
+        footer: '오늘의 연습이 차곡차곡 쌓였어요.',
+      ),
       onRestart: () {
         context.read<LearningProgressProvider>().resetCafeLearning();
         context.go(AppRoutes.cafeStepOne);
@@ -69,16 +76,16 @@ class _CafeFirstBadgeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colors.tertiaryContainer,
+        color: learningSageSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.tertiary),
+        border: Border.all(color: learningSageBorder),
       ),
       child: Row(
         children: [
           Icon(
             Icons.workspace_premium_outlined,
             size: 48,
-            color: colors.tertiary,
+            color: colors.primary,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -95,38 +102,6 @@ class _CafeFirstBadgeCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CafeCompletionSummary extends StatelessWidget {
-  const _CafeCompletionSummary({required this.completionCount});
-
-  final int completionCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.emoji_events_outlined, size: 32),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text(
-              '카페 연습 완료 $completionCount회',
-              textAlign: TextAlign.center,
-              softWrap: true,
-              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         ],

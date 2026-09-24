@@ -35,11 +35,36 @@ void showCafeMissionHint(BuildContext context) {
     context: context,
     builder: (dialogContext) {
       return AlertDialog(
-        title: const Text('오늘의 주문'),
-        content: Text(CafeOrderMission.today.displayOrder),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        contentPadding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        title: Text(
+          '오늘의 주문',
+          softWrap: true,
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEDF2EA),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFBAC9B7)),
+          ),
+          child: Text(
+            CafeOrderMission.today.displayOrder,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(
+              minimumSize: const Size.fromHeight(56),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
             child: const Text('다시 해볼게요'),
           ),
         ],

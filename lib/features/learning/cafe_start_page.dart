@@ -29,16 +29,16 @@ class CafeStartPage extends StatelessWidget {
           Text('카페 키오스크 연습', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 18),
           Text(
-            '음료를 주문하는 순서를 천천히 연습해요.',
+            '실제 주문 전에 천천히 연습해 볼 수 있어요.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: const Color(0xFFE4F3EA),
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF9FCBB4)),
+              border: Border.all(color: learningSageBorder),
             ),
             child: Column(
               children: [
@@ -57,7 +57,7 @@ class CafeStartPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  '주문 화면을 보며 차근차근 연습해볼까요?',
+                  '연습용 주문 화면을 보며 순서를 익혀보세요.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -67,14 +67,14 @@ class CafeStartPage extends StatelessWidget {
           const SizedBox(height: 30),
           LearningModeCard(
             title: '따라 해보기',
-            description: '화면의 안내를 보며 하나씩 연습해요.',
+            description: '화면의 안내를 보며 차근차근 연습해요.',
             icon: Icons.menu_book_outlined,
             onPressed: () => _selectMode(context, CafeLearningMode.guided),
           ),
           const SizedBox(height: 18),
           LearningModeCard(
             title: '혼자 해보기',
-            description: '오늘의 미션을 기억하고 직접 골라봐요.',
+            description: '오늘의 주문 미션을 기억하고 직접 해봐요.',
             icon: Icons.self_improvement_outlined,
             secondary: true,
             onPressed: () => _selectMode(context, CafeLearningMode.solo),

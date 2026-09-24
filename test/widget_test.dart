@@ -102,12 +102,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('차갑게 먹을게요'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('결제하기'));
-    await tester.tap(find.text('결제하기'));
+    await tester.ensureVisible(find.text('주문 완료하기'));
+    await tester.tap(find.text('주문 완료하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('잘하셨어요! 카페 주문 연습을 마쳤어요.'), findsOneWidget);
-    expect(find.text('다음에도 천천히 연습해보세요.'), findsOneWidget);
+    expect(find.text('잘하셨어요!'), findsOneWidget);
+    expect(find.text('카페 주문 순서를 한 걸음 더 익혔어요.'), findsOneWidget);
     expect(find.text('용기 포인트 +20점'), findsOneWidget);
     expect(find.text('혼자 주문 첫걸음'), findsOneWidget);
   });
@@ -809,7 +809,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('잘하셨어요! ATM 출금 연습을 마쳤어요.'), findsOneWidget);
-    expect(find.text('실제 ATM에서도 카드와 돈을 함께 챙기는 것을 기억해보세요.'), findsOneWidget);
+    expect(find.text('실제 ATM에서도 카드와 돈을 함께 챙겨보세요.'), findsOneWidget);
     expect(find.text('+10점'), findsOneWidget);
   });
 

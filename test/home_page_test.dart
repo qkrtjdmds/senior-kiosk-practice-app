@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,7 +51,23 @@ void main() {
     );
     final hospitalCenter = tester.getCenter(find.text('병원 접수'));
     final photoCenter = tester.getCenter(find.text('사진 보내기'));
-    expect(hospitalCenter.dy, isNot(closeTo(photoCenter.dy, 1)));
+    expect(hospitalCenter.dy, closeTo(photoCenter.dy, 1));
+    expect(hospitalCenter.dx, lessThan(photoCenter.dx));
+
+    final cafeTitle = tester.widget<Text>(find.text('카페 키오스크 연습'));
+    expect(cafeTitle.maxLines, 1);
+    expect(cafeTitle.overflow, TextOverflow.ellipsis);
+    final titleParagraph = tester.renderObject<RenderParagraph>(
+      find.text('카페 키오스크 연습'),
+    );
+    expect(
+      titleParagraph
+          .getPositionForOffset(
+            Offset(titleParagraph.size.width, titleParagraph.size.height / 2),
+          )
+          .offset,
+      '카페 키오스크 연습'.length,
+    );
     expect(tester.takeException(), isNull);
   });
 

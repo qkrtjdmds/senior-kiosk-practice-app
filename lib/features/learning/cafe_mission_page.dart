@@ -7,6 +7,7 @@ import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import 'cafe_order_mission.dart';
 import 'learning_progress_provider.dart';
+import 'widgets/learning_widgets.dart';
 
 class CafeMissionPage extends StatelessWidget {
   const CafeMissionPage({super.key});
@@ -30,14 +31,9 @@ class CafeMissionPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.25),
-                width: 1.5,
-              ),
+              color: learningSageSurface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: learningSageBorder, width: 1.5),
             ),
             child: Column(
               children: [

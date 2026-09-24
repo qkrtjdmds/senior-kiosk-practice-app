@@ -108,4 +108,33 @@ void main() {
     expect(find.text('카페 키오스크 연습'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('잘못된 경로에서도 홈으로 안전하게 돌아간다', (tester) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    SharedPreferences.setMockInitialValues({});
+    final progress = LearningProgressProvider(
+      await SharedPreferences.getInstance(),
+    );
+    await progress.setAccessibilityTextSize(AccessibilityTextSize.extraLarge);
+    appRouter.go('/없는-화면');
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('이 화면을 열 수 없어요.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.text('홈으로 돌아가기'));
+    await tester.pumpAndSettle();
+    expect(find.text('한걸음 디지털'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
