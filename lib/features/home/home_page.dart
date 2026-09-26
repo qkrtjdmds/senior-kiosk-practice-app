@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
+import '../daily_mission/daily_mission_provider.dart';
 
 const _sageSurface = Color(0xFFEDF2EA);
 const _sageBorder = Color(0xFFBAC9B7);
@@ -34,6 +36,8 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           const _HomeMessageCard(),
+          const SizedBox(height: 14),
+          const _DailyMissionSummary(),
           const SizedBox(height: 24),
           _HomeFeatureCard(
             title: '카페 키오스크 연습',
@@ -82,6 +86,61 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+}
+
+class _DailyMissionSummary extends StatelessWidget {
+  const _DailyMissionSummary();
+  @override
+  Widget build(BuildContext context) {
+    final daily = context.watch<DailyMissionProvider>();
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () => context.go(AppRoutes.missions),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.task_alt_outlined,
+                    color: _deepGreen,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '오늘의 미션 ${daily.completedCount}/3',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: _deepGreen,
+                    size: 18,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              LinearProgressIndicator(value: daily.progress, minHeight: 7),
+              const SizedBox(height: 8),
+              Text(
+                '미션 보러 가기',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: _deepGreen,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

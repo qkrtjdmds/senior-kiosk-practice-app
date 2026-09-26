@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
 import '../learning/learning_progress_provider.dart';
+import '../daily_mission/daily_mission.dart';
+import '../daily_mission/daily_mission_provider.dart';
 import '../learning/widgets/learning_widgets.dart';
 
 class HamburgerCompletePage extends StatefulWidget {
@@ -21,9 +23,14 @@ class _HamburgerCompletePageState extends State<HamburgerCompletePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final progress = context.read<LearningProgressProvider>();
+      final daily = context.read<DailyMissionProvider>();
       var firstBadge = false;
       if (progress.isHamburgerSoloMode) {
+        final before = progress.hamburgerSoloCompletionCount;
         firstBadge = await progress.completeHamburgerSoloLearning();
+        if (progress.hamburgerSoloCompletionCount > before) {
+          await daily.completeActiveMission(MissionContentType.hamburger);
+        }
       } else {
         await progress.completeHamburgerLearning();
       }

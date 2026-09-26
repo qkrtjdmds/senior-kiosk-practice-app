@@ -5,17 +5,15 @@ import 'package:provider/provider.dart';
 import '../../app/app_routes.dart';
 import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
-import 'cafe_order_mission.dart';
 import 'learning_progress_provider.dart';
 import 'widgets/learning_widgets.dart';
+import '../cafe_v2/cafe_order_provider.dart';
 
 class CafeMissionPage extends StatelessWidget {
   const CafeMissionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final mission = CafeOrderMission.today;
-
     return PageScaffold(
       title: '혼자 해보기',
       backRoute: AppRoutes.cafeStart,
@@ -44,7 +42,7 @@ class CafeMissionPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  mission.displayOrder,
+                  '포장 · 차가운 아메리카노 · 보통 크기 1잔',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
@@ -61,7 +59,10 @@ class CafeMissionPage extends StatelessWidget {
           LargeActionButton(
             label: '혼자 주문해보기',
             icon: Icons.play_arrow_rounded,
-            onPressed: () => context.go(AppRoutes.cafeStepOne),
+            onPressed: () {
+              context.read<CafeOrderProvider>().start(CafeLearningMode.solo);
+              context.go(AppRoutes.cafeV2Menu);
+            },
           ),
           const SizedBox(height: 16),
           LargeActionButton(

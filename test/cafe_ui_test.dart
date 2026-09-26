@@ -32,7 +32,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('실제 주문 전에 천천히 연습해 볼 수 있어요.'), findsOneWidget);
+    expect(find.text('가상 키오스크로 주문 순서를 천천히 연습해요.'), findsOneWidget);
     expect(find.text('연습용 주문 화면을 보며 순서를 익혀보세요.'), findsOneWidget);
     expect(tester.takeException(), isNull);
 

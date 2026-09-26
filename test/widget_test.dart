@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,19 +37,17 @@ void main() {
   testWidgets('카페 주문 선택값을 4단계 확인 화면에 표시한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    appRouter.go(AppRoutes.home);
+    final progress = LearningProgressProvider(preferences)
+      ..selectMode(CafeLearningMode.guided);
+    appRouter.go(AppRoutes.cafeStepOne);
 
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => LearningProgressProvider(preferences),
+      ChangeNotifierProvider.value(
+        value: progress,
         child: const HanGeoleumDigitalApp(),
       ),
     );
 
-    await tester.tap(find.text('카페 키오스크 연습'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('따라 해보기'));
-    await tester.pumpAndSettle();
     await tester.tap(find.text('포장할게요'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('카페라떼'));
@@ -80,36 +79,54 @@ void main() {
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
     expect(find.text('오늘의 주문 미션'), findsOneWidget);
-    expect(find.text('포장 · 아이스 아메리카노'), findsOneWidget);
+    expect(find.text('포장 · 차가운 아메리카노 · 보통 크기 1잔'), findsOneWidget);
 
     await tester.tap(find.text('혼자 주문해보기'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('매장에서 먹을게요'));
+    await tester.tap(find.text('디카페인 아메리카노'));
     await tester.pump();
-    expect(find.text('1 / 4 단계'), findsOneWidget);
-    expect(find.textContaining('괜찮아요. 오늘의 주문을 다시 확인해볼까요?'), findsOneWidget);
+    expect(find.text('1 / 7 · 메뉴 고르기'), findsOneWidget);
+    expect(find.textContaining('괜찮아요. 주문 내용을 다시 살펴볼까요?'), findsOneWidget);
 
     await tester.tap(find.text('힌트 보기'));
     await tester.pumpAndSettle();
-    expect(find.text('오늘의 주문'), findsOneWidget);
-    expect(find.text('포장 · 아이스 아메리카노'), findsOneWidget);
-    await tester.tap(find.text('다시 해볼게요'));
-    await tester.pumpAndSettle();
+    expect(find.textContaining('힌트: 차가운 아메리카노'), findsOneWidget);
 
-    await tester.tap(find.text('포장할게요'));
-    await tester.pumpAndSettle();
     await tester.tap(find.text('아메리카노'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('차갑게 먹을게요'));
+    await tester.tap(find.text('따뜻하게'));
+    await tester.pump();
+    expect(find.text('2 / 7 · 온도 고르기'), findsOneWidget);
+    await tester.tap(find.text('차갑게'));
+    await tester.pump();
+    await tester.tap(find.text('다음으로'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('주문 완료하기'));
-    await tester.tap(find.text('주문 완료하기'));
+    await tester.tap(find.text('보통'));
+    await tester.pump();
+    await tester.tap(find.text('다음으로'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('포장'));
+    await tester.pump();
+    await tester.tap(find.text('장바구니에 담기'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('주문 확인하기'));
+    await tester.tap(find.text('주문 확인하기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('적립하지 않기'));
+    await tester.pump();
+    await tester.tap(find.text('다음으로'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('신용카드'));
+    await tester.pump();
+    await tester.tap(find.text('결제 연습 완료하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('잘하셨어요!'), findsOneWidget);
-    expect(find.text('카페 주문 순서를 한 걸음 더 익혔어요.'), findsOneWidget);
+    expect(find.text('주문 연습을 완료했어요!'), findsOneWidget);
+    await tester.drag(find.byType(ListView).last, const Offset(0, -700));
+    await tester.pumpAndSettle();
+    expect(find.text('실제 주문이나 결제가 진행된 것은 아니에요.'), findsOneWidget);
     expect(find.text('용기 포인트 +20점'), findsOneWidget);
-    expect(find.text('혼자 주문 첫걸음'), findsOneWidget);
+    expect(find.textContaining('혼자 주문 첫걸음'), findsOneWidget);
   });
 
   test('카페 완료 횟수를 저장하고 다시 읽는다', () async {

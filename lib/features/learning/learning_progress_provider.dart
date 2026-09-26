@@ -31,6 +31,7 @@ class LearningProgressProvider extends ChangeNotifier {
   static const _guidedCompletionCountKey = 'cafe_guided_completion_count';
   static const _soloCompletionCountKey = 'cafe_solo_completion_count';
   static const _pointsKey = 'digital_confidence_points';
+  static const _dailyMissionRewardTokensKey = 'daily_mission_reward_tokens';
   static const _soloFirstBadgeKey = 'cafe_solo_first_badge_earned';
   static const _cafeFamiliarBadgeKey = 'cafe_familiar_badge_earned';
   static const _cafeModeKey = 'cafe_learning_mode';
@@ -92,6 +93,7 @@ class LearningProgressProvider extends ChangeNotifier {
     _guidedCompletionCountKey,
     _soloCompletionCountKey,
     _pointsKey,
+    _dailyMissionRewardTokensKey,
     _soloFirstBadgeKey,
     _cafeFamiliarBadgeKey,
     _cafeModeKey,
@@ -138,6 +140,10 @@ class LearningProgressProvider extends ChangeNotifier {
     _civilDocumentModeKey,
   ];
   final SharedPreferences _preferences;
+  final List<Future<void> Function()> _practiceResetHandlers = [];
+  final List<VoidCallback> _practiceStartHandlers = [];
+  final Set<String> _awardingDailyMissionTokens = {};
+  SharedPreferences get preferences => _preferences;
 
   LearningProgressProvider(this._preferences) {
     _syncFamiliarBadge();
@@ -234,6 +240,55 @@ class LearningProgressProvider extends ChangeNotifier {
   int get cafeCompletionCount => guidedCompletionCount + soloCompletionCount;
   int get totalPoints =>
       _preferences.getInt(_pointsKey) ?? (guidedCompletionCount * 10);
+  bool hasDailyMissionReward(String token) =>
+      (_preferences.getStringList(_dailyMissionRewardTokensKey) ?? const [])
+          .contains(token);
+
+  Future<bool> awardDailyMissionBonus(String token) async {
+    if (_awardingDailyMissionTokens.contains(token)) return false;
+    final tokens =
+        _preferences.getStringList(_dailyMissionRewardTokensKey) ?? <String>[];
+    if (tokens.contains(token)) return false;
+    _awardingDailyMissionTokens.add(token);
+    try {
+      await _preferences.setStringList(_dailyMissionRewardTokensKey, [
+        ...tokens,
+        token,
+      ]);
+      await _preferences.setInt(_pointsKey, totalPoints + 10);
+      notifyListeners();
+      return true;
+    } finally {
+      _awardingDailyMissionTokens.remove(token);
+    }
+  }
+
+  void registerPracticeResetHandler(Future<void> Function() handler) {
+    if (!_practiceResetHandlers.contains(handler)) {
+      _practiceResetHandlers.add(handler);
+    }
+  }
+
+  void unregisterPracticeResetHandler(Future<void> Function() handler) {
+    _practiceResetHandlers.remove(handler);
+  }
+
+  void registerPracticeStartHandler(VoidCallback handler) {
+    if (!_practiceStartHandlers.contains(handler)) {
+      _practiceStartHandlers.add(handler);
+    }
+  }
+
+  void unregisterPracticeStartHandler(VoidCallback handler) {
+    _practiceStartHandlers.remove(handler);
+  }
+
+  void _notifyPracticeStarted() {
+    for (final handler in List.of(_practiceStartHandlers)) {
+      handler();
+    }
+  }
+
   bool get soloFirstBadgeEarned =>
       _preferences.getBool(_soloFirstBadgeKey) ?? false;
   bool get cafeFamiliarBadgeEarned =>
@@ -342,6 +397,7 @@ class LearningProgressProvider extends ChangeNotifier {
   }
 
   void selectMode(CafeLearningMode value) {
+    _notifyPracticeStarted();
     _mode = value;
     _preferences.setString(_cafeModeKey, value.name);
     _dineOption = null;
@@ -480,6 +536,7 @@ class LearningProgressProvider extends ChangeNotifier {
   }
 
   void selectHospitalMode(HospitalLearningMode value) {
+    _notifyPracticeStarted();
     _hospitalMode = value;
     _preferences.setString(_hospitalModeKey, value.name);
     resetHospitalLearning();
@@ -558,6 +615,7 @@ class LearningProgressProvider extends ChangeNotifier {
   }
 
   void selectPhotoMode(PhotoLearningMode value) {
+    _notifyPracticeStarted();
     _photoMode = value;
     _preferences.setString(_photoModeKey, value.name);
     resetPhotoLearning();
@@ -636,6 +694,7 @@ class LearningProgressProvider extends ChangeNotifier {
   }
 
   void selectTrainMode(TrainLearningMode value) {
+    _notifyPracticeStarted();
     _trainMode = value;
     _preferences.setString(_trainModeKey, value.name);
     resetTrainLearning();
@@ -720,6 +779,7 @@ class LearningProgressProvider extends ChangeNotifier {
   }
 
   void selectHamburgerMode(HamburgerLearningMode value) {
+    _notifyPracticeStarted();
     _hamburgerMode = value;
     _preferences.setString(
       _hamburgerModeKey,
@@ -833,6 +893,7 @@ class LearningProgressProvider extends ChangeNotifier {
   Future<void> startAtmLearning([
     AtmLearningMode mode = AtmLearningMode.guided,
   ]) async {
+    _notifyPracticeStarted();
     _atmMode = mode;
     _atmAmount = null;
     _atmCompletionAwarded = false;
@@ -894,6 +955,7 @@ class LearningProgressProvider extends ChangeNotifier {
   Future<void> startCivilDocumentLearning([
     CivilDocumentLearningMode mode = CivilDocumentLearningMode.guided,
   ]) async {
+    _notifyPracticeStarted();
     _civilDocumentMode = mode;
     _civilDocumentContent = null;
     _civilDocumentCopies = null;
@@ -1006,6 +1068,10 @@ class LearningProgressProvider extends ChangeNotifier {
     _civilDocumentCompletionAwarded = false;
     _civilDocumentMode = null;
     _civilDocumentSoloCompletionAwarded = false;
+    _awardingDailyMissionTokens.clear();
+    for (final handler in List.of(_practiceResetHandlers)) {
+      await handler();
+    }
     notifyListeners();
   }
 }

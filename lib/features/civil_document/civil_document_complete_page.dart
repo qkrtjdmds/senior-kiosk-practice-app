@@ -6,6 +6,8 @@ import '../../app/app_routes.dart';
 import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../learning/learning_progress_provider.dart';
+import '../daily_mission/daily_mission.dart';
+import '../daily_mission/daily_mission_provider.dart';
 
 class CivilDocumentCompletePage extends StatefulWidget {
   const CivilDocumentCompletePage({super.key});
@@ -23,9 +25,14 @@ class _CivilDocumentCompletePageState extends State<CivilDocumentCompletePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final progress = context.read<LearningProgressProvider>();
+      final daily = context.read<DailyMissionProvider>();
       var firstBadge = false;
       if (progress.isCivilDocumentSoloMode) {
+        final before = progress.civilDocumentSoloCompletionCount;
         firstBadge = await progress.completeCivilDocumentSoloLearning();
+        if (progress.civilDocumentSoloCompletionCount > before) {
+          await daily.completeActiveMission(MissionContentType.civilDocument);
+        }
       } else {
         await progress.completeCivilDocumentLearning();
       }

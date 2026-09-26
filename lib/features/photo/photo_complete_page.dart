@@ -6,6 +6,8 @@ import '../../app/app_routes.dart';
 import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../learning/learning_progress_provider.dart';
+import '../daily_mission/daily_mission.dart';
+import '../daily_mission/daily_mission_provider.dart';
 
 class PhotoCompletePage extends StatefulWidget {
   const PhotoCompletePage({super.key});
@@ -22,9 +24,14 @@ class _PhotoCompletePageState extends State<PhotoCompletePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final progress = context.read<LearningProgressProvider>();
+      final daily = context.read<DailyMissionProvider>();
       var firstBadge = false;
       if (progress.isPhotoSoloMode) {
+        final before = progress.photoSoloCompletionCount;
         firstBadge = await progress.completePhotoSoloLearning();
+        if (progress.photoSoloCompletionCount > before) {
+          await daily.completeActiveMission(MissionContentType.photo);
+        }
       } else {
         await progress.completePhotoLearning();
       }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
+import '../cafe_v2/cafe_order_provider.dart';
 import 'learning_progress_provider.dart';
 import 'widgets/learning_widgets.dart';
 
@@ -12,24 +13,25 @@ class CafeStartPage extends StatelessWidget {
 
   void _selectMode(BuildContext context, CafeLearningMode mode) {
     context.read<LearningProgressProvider>().selectMode(mode);
+    context.read<CafeOrderProvider>().start(mode);
     context.go(
       mode == CafeLearningMode.solo
           ? AppRoutes.cafeMission
-          : AppRoutes.cafeStepOne,
+          : AppRoutes.cafeV2Menu,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: '카페 키오스크 연습',
+      title: '카페 주문 연습',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('카페 키오스크 연습', style: Theme.of(context).textTheme.headlineMedium),
+          Text('카페 주문 연습', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 18),
           Text(
-            '실제 주문 전에 천천히 연습해 볼 수 있어요.',
+            '가상 키오스크로 주문 순서를 천천히 연습해요.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),

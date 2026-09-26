@@ -646,6 +646,8 @@ class LearningCompletionLayout extends StatelessWidget {
     this.secondaryActionLabel,
     this.onSecondaryAction,
     this.pageTitle = '연습 완료',
+    this.restartLabel = '처음부터 다시 하기',
+    this.homeLabel = '홈으로 돌아가기',
     super.key,
   });
 
@@ -659,6 +661,8 @@ class LearningCompletionLayout extends StatelessWidget {
   final String? secondaryActionLabel;
   final VoidCallback? onSecondaryAction;
   final String pageTitle;
+  final String restartLabel;
+  final String homeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -721,7 +725,7 @@ class LearningCompletionLayout extends StatelessWidget {
           if (summary != null) ...[const SizedBox(height: 18), summary!],
           const SizedBox(height: 36),
           LargeActionButton(
-            label: '처음부터 다시 하기',
+            label: restartLabel,
             icon: Icons.refresh_rounded,
             onPressed: onRestart,
           ),
@@ -736,7 +740,7 @@ class LearningCompletionLayout extends StatelessWidget {
           ],
           const SizedBox(height: 16),
           LargeActionButton(
-            label: '홈으로 돌아가기',
+            label: homeLabel,
             icon: Icons.home_outlined,
             secondary: true,
             onPressed: onHome,

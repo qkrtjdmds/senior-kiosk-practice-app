@@ -105,7 +105,7 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.tap(find.byTooltip('이전 화면으로 돌아가기'));
     await tester.pumpAndSettle();
-    expect(find.text('카페 키오스크 연습'), findsWidgets);
+    expect(find.text('카페 주문 연습'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 

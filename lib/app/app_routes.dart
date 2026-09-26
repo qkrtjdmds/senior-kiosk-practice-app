@@ -11,6 +11,14 @@ abstract final class AppRoutes {
   static const cafeStepThree = '/cafe/practice/step-3';
   static const cafeStepFour = '/cafe/practice/step-4';
   static const cafeComplete = '/cafe/complete';
+  static const cafeV2Menu = '/cafe/v2/menu';
+  static const cafeV2Temperature = '/cafe/v2/options/temperature';
+  static const cafeV2Size = '/cafe/v2/options/size';
+  static const cafeV2DineOption = '/cafe/v2/options/dine-option';
+  static const cafeV2Cart = '/cafe/v2/cart';
+  static const cafeV2Point = '/cafe/v2/point';
+  static const cafeV2Payment = '/cafe/v2/payment';
+  static const cafeV2Complete = '/cafe/v2/complete';
   static const hospitalStart = '/hospital';
   static const hospitalMission = '/hospital/mission';
   static const hospitalStepOne = '/hospital/practice';

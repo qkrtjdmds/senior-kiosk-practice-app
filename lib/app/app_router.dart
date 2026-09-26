@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'app_routes.dart';
 import '../features/home/home_page.dart';
@@ -15,6 +16,8 @@ import '../features/learning/cafe_start_page.dart';
 import '../features/learning/cafe_step_four_page.dart';
 import '../features/learning/cafe_step_three_page.dart';
 import '../features/learning/cafe_step_two_page.dart';
+import '../features/cafe_v2/cafe_order_provider.dart';
+import '../features/cafe_v2/cafe_v2_pages.dart';
 import '../features/hospital/hospital_complete_page.dart';
 import '../features/hospital/hospital_mission_page.dart';
 import '../features/hospital/hospital_start_page.dart';
@@ -50,6 +53,12 @@ import '../features/civil_document/civil_document_mission_page.dart';
 import '../features/civil_document/civil_document_practice_page.dart';
 import '../features/civil_document/civil_document_start_page.dart';
 
+final cafeOrderProvider = CafeOrderProvider();
+
+Widget _withCafeOrderProvider(Widget child) {
+  return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
+}
+
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
   errorBuilder: (context, state) => const _RouteNotFoundPage(),
@@ -82,11 +91,13 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.cafeStart,
-      builder: (context, state) => const CafeStartPage(),
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeStartPage()),
     ),
     GoRoute(
       path: AppRoutes.cafeMission,
-      builder: (context, state) => const CafeMissionPage(),
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeMissionPage()),
     ),
     GoRoute(
       path: AppRoutes.cafeStepOne,
@@ -107,6 +118,46 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.cafeComplete,
       builder: (context, state) => const CafeCompletePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Menu,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2MenuPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Temperature,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2TemperaturePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Size,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2SizePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2DineOption,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2DineOptionPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Cart,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2CartPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Point,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2PointPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Payment,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2PaymentPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.cafeV2Complete,
+      builder: (context, state) =>
+          _withCafeOrderProvider(const CafeV2CompletePage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalStart,
