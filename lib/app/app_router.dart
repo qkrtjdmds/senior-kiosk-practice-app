@@ -40,10 +40,8 @@ import '../features/train/train_step_four_page.dart';
 import '../features/train/train_step_one_page.dart';
 import '../features/train/train_step_three_page.dart';
 import '../features/train/train_step_two_page.dart';
-import '../features/hamburger/hamburger_complete_page.dart';
-import '../features/hamburger/hamburger_mission_page.dart';
-import '../features/hamburger/hamburger_practice_page.dart';
-import '../features/hamburger/hamburger_start_page.dart';
+import '../features/hamburger_v2/burger_order_provider.dart';
+import '../features/hamburger_v2/burger_v2_pages.dart';
 import '../features/atm/atm_complete_page.dart';
 import '../features/atm/atm_mission_page.dart';
 import '../features/atm/atm_practice_page.dart';
@@ -54,9 +52,14 @@ import '../features/civil_document/civil_document_practice_page.dart';
 import '../features/civil_document/civil_document_start_page.dart';
 
 final cafeOrderProvider = CafeOrderProvider();
+final burgerOrderProvider = BurgerOrderProvider();
 
 Widget _withCafeOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
+}
+
+Widget _withBurgerOrderProvider(Widget child) {
+  return ChangeNotifierProvider.value(value: burgerOrderProvider, child: child);
 }
 
 final appRouter = GoRouter(
@@ -249,19 +252,23 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.hamburgerStart,
-      builder: (context, state) => const HamburgerStartPage(),
+      builder: (context, state) =>
+          _withBurgerOrderProvider(const BurgerV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.hamburgerMission,
-      builder: (context, state) => const HamburgerMissionPage(),
+      builder: (context, state) =>
+          _withBurgerOrderProvider(const BurgerV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.hamburgerPractice,
-      builder: (context, state) => const HamburgerPracticePage(),
+      builder: (context, state) =>
+          _withBurgerOrderProvider(const BurgerV2OrderPage()),
     ),
     GoRoute(
       path: AppRoutes.hamburgerComplete,
-      builder: (context, state) => const HamburgerCompletePage(),
+      builder: (context, state) =>
+          _withBurgerOrderProvider(const BurgerV2CompletePage()),
     ),
     GoRoute(
       path: AppRoutes.atmStart,

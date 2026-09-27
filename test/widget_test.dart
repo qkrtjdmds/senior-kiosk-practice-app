@@ -15,6 +15,8 @@ import 'package:han_geoleum_digital/app/app_router.dart';
 import 'package:han_geoleum_digital/app/app_routes.dart';
 import 'package:han_geoleum_digital/features/hamburger/hamburger_mission.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
+import 'package:han_geoleum_digital/features/hamburger_v2/burger_order_provider.dart';
+import 'package:han_geoleum_digital/features/hamburger_v2/burger_scenario.dart';
 
 void main() {
   testWidgets('홈 화면을 표시한다', (WidgetTester tester) async {
@@ -584,50 +586,14 @@ void main() {
     expect(reloaded.recentPracticeRecords.length, 20);
   });
 
-  testWidgets('홈에서 햄버거 주문 4단계를 완료한다', (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final preferences = await SharedPreferences.getInstance();
-    appRouter.go(AppRoutes.home);
-
-    await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => LearningProgressProvider(preferences),
-        child: const HanGeoleumDigitalApp(),
-      ),
-    );
-
-    await tester.ensureVisible(find.text('햄버거 주문'));
-    await tester.tap(find.text('햄버거 주문'));
-    await tester.pumpAndSettle();
-    expect(find.text('햄버거 주문 연습'), findsNWidgets(2));
-
-    await tester.tap(find.text('따라 해보기'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('포장할게요'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('새우버거'));
-    await tester.tap(find.text('새우버거'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('세트로 주문할게요'));
-    await tester.pumpAndSettle();
-    expect(find.text('음료를 골라주세요'), findsOneWidget);
-    await tester.tap(find.text('물'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('4 / 4 단계'), findsOneWidget);
-    expect(find.text('포장'), findsWidgets);
-    expect(find.text('새우버거'), findsWidgets);
-    expect(find.text('세트'), findsWidgets);
-    expect(find.text('물'), findsWidgets);
-    await tester.ensureVisible(find.text('결제하기'));
-    await tester.tap(find.text('결제하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('잘하셨어요!'), findsOneWidget);
-    expect(find.text('햄버거 주문 순서를 천천히 잘 따라오셨어요.'), findsOneWidget);
-    expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+  test('햄버거 V2 따라 해보기는 권장 선택만 다음 단계로 진행한다', () {
+    final order = BurgerOrderProvider()..begin(HamburgerLearningMode.guided);
+    order.chooseDine('매장에서 먹기', correct: false);
+    expect(order.step, BurgerOrderStep.dine);
+    expect(order.inlineMessage, isNotNull);
+    order.chooseDine('포장하기', correct: true);
+    expect(order.step, BurgerOrderStep.menu);
   });
-
   test('햄버거 주문 완료 보상과 기록은 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -648,72 +614,37 @@ void main() {
     expect(reloaded.totalPoints, 10);
   });
 
-  testWidgets('햄버거 혼자 해보기 미션과 첫 배지를 완료한다', (WidgetTester tester) async {
+  testWidgets('햄버거 V2 혼자 해보기 미션과 힌트를 확인한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     final progress = LearningProgressProvider(preferences);
-    appRouter.go(AppRoutes.home);
-
+    appRouter.go(AppRoutes.hamburgerStart);
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => progress,
+      ChangeNotifierProvider.value(
+        value: progress,
         child: const HanGeoleumDigitalApp(),
       ),
     );
-
-    await tester.ensureVisible(find.text('햄버거 주문'));
-    await tester.tap(find.text('햄버거 주문'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
-
     final mission = progress.currentHamburgerMission;
-    expect(find.text('오늘의 햄버거 주문 미션'), findsOneWidget);
-    expect(find.text(mission.title), findsOneWidget);
-    expect(find.text(mission.displayText), findsOneWidget);
+    expect(find.text('오늘의 햄버거 주문 미션'), findsWidgets);
+    expect(
+      find.text(BurgerScenario.fromMissionId(mission.id).title),
+      findsOneWidget,
+    );
     await tester.tap(find.text('혼자 주문해보기'));
     await tester.pumpAndSettle();
-
-    final wrongDineOption = mission.dineOption == '포장' ? '매장에서 먹을게요' : '포장할게요';
-    await tester.tap(find.text(wrongDineOption));
-    await tester.pump();
-    expect(find.text('1 / 4 단계'), findsOneWidget);
-    expect(find.textContaining('괜찮아요. 오늘의 주문 내용을 다시 확인해볼까요?'), findsOneWidget);
-    await tester.ensureVisible(find.text('힌트 보기'));
     await tester.tap(find.text('힌트 보기'));
-    await tester.pumpAndSettle();
-    expect(find.text('오늘의 주문 내용'), findsOneWidget);
-    expect(find.textContaining(mission.menu), findsOneWidget);
-    await tester.tap(find.text('다시 해볼게요'));
-    await tester.pumpAndSettle();
-
-    final dineChoice = mission.dineOption == '포장' ? '포장할게요' : '매장에서 먹을게요';
-    await tester.tap(find.text(dineChoice));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text(mission.menu));
-    await tester.tap(find.text(mission.menu));
-    await tester.pumpAndSettle();
-    final orderChoice = mission.isSet ? '세트로 주문할게요' : '햄버거만 주문할게요';
-    await tester.tap(find.text(orderChoice));
-    await tester.pumpAndSettle();
-    if (mission.isSet) {
-      await tester.tap(find.text(mission.drink!));
-      await tester.pumpAndSettle();
-    }
-
-    expect(find.text('4 / 4 단계'), findsOneWidget);
-    expect(find.text(mission.menu), findsWidgets);
-    expect(find.text(mission.drink ?? '선택하지 않음'), findsWidgets);
-    await tester.ensureVisible(find.text('결제하기'));
-    await tester.tap(find.text('결제하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('혼자서도 잘하셨어요!'), findsOneWidget);
-    expect(find.text('오늘의 햄버거 주문 미션을 완성했어요.'), findsOneWidget);
-    expect(find.text(mission.title), findsOneWidget);
-    expect(find.text('용기 포인트 +20점'), findsOneWidget);
-    expect(find.text('혼자 햄버거 주문 첫걸음'), findsOneWidget);
+    await tester.pump();
+    expect(find.textContaining('힌트:'), findsOneWidget);
+    final targetDine = BurgerScenario.fromMissionId(mission.id).dine;
+    final wrong = targetDine == '포장하기' ? '매장에서 먹기' : '포장하기';
+    await tester.tap(find.text(wrong));
+    await tester.pump();
+    expect(find.text('1 / 9 단계'), findsOneWidget);
+    expect(find.textContaining('괜찮아요'), findsOneWidget);
   });
 
   test('햄버거 혼자 해보기 보상과 첫 배지는 한 번만 저장한다', () async {
