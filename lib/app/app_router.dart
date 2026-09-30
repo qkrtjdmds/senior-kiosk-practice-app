@@ -18,13 +18,14 @@ import '../features/learning/cafe_step_three_page.dart';
 import '../features/learning/cafe_step_two_page.dart';
 import '../features/cafe_v2/cafe_order_provider.dart';
 import '../features/cafe_v2/cafe_v2_pages.dart';
-import '../features/hospital/hospital_complete_page.dart';
-import '../features/hospital/hospital_mission_page.dart';
-import '../features/hospital/hospital_start_page.dart';
-import '../features/hospital/hospital_step_four_page.dart';
-import '../features/hospital/hospital_step_one_page.dart';
-import '../features/hospital/hospital_step_three_page.dart';
-import '../features/hospital/hospital_step_two_page.dart';
+import '../features/hospital_v2/hospital_reception_provider.dart';
+import '../features/hospital_v2/hospital_reservation_provider.dart';
+import '../features/hospital_v2/hospital_reservation_pages.dart';
+import '../features/hospital_v2/hospital_payment_provider.dart';
+import '../features/hospital_v2/hospital_payment_pages.dart';
+import '../features/hospital_v2/hospital_document_provider.dart';
+import '../features/hospital_v2/hospital_document_pages.dart';
+import '../features/hospital_v2/hospital_v2_pages.dart';
 import '../features/photo/photo_complete_page.dart';
 import '../features/photo/photo_mission_page.dart';
 import '../features/photo/photo_start_page.dart';
@@ -53,6 +54,10 @@ import '../features/civil_document/civil_document_start_page.dart';
 
 final cafeOrderProvider = CafeOrderProvider();
 final burgerOrderProvider = BurgerOrderProvider();
+final hospitalReceptionProvider = HospitalReceptionProvider();
+final hospitalReservationProvider = HospitalReservationProvider();
+final hospitalPaymentProvider = HospitalPaymentProvider();
+final hospitalDocumentProvider = HospitalDocumentProvider();
 
 Widget _withCafeOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
@@ -60,6 +65,18 @@ Widget _withCafeOrderProvider(Widget child) {
 
 Widget _withBurgerOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: burgerOrderProvider, child: child);
+}
+
+Widget _withHospitalReceptionProvider(Widget child) {
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider.value(value: hospitalReceptionProvider),
+      ChangeNotifierProvider.value(value: hospitalReservationProvider),
+      ChangeNotifierProvider.value(value: hospitalPaymentProvider),
+      ChangeNotifierProvider.value(value: hospitalDocumentProvider),
+    ],
+    child: child,
+  );
 }
 
 final appRouter = GoRouter(
@@ -164,31 +181,70 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.hospitalStart,
-      builder: (context, state) => const HospitalStartPage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalMission,
-      builder: (context, state) => const HospitalMissionPage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalStepOne,
-      builder: (context, state) => const HospitalStepOnePage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2OrderPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalStepTwo,
-      builder: (context, state) => const HospitalStepTwoPage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2OrderPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalStepThree,
-      builder: (context, state) => const HospitalStepThreePage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2OrderPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalStepFour,
-      builder: (context, state) => const HospitalStepFourPage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2OrderPage()),
     ),
     GoRoute(
       path: AppRoutes.hospitalComplete,
-      builder: (context, state) => const HospitalCompletePage(),
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalV2CompletePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalReservationPractice,
+      builder: (context, state) => _withHospitalReceptionProvider(
+        const HospitalReservationPracticePage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalReservationComplete,
+      builder: (context, state) => _withHospitalReceptionProvider(
+        const HospitalReservationCompletePage(),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalPaymentPractice,
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalPaymentPracticePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalPaymentComplete,
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalPaymentCompletePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalDocumentPractice,
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalDocumentPracticePage()),
+    ),
+    GoRoute(
+      path: AppRoutes.hospitalDocumentComplete,
+      builder: (context, state) =>
+          _withHospitalReceptionProvider(const HospitalDocumentCompletePage()),
     ),
     GoRoute(
       path: AppRoutes.photoStart,

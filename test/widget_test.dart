@@ -5,7 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -202,7 +202,7 @@ void main() {
     expect(find.text('달성했어요'), findsOneWidget);
   });
 
-  testWidgets('홈에서 병원 접수 4단계를 완료한다', (WidgetTester tester) async {
+  testWidgets('홈에서 병원 접수 V2를 완료한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go(AppRoutes.home);
@@ -217,27 +217,35 @@ void main() {
     await tester.ensureVisible(find.text('병원 접수'));
     await tester.tap(find.text('병원 접수'));
     await tester.pumpAndSettle();
-    expect(find.text('병원 접수 연습'), findsNWidgets(2));
+    expect(find.text('병원 접수 연습'), findsOneWidget);
 
     await tester.tap(find.text('따라 해보기'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('진료를 받으러 왔어요'));
+    for (final choice in ['접수 시작하기', '진료 접수', '전에 방문한 적 있어요']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await tester.tap(find.text('환자 확인하기'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('처음 방문이에요'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('속이 불편해요'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('내과'), findsOneWidget);
+    for (final choice in ['예약했어요', '내과', '감기 증상']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
     await tester.ensureVisible(find.text('접수 완료하기'));
     await tester.tap(find.text('접수 완료하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('잘하셨어요!'), findsOneWidget);
-    expect(find.text('병원 접수 순서를 천천히 잘 따라오셨어요.'), findsOneWidget);
+    expect(find.text('진료 접수 연습을 완료했어요!'), findsOneWidget);
     expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(find.text('A-023 (연습용)'), findsOneWidget);
   });
-
   test('병원 접수 완료 보상은 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -429,7 +437,7 @@ void main() {
     expect(progress.totalPoints, 20);
   });
 
-  testWidgets('병원 혼자 해보기 미션과 첫 배지를 완료한다', (WidgetTester tester) async {
+  testWidgets('병원 V2 혼자 해보기 미션과 첫 배지를 완료한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go(AppRoutes.home);
@@ -444,44 +452,47 @@ void main() {
     await tester.ensureVisible(find.text('병원 접수'));
     await tester.tap(find.text('병원 접수'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
 
     expect(find.text('오늘의 병원 접수 미션'), findsOneWidget);
-    expect(find.text('진료 접수 · 다시 방문'), findsOneWidget);
+    expect(find.text('처음 방문 접수'), findsOneWidget);
     await tester.tap(find.text('혼자 접수해보기'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('접수 시작하기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('진료 접수'));
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.text('예약을 확인하고 싶어요'));
+    await tester.tap(find.text('전에 방문한 적 있어요'));
     await tester.pump();
-    expect(find.text('1 / 4 단계'), findsOneWidget);
-    expect(find.textContaining('괜찮아요. 오늘의 접수 내용을 다시 확인해볼까요?'), findsOneWidget);
-    await tester.ensureVisible(find.text('힌트 보기'));
+    expect(find.textContaining('괜찮아요.'), findsOneWidget);
     await tester.tap(find.text('힌트 보기'));
-    await tester.pumpAndSettle();
-    expect(find.text('오늘의 접수 내용'), findsOneWidget);
-    expect(find.textContaining('진료를 받으러 왔어요'), findsNWidgets(2));
-    await tester.tap(find.text('다시 해볼게요'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    expect(find.textContaining('처음 방문이에요'), findsWidgets);
 
-    await tester.tap(find.text('진료를 받으러 왔어요'));
+    await tester.tap(find.text('처음 방문이에요'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('다시 방문했어요'));
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await tester.tap(find.text('환자 확인하기'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('무릎이나 허리가 불편해요'));
-    await tester.tap(find.text('무릎이나 허리가 불편해요'));
-    await tester.pumpAndSettle();
+    for (final choice in ['예약하지 않았어요', '내과', '배가 불편해요']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
     await tester.ensureVisible(find.text('접수 완료하기'));
     await tester.tap(find.text('접수 완료하기'));
     await tester.pumpAndSettle();
 
     expect(find.text('혼자서도 잘하셨어요!'), findsOneWidget);
-    expect(find.text('오늘의 병원 접수 미션을 완성했어요.'), findsOneWidget);
-    expect(find.text('용기 포인트 +20점'), findsOneWidget);
-    expect(find.text('혼자 병원 접수 첫걸음'), findsOneWidget);
+    expect(find.textContaining('용기 포인트 +20점'), findsOneWidget);
+    expect(find.textContaining('혼자 병원 접수 첫걸음'), findsOneWidget);
   });
-
   test('병원 혼자 해보기 보상은 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -877,5 +888,255 @@ void main() {
 
     expect(find.text('아직 완료한 연습이 없어요.'), findsOneWidget);
     expect(find.text('홈에서 연습 시작하기'), findsOneWidget);
+  });
+
+  testWidgets('320dp 기본 글씨에서 삭제 키 문구를 온전히 한 줄로 표시한다', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(640, 1280);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+    final progress = LearningProgressProvider(preferences);
+    appRouter.go(AppRoutes.hospitalStart);
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final choice in ['따라 해보기', '접수 시작하기', '진료 접수', '전에 방문한 적 있어요']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('한 글자'), findsOneWidget);
+    expect(find.text('전체'), findsOneWidget);
+    for (final label in ['한 글자', '전체']) {
+      final text = tester.widget<Text>(find.text(label));
+      expect(text.maxLines, 1);
+      expect(text.softWrap, isFalse);
+      expect(text.overflow, isNull);
+    }
+    expect(find.bySemanticsLabel('입력한 숫자 한 글자 지우기'), findsOneWidget);
+    expect(find.bySemanticsLabel('입력한 숫자 전체 지우기'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('320dp 아주 큰 글씨에서 병원 환자 확인 키패드가 넘치지 않는다', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(640, 1280);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+    final progress = LearningProgressProvider(preferences);
+    await progress.setAccessibilityTextSize(AccessibilityTextSize.extraLarge);
+    appRouter.go(AppRoutes.hospitalStart);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final choice in ['따라 해보기', '접수 시작하기', '진료 접수', '전에 방문한 적 있어요']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.bySemanticsLabel('입력한 숫자 한 글자 지우기'), findsOneWidget);
+    expect(find.bySemanticsLabel('입력한 숫자 전체 지우기'), findsOneWidget);
+    expect(find.text('한 글자'), findsNothing);
+    expect(find.text('전체'), findsNothing);
+    final disabled = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, '환자 확인하기'),
+    );
+    expect(disabled.onPressed, isNull);
+    expect(tester.takeException(), isNull);
+
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    final enabled = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, '환자 확인하기'),
+    );
+    expect(enabled.onPressed, isNotNull);
+    expect(find.bySemanticsLabel('8자리 중 8자리 입력됨'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('병원 예약 확인 따라 해보기 전체 흐름을 완료한다', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(640, 1280);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+    final progress = LearningProgressProvider(preferences);
+    appRouter.go(AppRoutes.hospitalStart);
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final choice in ['따라 해보기', '접수 시작하기', '예약 확인', '예약 확인 시작하기']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('2 / 5 단계'), findsOneWidget);
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await tester.tap(find.text('환자 확인하기'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 5 단계'), findsOneWidget);
+    expect(find.text('오늘 · 오전 10:30'), findsOneWidget);
+    expect(find.text('내일 · 오후 2:00'), findsOneWidget);
+    expect(find.text('다음 주 화요일 · 오전 11:00'), findsOneWidget);
+
+    await tester.tap(find.text('내일 · 오후 2:00'));
+    await tester.pump();
+    expect(find.textContaining('다시 확인'), findsOneWidget);
+    expect(find.text('3 / 5 단계'), findsOneWidget);
+
+    await tester.tap(find.text('오늘 · 오전 10:30'));
+    await tester.pumpAndSettle();
+    expect(find.text('4 / 5 단계'), findsOneWidget);
+    await tester.tap(find.text('이 예약 확인하기'));
+    await tester.pumpAndSettle();
+    expect(find.text('예약 확인 연습을 완료했어요'), findsOneWidget);
+    expect(find.text('5 / 5 단계'), findsOneWidget);
+    expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('병원 진료비 수납 카드 결제와 가상 영수증을 완료한다', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(640, 1280);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+    final progress = LearningProgressProvider(preferences);
+    appRouter.go(AppRoutes.hospitalStart);
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final choice in ['따라 해보기', '접수 시작하기', '진료비 수납', '진료비 수납 시작하기']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('2 / 7 단계'), findsOneWidget);
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await tester.tap(find.text('환자 확인하기'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 7 단계'), findsOneWidget);
+    expect(find.text('18,500원'), findsOneWidget);
+    expect(find.text('32,000원'), findsOneWidget);
+    expect(find.text('12,700원'), findsOneWidget);
+    await tester.tap(find.text('지난주 · 이비인후과'));
+    await tester.pump();
+    expect(find.textContaining('납부가 완료'), findsOneWidget);
+    await tester.tap(find.text('오늘 · 내과'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('이 진료비 수납하기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('카드'));
+    await tester.pumpAndSettle();
+    for (final action in ['카드를 넣었어요', '금액을 확인했어요', '결제 연습 진행', '카드를 챙겼어요']) {
+      await tester.ensureVisible(find.textContaining(action));
+      await tester.tap(find.textContaining(action));
+      await tester.pump();
+    }
+    await tester.ensureVisible(find.text('영수증 받기'));
+    await tester.tap(find.text('영수증 받기'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('수납 연습 완료하기'));
+    await tester.tap(find.text('수납 연습 완료하기'));
+    await tester.pumpAndSettle();
+    expect(find.text('진료비 수납 연습을 완료했어요'), findsOneWidget);
+    expect(find.text('연습용 가상 영수증'), findsOneWidget);
+    expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('병원 서류 발급은 320dp에서 서류 목록과 신청 확인을 표시한다', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(640, 1280);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({});
+    final preferences = await SharedPreferences.getInstance();
+    final progress = LearningProgressProvider(preferences);
+    appRouter.go(AppRoutes.hospitalStart);
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final choice in ['따라 해보기', '접수 시작하기', '서류 발급', '서류 발급 시작하기']) {
+      await tester.ensureVisible(find.text(choice));
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('2 / 8 단계'), findsOneWidget);
+    for (final digit in '19580412'.split('')) {
+      await tester.ensureVisible(find.text(digit));
+      await tester.tap(find.text(digit));
+      await tester.pump();
+    }
+    await tester.tap(find.text('환자 확인하기'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 8 단계'), findsOneWidget);
+    expect(find.text('통원확인서'), findsOneWidget);
+    expect(find.text('진단서'), findsOneWidget);
+    await tester.ensureVisible(find.text('진단서'));
+    await tester.tap(find.text('진단서'));
+    await tester.pump();
+    expect(find.textContaining('원무창구'), findsWidgets);
+    await tester.ensureVisible(find.text('통원확인서'));
+    await tester.tap(find.text('통원확인서'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('보험회사 제출'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('1부'));
+    await tester.pumpAndSettle();
+    expect(find.text('6 / 8 단계'), findsOneWidget);
+    expect(find.text('총 가상 수수료'), findsOneWidget);
+    expect(find.text('3,000원'), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }

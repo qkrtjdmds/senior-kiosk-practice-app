@@ -45,6 +45,30 @@ class LearningProgressProvider extends ChangeNotifier {
   static const _hospitalGuidedSessionAwardedKey =
       'hospital_guided_session_awarded';
   static const _hospitalSoloSessionAwardedKey = 'hospital_solo_session_awarded';
+  static const _hospitalReservationCompletionCountKey =
+      'hospital_reservation_guided_completion_count';
+  static const _hospitalReservationSoloCompletionCountKey =
+      'hospital_reservation_solo_completion_count';
+  static const _hospitalReservationGuidedSessionAwardedKey =
+      'hospital_reservation_guided_session_awarded';
+  static const _hospitalReservationSoloSessionAwardedKey =
+      'hospital_reservation_solo_session_awarded';
+  static const _hospitalPaymentCompletionCountKey =
+      'hospital_payment_guided_completion_count';
+  static const _hospitalPaymentSoloCompletionCountKey =
+      'hospital_payment_solo_completion_count';
+  static const _hospitalPaymentGuidedSessionAwardedKey =
+      'hospital_payment_guided_session_awarded';
+  static const _hospitalPaymentSoloSessionAwardedKey =
+      'hospital_payment_solo_session_awarded';
+  static const _hospitalDocumentCompletionCountKey =
+      'hospital_document_guided_completion_count';
+  static const _hospitalDocumentSoloCompletionCountKey =
+      'hospital_document_solo_completion_count';
+  static const _hospitalDocumentGuidedSessionAwardedKey =
+      'hospital_document_guided_session_awarded';
+  static const _hospitalDocumentSoloSessionAwardedKey =
+      'hospital_document_solo_session_awarded';
   static const _photoCompletionCountKey = 'photo_guided_completion_count';
   static const _photoSoloCompletionCountKey = 'photo_solo_completion_count';
   static const _photoSoloFirstBadgeKey = 'photo_solo_first_badge_earned';
@@ -105,6 +129,18 @@ class LearningProgressProvider extends ChangeNotifier {
     _hospitalModeKey,
     _hospitalGuidedSessionAwardedKey,
     _hospitalSoloSessionAwardedKey,
+    _hospitalReservationCompletionCountKey,
+    _hospitalReservationSoloCompletionCountKey,
+    _hospitalReservationGuidedSessionAwardedKey,
+    _hospitalReservationSoloSessionAwardedKey,
+    _hospitalPaymentCompletionCountKey,
+    _hospitalPaymentSoloCompletionCountKey,
+    _hospitalPaymentGuidedSessionAwardedKey,
+    _hospitalPaymentSoloSessionAwardedKey,
+    _hospitalDocumentCompletionCountKey,
+    _hospitalDocumentSoloCompletionCountKey,
+    _hospitalDocumentGuidedSessionAwardedKey,
+    _hospitalDocumentSoloSessionAwardedKey,
     _photoCompletionCountKey,
     _photoSoloCompletionCountKey,
     _photoSoloFirstBadgeKey,
@@ -196,6 +232,12 @@ class LearningProgressProvider extends ChangeNotifier {
   bool _hospitalCompletionAwarded = false;
   HospitalLearningMode? _hospitalMode;
   bool _hospitalSoloCompletionAwarded = false;
+  bool _hospitalReservationGuidedAwarded = false;
+  bool _hospitalReservationSoloAwarded = false;
+  bool _hospitalPaymentGuidedAwarded = false;
+  bool _hospitalPaymentSoloAwarded = false;
+  bool _hospitalDocumentGuidedAwarded = false;
+  bool _hospitalDocumentSoloAwarded = false;
   String? _photoRecipient;
   String? _photoSelection;
   String? _photoMessage;
@@ -306,6 +348,18 @@ class LearningProgressProvider extends ChangeNotifier {
       _preferences.getInt(_hospitalSoloCompletionCountKey) ?? 0;
   bool get hospitalSoloFirstBadgeEarned =>
       _preferences.getBool(_hospitalSoloFirstBadgeKey) ?? false;
+  int get hospitalReservationCompletionCount =>
+      _preferences.getInt(_hospitalReservationCompletionCountKey) ?? 0;
+  int get hospitalReservationSoloCompletionCount =>
+      _preferences.getInt(_hospitalReservationSoloCompletionCountKey) ?? 0;
+  int get hospitalPaymentCompletionCount =>
+      _preferences.getInt(_hospitalPaymentCompletionCountKey) ?? 0;
+  int get hospitalPaymentSoloCompletionCount =>
+      _preferences.getInt(_hospitalPaymentSoloCompletionCountKey) ?? 0;
+  int get hospitalDocumentCompletionCount =>
+      _preferences.getInt(_hospitalDocumentCompletionCountKey) ?? 0;
+  int get hospitalDocumentSoloCompletionCount =>
+      _preferences.getInt(_hospitalDocumentSoloCompletionCountKey) ?? 0;
   String? get photoRecipient => _photoRecipient;
   String? get photoSelection => _photoSelection;
   String? get photoMessage => _photoMessage;
@@ -607,6 +661,124 @@ class LearningProgressProvider extends ChangeNotifier {
     await _saveRecentPractice('병원 접수', '혼자 해보기', 20);
     notifyListeners();
     return shouldAwardBadge;
+  }
+
+  void startHospitalReservationLearning({required bool solo}) {
+    _hospitalReservationGuidedAwarded = false;
+    _hospitalReservationSoloAwarded = false;
+    _preferences.setBool(
+      solo
+          ? _hospitalReservationSoloSessionAwardedKey
+          : _hospitalReservationGuidedSessionAwardedKey,
+      false,
+    );
+  }
+
+  Future<bool> completeHospitalReservationLearning({required bool solo}) async {
+    final key = solo
+        ? _hospitalReservationSoloSessionAwardedKey
+        : _hospitalReservationGuidedSessionAwardedKey;
+    final alreadyAwarded = solo
+        ? _hospitalReservationSoloAwarded
+        : _hospitalReservationGuidedAwarded;
+    if (alreadyAwarded || (_preferences.getBool(key) ?? false)) return false;
+
+    if (solo) {
+      _hospitalReservationSoloAwarded = true;
+    } else {
+      _hospitalReservationGuidedAwarded = true;
+    }
+    await _preferences.setBool(key, true);
+    final points = solo ? 20 : 10;
+    await _preferences.setInt(_pointsKey, totalPoints + points);
+    final countKey = solo
+        ? _hospitalReservationSoloCompletionCountKey
+        : _hospitalReservationCompletionCountKey;
+    final count = solo
+        ? hospitalReservationSoloCompletionCount
+        : hospitalReservationCompletionCount;
+    await _preferences.setInt(countKey, count + 1);
+    await _saveRecentPractice('병원 예약 확인', solo ? '혼자 해보기' : '따라 해보기', points);
+    notifyListeners();
+    return true;
+  }
+
+  void startHospitalPaymentLearning({required bool solo}) {
+    _hospitalPaymentGuidedAwarded = false;
+    _hospitalPaymentSoloAwarded = false;
+    _preferences.setBool(
+      solo
+          ? _hospitalPaymentSoloSessionAwardedKey
+          : _hospitalPaymentGuidedSessionAwardedKey,
+      false,
+    );
+  }
+
+  Future<bool> completeHospitalPaymentLearning({required bool solo}) async {
+    final key = solo
+        ? _hospitalPaymentSoloSessionAwardedKey
+        : _hospitalPaymentGuidedSessionAwardedKey;
+    final alreadyAwarded = solo
+        ? _hospitalPaymentSoloAwarded
+        : _hospitalPaymentGuidedAwarded;
+    if (alreadyAwarded || (_preferences.getBool(key) ?? false)) return false;
+    if (solo) {
+      _hospitalPaymentSoloAwarded = true;
+    } else {
+      _hospitalPaymentGuidedAwarded = true;
+    }
+    await _preferences.setBool(key, true);
+    final points = solo ? 20 : 10;
+    await _preferences.setInt(_pointsKey, totalPoints + points);
+    final countKey = solo
+        ? _hospitalPaymentSoloCompletionCountKey
+        : _hospitalPaymentCompletionCountKey;
+    final count = solo
+        ? hospitalPaymentSoloCompletionCount
+        : hospitalPaymentCompletionCount;
+    await _preferences.setInt(countKey, count + 1);
+    await _saveRecentPractice('병원 진료비 수납', solo ? '혼자 해보기' : '따라 해보기', points);
+    notifyListeners();
+    return true;
+  }
+
+  void startHospitalDocumentLearning({required bool solo}) {
+    _hospitalDocumentGuidedAwarded = false;
+    _hospitalDocumentSoloAwarded = false;
+    _preferences.setBool(
+      solo
+          ? _hospitalDocumentSoloSessionAwardedKey
+          : _hospitalDocumentGuidedSessionAwardedKey,
+      false,
+    );
+  }
+
+  Future<bool> completeHospitalDocumentLearning({required bool solo}) async {
+    final key = solo
+        ? _hospitalDocumentSoloSessionAwardedKey
+        : _hospitalDocumentGuidedSessionAwardedKey;
+    final alreadyAwarded = solo
+        ? _hospitalDocumentSoloAwarded
+        : _hospitalDocumentGuidedAwarded;
+    if (alreadyAwarded || (_preferences.getBool(key) ?? false)) return false;
+    if (solo) {
+      _hospitalDocumentSoloAwarded = true;
+    } else {
+      _hospitalDocumentGuidedAwarded = true;
+    }
+    await _preferences.setBool(key, true);
+    final points = solo ? 20 : 10;
+    await _preferences.setInt(_pointsKey, totalPoints + points);
+    final countKey = solo
+        ? _hospitalDocumentSoloCompletionCountKey
+        : _hospitalDocumentCompletionCountKey;
+    final count = solo
+        ? hospitalDocumentSoloCompletionCount
+        : hospitalDocumentCompletionCount;
+    await _preferences.setInt(countKey, count + 1);
+    await _saveRecentPractice('병원 서류 발급', solo ? '혼자 해보기' : '따라 해보기', points);
+    notifyListeners();
+    return true;
   }
 
   void selectPhotoRecipient(String value) {
@@ -1039,6 +1211,12 @@ class LearningProgressProvider extends ChangeNotifier {
     _hospitalCompletionAwarded = false;
     _hospitalMode = null;
     _hospitalSoloCompletionAwarded = false;
+    _hospitalReservationGuidedAwarded = false;
+    _hospitalReservationSoloAwarded = false;
+    _hospitalPaymentGuidedAwarded = false;
+    _hospitalPaymentSoloAwarded = false;
+    _hospitalDocumentGuidedAwarded = false;
+    _hospitalDocumentSoloAwarded = false;
     _photoRecipient = null;
     _photoSelection = null;
     _photoMessage = null;

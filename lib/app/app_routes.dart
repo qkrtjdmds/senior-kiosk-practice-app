@@ -26,6 +26,12 @@ abstract final class AppRoutes {
   static const hospitalStepThree = '/hospital/practice/step-3';
   static const hospitalStepFour = '/hospital/practice/step-4';
   static const hospitalComplete = '/hospital/complete';
+  static const hospitalReservationPractice = '/hospital/reservation/practice';
+  static const hospitalReservationComplete = '/hospital/reservation/complete';
+  static const hospitalPaymentPractice = '/hospital/payment/practice';
+  static const hospitalPaymentComplete = '/hospital/payment/complete';
+  static const hospitalDocumentPractice = '/hospital/document/practice';
+  static const hospitalDocumentComplete = '/hospital/document/complete';
   static const photoStart = '/photo';
   static const photoMission = '/photo/mission';
   static const photoStepOne = '/photo/practice';
