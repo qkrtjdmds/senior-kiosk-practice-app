@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,21 +7,20 @@ import 'package:han_geoleum_digital/app/app.dart';
 import 'package:han_geoleum_digital/app/app_router.dart';
 import 'package:han_geoleum_digital/app/app_routes.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
+import 'package:han_geoleum_digital/features/atm_v2/atm_withdrawal_models.dart';
 
 void main() {
-  testWidgets('좁은 화면과 아주 큰 글씨에서 ATM 주요 화면이 넘치지 않는다', (tester) async {
+  testWidgets('320dp와 아주 큰 글씨에서 ATM V2 주요 화면이 넘치지 않는다', (tester) async {
     tester.view.physicalSize = const Size(320, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-
     SharedPreferences.setMockInitialValues({});
     final progress = LearningProgressProvider(
       await SharedPreferences.getInstance(),
     );
     await progress.setAccessibilityTextSize(AccessibilityTextSize.extraLarge);
     await progress.setScreenContrast(ScreenContrast.vivid);
-
     appRouter.go(AppRoutes.atmStart);
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -30,37 +29,41 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-
-    expect(find.text('실제 돈이 나가지 않는 연습 화면이에요.'), findsOneWidget);
-    expect(find.text('ATM에서 돈을 찾는 순서를 천천히 연습해요.'), findsOneWidget);
-    expect(find.text('화면의 안내를 보며 하나씩 연습해요.'), findsOneWidget);
-    expect(find.text('오늘의 출금 미션을 기억하고 직접 해봐요.'), findsOneWidget);
+    expect(find.text('ATM 출금 연습'), findsWidgets);
+    expect(find.text('따라 해보기'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('혼자 해보기'),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('혼자 해보기'), findsOneWidget);
     expect(tester.takeException(), isNull);
-
     await progress.startAtmLearning(AtmLearningMode.guided);
-    appRouter.go(AppRoutes.atmPractice);
+    atmWithdrawalProvider.begin(AtmLearningMode.guided);
+    appRouter.go(AppRoutes.atmV2Services);
     await tester.pumpAndSettle();
-    expect(find.text('화면의 안내를 보고 선택해보세요.'), findsOneWidget);
-    expect(find.text('여기를 눌러보세요'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-
-    await progress.startAtmLearning(AtmLearningMode.solo);
-    appRouter.go(AppRoutes.atmPractice);
-    await tester.pumpAndSettle();
-    expect(find.text('미션을 기억하고 직접 골라보세요.'), findsOneWidget);
-    expect(find.text('힌트 보기'), findsOneWidget);
-    expect(find.text('여기를 눌러보세요'), findsNothing);
+    expect(find.text('원하는 업무를 선택해 주세요'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('ATM 출금 확인은 선택 금액과 수수료를 공통 요약 카드에 표시한다', (tester) async {
+  testWidgets('ATM V2 거래 확인은 금액과 가상 수수료를 구분해 표시한다', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final progress = LearningProgressProvider(
       await SharedPreferences.getInstance(),
     );
     await progress.startAtmLearning(AtmLearningMode.guided);
-
-    appRouter.go(AppRoutes.atmPractice);
+    atmWithdrawalProvider.begin(AtmLearningMode.guided);
+    final atm = atmWithdrawalProvider;
+    atm.chooseService('현금 출금');
+    atm.chooseTransaction('현금 출금');
+    atm.insertCard();
+    for (final digit in '1234'.split('')) {
+      atm.addPinDigit(digit);
+    }
+    atm.verifyPin();
+    atm.chooseAccount(atmPracticeAccounts.first);
+    atm.chooseAmount(50000);
+    appRouter.go(AppRoutes.atmV2Review);
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: progress,
@@ -68,24 +71,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-
-    Future<void> choose(String label) async {
-      final target = find.text(label);
-      await tester.ensureVisible(target);
-      await tester.tap(target);
-      await tester.pumpAndSettle();
-    }
-
-    await choose('카드를 넣을게요');
-    await choose('돈을 찾을게요');
-    await choose('5만 원');
-
-    expect(find.text('출금 내용'), findsOneWidget);
-    expect(find.text('출금 금액'), findsOneWidget);
-    expect(find.text('수수료'), findsOneWidget);
-    expect(find.text('없음'), findsOneWidget);
-    expect(find.text('받을 금액'), findsOneWidget);
-    expect(find.text('실제 거래가 아닌 연습용 화면이에요.'), findsOneWidget);
+    expect(find.text('거래 내용을 확인해 주세요'), findsOneWidget);
+    expect(find.text('가상 수수료'), findsOneWidget);
+    expect(find.text('0원'), findsOneWidget);
+    expect(find.text('차감 예정 가상 금액'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

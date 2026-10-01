@@ -34,19 +34,19 @@ import '../features/photo/photo_step_one_page.dart';
 import '../features/photo/photo_step_three_page.dart';
 import '../features/photo/photo_step_two_page.dart';
 import '../features/train/train_complete_page.dart';
-import '../features/train/train_mission_page.dart';
-import '../features/train/train_start_page.dart';
 import '../features/train/train_step_five_page.dart';
 import '../features/train/train_step_four_page.dart';
 import '../features/train/train_step_one_page.dart';
 import '../features/train/train_step_three_page.dart';
 import '../features/train/train_step_two_page.dart';
+import '../features/train_v2/train_booking_models.dart';
+import '../features/train_v2/train_booking_provider.dart';
+import '../features/train_v2/train_v2_pages.dart';
 import '../features/hamburger_v2/burger_order_provider.dart';
 import '../features/hamburger_v2/burger_v2_pages.dart';
-import '../features/atm/atm_complete_page.dart';
-import '../features/atm/atm_mission_page.dart';
-import '../features/atm/atm_practice_page.dart';
-import '../features/atm/atm_start_page.dart';
+import '../features/atm_v2/atm_v2_pages.dart';
+import '../features/atm_v2/atm_withdrawal_models.dart';
+import '../features/atm_v2/atm_withdrawal_provider.dart';
 import '../features/civil_document/civil_document_complete_page.dart';
 import '../features/civil_document/civil_document_mission_page.dart';
 import '../features/civil_document/civil_document_practice_page.dart';
@@ -58,6 +58,8 @@ final hospitalReceptionProvider = HospitalReceptionProvider();
 final hospitalReservationProvider = HospitalReservationProvider();
 final hospitalPaymentProvider = HospitalPaymentProvider();
 final hospitalDocumentProvider = HospitalDocumentProvider();
+final trainBookingProvider = TrainBookingProvider();
+final atmWithdrawalProvider = AtmWithdrawalProvider();
 
 Widget _withCafeOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
@@ -65,6 +67,20 @@ Widget _withCafeOrderProvider(Widget child) {
 
 Widget _withBurgerOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: burgerOrderProvider, child: child);
+}
+
+Widget _withTrainBookingProvider(Widget child) {
+  return ChangeNotifierProvider.value(
+    value: trainBookingProvider,
+    child: child,
+  );
+}
+
+Widget _withAtmWithdrawalProvider(Widget child) {
+  return ChangeNotifierProvider.value(
+    value: atmWithdrawalProvider,
+    child: child,
+  );
 }
 
 Widget _withHospitalReceptionProvider(Widget child) {
@@ -276,11 +292,13 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.trainStart,
-      builder: (context, state) => const TrainStartPage(),
+      builder: (context, state) =>
+          _withTrainBookingProvider(const TrainV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.trainMission,
-      builder: (context, state) => const TrainMissionPage(),
+      builder: (context, state) =>
+          _withTrainBookingProvider(const TrainV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.trainStepOne,
@@ -306,6 +324,29 @@ final appRouter = GoRouter(
       path: AppRoutes.trainComplete,
       builder: (context, state) => const TrainCompletePage(),
     ),
+    for (final entry in <String, TrainBookingStep>{
+      AppRoutes.trainV2TripType: TrainBookingStep.tripType,
+      AppRoutes.trainV2Stations: TrainBookingStep.stations,
+      AppRoutes.trainV2Date: TrainBookingStep.date,
+      AppRoutes.trainV2Time: TrainBookingStep.timeBand,
+      AppRoutes.trainV2Passengers: TrainBookingStep.passengers,
+      AppRoutes.trainV2SearchReview: TrainBookingStep.searchReview,
+      AppRoutes.trainV2Schedules: TrainBookingStep.schedules,
+      AppRoutes.trainV2CarType: TrainBookingStep.carType,
+      AppRoutes.trainV2Seats: TrainBookingStep.seats,
+      AppRoutes.trainV2BookingReview: TrainBookingStep.bookingReview,
+      AppRoutes.trainV2Payment: TrainBookingStep.payment,
+    }.entries)
+      GoRoute(
+        path: entry.key,
+        builder: (context, state) =>
+            _withTrainBookingProvider(TrainV2FlowPage(pageStep: entry.value)),
+      ),
+    GoRoute(
+      path: AppRoutes.trainV2Ticket,
+      builder: (context, state) =>
+          _withTrainBookingProvider(const TrainV2TicketPage()),
+    ),
     GoRoute(
       path: AppRoutes.hamburgerStart,
       builder: (context, state) =>
@@ -328,20 +369,43 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.atmStart,
-      builder: (context, state) => const AtmStartPage(),
+      builder: (context, state) =>
+          _withAtmWithdrawalProvider(const AtmV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.atmMission,
-      builder: (context, state) => const AtmMissionPage(),
+      builder: (context, state) =>
+          _withAtmWithdrawalProvider(const AtmV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.atmPractice,
-      builder: (context, state) => const AtmPracticePage(),
+      builder: (context, state) => _withAtmWithdrawalProvider(
+        const AtmV2FlowPage(pageStep: AtmV2Step.services),
+      ),
     ),
     GoRoute(
       path: AppRoutes.atmComplete,
-      builder: (context, state) => const AtmCompletePage(),
+      builder: (context, state) =>
+          _withAtmWithdrawalProvider(const AtmV2CompletePage()),
     ),
+    for (final entry in <String, AtmV2Step>{
+      AppRoutes.atmV2Services: AtmV2Step.services,
+      AppRoutes.atmV2Transaction: AtmV2Step.transaction,
+      AppRoutes.atmV2Card: AtmV2Step.card,
+      AppRoutes.atmV2Pin: AtmV2Step.pin,
+      AppRoutes.atmV2Account: AtmV2Step.account,
+      AppRoutes.atmV2Amount: AtmV2Step.amount,
+      AppRoutes.atmV2Review: AtmV2Step.review,
+      AppRoutes.atmV2Processing: AtmV2Step.processing,
+      AppRoutes.atmV2CardReturn: AtmV2Step.cardReturn,
+      AppRoutes.atmV2CashReturn: AtmV2Step.cashReturn,
+      AppRoutes.atmV2Receipt: AtmV2Step.receipt,
+    }.entries)
+      GoRoute(
+        path: entry.key,
+        builder: (context, state) =>
+            _withAtmWithdrawalProvider(AtmV2FlowPage(pageStep: entry.value)),
+      ),
     GoRoute(
       path: AppRoutes.civilDocumentStart,
       builder: (context, state) => const CivilDocumentStartPage(),

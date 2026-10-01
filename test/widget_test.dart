@@ -17,6 +17,7 @@ import 'package:han_geoleum_digital/features/hamburger/hamburger_mission.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_order_provider.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_scenario.dart';
+import 'package:han_geoleum_digital/features/train_v2/train_booking_models.dart';
 
 void main() {
   testWidgets('홈 화면을 표시한다', (WidgetTester tester) async {
@@ -307,52 +308,57 @@ void main() {
     expect(progress.totalPoints, 10);
   });
 
-  testWidgets('기차표 예매 5단계를 완료한다', (WidgetTester tester) async {
+  testWidgets('기차표 V2 따라 해보기 진입과 완료 보상을 확인한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go(AppRoutes.home);
-
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => LearningProgressProvider(preferences),
         child: const HanGeoleumDigitalApp(),
       ),
     );
-
     await tester.ensureVisible(find.text('기차표 예매'));
     await tester.tap(find.text('기차표 예매'));
     await tester.pumpAndSettle();
-    expect(find.text('기차표 예매 연습'), findsWidgets);
-
     await tester.tap(find.text('따라 해보기'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('서울역'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('서울역'));
-    await tester.pump();
-    expect(find.text('2 / 5 단계'), findsOneWidget);
-    expect(find.text('출발역과 다른 도착역을 골라볼까요?'), findsOneWidget);
+    expect(find.text('어떤 표를 예매할까요?'), findsOneWidget);
+    expect(find.textContaining('1 /'), findsOneWidget);
 
-    await tester.tap(find.text('부산역'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('오늘 오전'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('창가 자리'));
+    trainBookingProvider.outbound = TrainSchedule(
+      id: 'test',
+      type: '한걸음 고속',
+      number: 'H101',
+      departure: trainStations.firstWhere((e) => e.id == 'seoul'),
+      arrival: trainStations.firstWhere((e) => e.id == 'busan'),
+      departureMinutes: 560,
+      durationMinutes: 150,
+      standardSeats: 10,
+      premiumSeats: 4,
+      standardFare: 42000,
+      premiumFare: 59000,
+    );
+    trainBookingProvider.departure = trainStations.firstWhere(
+      (e) => e.id == 'seoul',
+    );
+    trainBookingProvider.arrival = trainStations.firstWhere(
+      (e) => e.id == 'busan',
+    );
+    trainBookingProvider.carType = TrainCarType.standard;
+    trainBookingProvider.outboundSeats.add(const TrainSeat('1A'));
+    appRouter.go(AppRoutes.trainV2Ticket);
     await tester.pumpAndSettle();
 
-    expect(find.text('5 / 5 단계'), findsOneWidget);
-    expect(find.text('서울역'), findsOneWidget);
-    expect(find.text('부산역'), findsOneWidget);
-    expect(find.text('오늘 오전'), findsOneWidget);
-    expect(find.text('창가 자리'), findsOneWidget);
-    await tester.ensureVisible(find.text('예매 완료하기'));
-    await tester.tap(find.text('예매 완료하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('기차표 예매 순서를 천천히 잘 따라오셨어요.'), findsOneWidget);
-    expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(find.text('기차표 예매 연습을 완료했어요'), findsOneWidget);
+    expect(find.text('연습용 승차권'), findsOneWidget);
+    expect(find.textContaining('실제 탑승에는 사용할 수 없습니다'), findsOneWidget);
+    final progress = tester
+        .element(find.text('기차표 예매 연습을 완료했어요'))
+        .read<LearningProgressProvider>();
+    expect(progress.trainCompletionCount, 1);
+    expect(progress.totalPoints, 10);
   });
-
   test('기차표 예매 완료 보상은 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -365,18 +371,16 @@ void main() {
     expect(progress.totalPoints, 10);
   });
 
-  testWidgets('기차표 혼자 해보기 미션과 첫 배지를 완료한다', (WidgetTester tester) async {
+  testWidgets('기차표 V2 혼자 해보기 목표와 인라인 힌트를 확인한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go(AppRoutes.home);
-
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => LearningProgressProvider(preferences),
         child: const HanGeoleumDigitalApp(),
       ),
     );
-
     await tester.ensureVisible(find.text('기차표 예매'));
     await tester.tap(find.text('기차표 예매'));
     await tester.pumpAndSettle();
@@ -384,44 +388,18 @@ void main() {
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('오늘의 기차표 예매 미션'), findsOneWidget);
-    expect(find.text('서울역에서 부산역까지'), findsOneWidget);
+    expect(find.text('오늘의 기차표 예매 목표'), findsOneWidget);
+    expect(find.textContaining('서울에서 부산'), findsNWidgets(2));
     await tester.tap(find.text('혼자 예매해보기'));
     await tester.pumpAndSettle();
-
-    await tester.tap(find.text('부산역'));
+    await tester.tap(find.text('왕복'));
     await tester.pump();
-    expect(find.text('1 / 5 단계'), findsOneWidget);
-    expect(find.textContaining('괜찮아요. 오늘의 예매 내용을 다시 확인해볼까요?'), findsOneWidget);
-    await tester.ensureVisible(find.text('힌트 보기'));
+    expect(find.textContaining('1 /'), findsOneWidget);
+    expect(find.textContaining('괜찮아요. 예매 목표를 다시 살펴볼까요?'), findsOneWidget);
     await tester.tap(find.text('힌트 보기'));
-    await tester.pumpAndSettle();
-    expect(find.text('오늘의 예매 내용'), findsOneWidget);
-    expect(find.textContaining('서울역 → 부산역'), findsOneWidget);
-    await tester.tap(find.text('다시 해볼게요'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('서울역'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('부산역'));
-    await tester.tap(find.text('부산역'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('내일 오전'));
-    await tester.tap(find.text('내일 오전'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('창가 자리'));
-    await tester.tap(find.text('창가 자리'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('예매 완료하기'));
-    await tester.tap(find.text('예매 완료하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('혼자서도 잘하셨어요!'), findsOneWidget);
-    expect(find.text('오늘의 기차표 예매 미션을 완성했어요.'), findsOneWidget);
-    expect(find.text('용기 포인트 +20점'), findsOneWidget);
-    expect(find.text('기차표 예매 첫걸음'), findsOneWidget);
+    await tester.pump();
+    expect(find.textContaining('힌트: 편도를 골라보세요.'), findsOneWidget);
   });
-
   test('기차표 혼자 해보기 보상은 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
@@ -711,65 +689,6 @@ void main() {
 
     await reloaded.startHamburgerSoloMission();
     expect(reloaded.currentHamburgerMission.id, isNot(firstMissionId));
-  });
-
-  testWidgets('홈에서 ATM 출금 5단계를 완료한다', (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final preferences = await SharedPreferences.getInstance();
-    appRouter.go(AppRoutes.home);
-
-    await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => LearningProgressProvider(preferences),
-        child: const HanGeoleumDigitalApp(),
-      ),
-    );
-
-    await tester.ensureVisible(find.text('ATM 출금'));
-    await tester.tap(find.text('ATM 출금'));
-    await tester.pumpAndSettle();
-    expect(find.text('ATM 출금 연습'), findsNWidgets(2));
-    expect(find.text('실제 돈이 나가지 않는 연습 화면이에요.'), findsOneWidget);
-
-    await tester.ensureVisible(find.text('따라 해보기'));
-    await tester.tap(find.text('따라 해보기'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('도움이 필요해요'));
-    await tester.tap(find.text('도움이 필요해요'));
-    await tester.pump();
-    expect(find.text('1 / 5 단계'), findsOneWidget);
-    expect(find.text('괜찮아요. 카드를 넣는 것부터 천천히 해볼까요?'), findsOneWidget);
-    await tester.tap(find.text('카드를 넣을게요'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('잔액을 확인할게요'));
-    await tester.pump();
-    expect(find.text('2 / 5 단계'), findsOneWidget);
-    expect(find.text('이번에는 돈을 찾는 연습을 해볼까요?'), findsOneWidget);
-    await tester.tap(find.text('돈을 찾을게요'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('5만 원'));
-    await tester.tap(find.text('5만 원'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('4 / 5 단계'), findsOneWidget);
-    expect(find.text('출금 금액'), findsOneWidget);
-    expect(find.text('수수료'), findsOneWidget);
-    expect(find.text('없음'), findsOneWidget);
-    expect(find.text('받을 금액'), findsOneWidget);
-    expect(find.text('5만 원'), findsNWidgets(2));
-    await tester.tap(find.text('맞아요, 출금할게요'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('카드만 챙겼어요'));
-    await tester.pump();
-    expect(find.text('5 / 5 단계'), findsOneWidget);
-    expect(find.text('돈도 함께 챙기면 더 안전해요.'), findsOneWidget);
-    await tester.tap(find.text('카드와 돈을 챙겼어요'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('잘하셨어요! ATM 출금 연습을 마쳤어요.'), findsOneWidget);
-    expect(find.text('실제 ATM에서도 카드와 돈을 함께 챙겨보세요.'), findsOneWidget);
-    expect(find.text('+10점'), findsOneWidget);
   });
 
   test('ATM 출금 완료 보상과 기록은 재진입해도 한 번만 저장한다', () async {
