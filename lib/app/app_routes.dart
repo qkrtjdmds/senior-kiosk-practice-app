@@ -82,4 +82,15 @@ abstract final class AppRoutes {
   static const civilDocumentMission = '/civil-document/mission';
   static const civilDocumentPractice = '/civil-document/practice';
   static const civilDocumentComplete = '/civil-document/complete';
+  static const civilDocumentV2Categories = '/civil-document/v2/categories';
+  static const civilDocumentV2Documents = '/civil-document/v2/documents';
+  static const civilDocumentV2Availability = '/civil-document/v2/availability';
+  static const civilDocumentV2Identity = '/civil-document/v2/identity';
+  static const civilDocumentV2Fingerprint = '/civil-document/v2/fingerprint';
+  static const civilDocumentV2Options = '/civil-document/v2/options';
+  static const civilDocumentV2Copies = '/civil-document/v2/copies';
+  static const civilDocumentV2Review = '/civil-document/v2/review';
+  static const civilDocumentV2Payment = '/civil-document/v2/payment';
+  static const civilDocumentV2Printing = '/civil-document/v2/printing';
+  static const civilDocumentV2Collection = '/civil-document/v2/collection';
 }

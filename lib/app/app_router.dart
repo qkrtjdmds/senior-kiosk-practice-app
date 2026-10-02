@@ -47,10 +47,9 @@ import '../features/hamburger_v2/burger_v2_pages.dart';
 import '../features/atm_v2/atm_v2_pages.dart';
 import '../features/atm_v2/atm_withdrawal_models.dart';
 import '../features/atm_v2/atm_withdrawal_provider.dart';
-import '../features/civil_document/civil_document_complete_page.dart';
-import '../features/civil_document/civil_document_mission_page.dart';
-import '../features/civil_document/civil_document_practice_page.dart';
-import '../features/civil_document/civil_document_start_page.dart';
+import '../features/civil_document_v2/civil_document_models.dart';
+import '../features/civil_document_v2/civil_document_provider.dart';
+import '../features/civil_document_v2/civil_document_v2_pages.dart';
 
 final cafeOrderProvider = CafeOrderProvider();
 final burgerOrderProvider = BurgerOrderProvider();
@@ -60,6 +59,7 @@ final hospitalPaymentProvider = HospitalPaymentProvider();
 final hospitalDocumentProvider = HospitalDocumentProvider();
 final trainBookingProvider = TrainBookingProvider();
 final atmWithdrawalProvider = AtmWithdrawalProvider();
+final civilDocumentV2Provider = CivilDocumentV2Provider();
 
 Widget _withCafeOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
@@ -79,6 +79,13 @@ Widget _withTrainBookingProvider(Widget child) {
 Widget _withAtmWithdrawalProvider(Widget child) {
   return ChangeNotifierProvider.value(
     value: atmWithdrawalProvider,
+    child: child,
+  );
+}
+
+Widget _withCivilDocumentV2Provider(Widget child) {
+  return ChangeNotifierProvider.value(
+    value: civilDocumentV2Provider,
     child: child,
   );
 }
@@ -408,20 +415,44 @@ final appRouter = GoRouter(
       ),
     GoRoute(
       path: AppRoutes.civilDocumentStart,
-      builder: (context, state) => const CivilDocumentStartPage(),
+      builder: (context, state) =>
+          _withCivilDocumentV2Provider(const CivilDocumentV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.civilDocumentMission,
-      builder: (context, state) => const CivilDocumentMissionPage(),
+      builder: (context, state) =>
+          _withCivilDocumentV2Provider(const CivilDocumentV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.civilDocumentPractice,
-      builder: (context, state) => const CivilDocumentPracticePage(),
+      builder: (context, state) => _withCivilDocumentV2Provider(
+        const CivilDocumentV2FlowPage(pageStep: CivilDocumentV2Step.categories),
+      ),
     ),
     GoRoute(
       path: AppRoutes.civilDocumentComplete,
-      builder: (context, state) => const CivilDocumentCompletePage(),
+      builder: (context, state) =>
+          _withCivilDocumentV2Provider(const CivilDocumentV2CompletePage()),
     ),
+    for (final entry in <String, CivilDocumentV2Step>{
+      AppRoutes.civilDocumentV2Categories: CivilDocumentV2Step.categories,
+      AppRoutes.civilDocumentV2Documents: CivilDocumentV2Step.documents,
+      AppRoutes.civilDocumentV2Availability: CivilDocumentV2Step.availability,
+      AppRoutes.civilDocumentV2Identity: CivilDocumentV2Step.identity,
+      AppRoutes.civilDocumentV2Fingerprint: CivilDocumentV2Step.fingerprint,
+      AppRoutes.civilDocumentV2Options: CivilDocumentV2Step.options,
+      AppRoutes.civilDocumentV2Copies: CivilDocumentV2Step.copies,
+      AppRoutes.civilDocumentV2Review: CivilDocumentV2Step.review,
+      AppRoutes.civilDocumentV2Payment: CivilDocumentV2Step.payment,
+      AppRoutes.civilDocumentV2Printing: CivilDocumentV2Step.printing,
+      AppRoutes.civilDocumentV2Collection: CivilDocumentV2Step.collection,
+    }.entries)
+      GoRoute(
+        path: entry.key,
+        builder: (context, state) => _withCivilDocumentV2Provider(
+          CivilDocumentV2FlowPage(pageStep: entry.value),
+        ),
+      ),
   ],
 );
 

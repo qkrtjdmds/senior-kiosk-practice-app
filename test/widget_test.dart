@@ -717,55 +717,84 @@ void main() {
     expect(reloaded.totalPoints, 10);
   });
 
-  testWidgets('홈에서 무인민원발급기 5단계를 완료한다', (WidgetTester tester) async {
+  testWidgets('홈에서 무인민원발급기 V2 따라 해보기를 완료한다', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    appRouter.go(AppRoutes.home);
-
+    final progress = LearningProgressProvider(preferences);
+    appRouter.go(AppRoutes.civilDocumentStart);
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => LearningProgressProvider(preferences),
+      ChangeNotifierProvider.value(
+        value: progress,
         child: const HanGeoleumDigitalApp(),
       ),
     );
-
-    await tester.ensureVisible(find.text('서류 발급'));
-    await tester.tap(find.text('서류 발급'));
     await tester.pumpAndSettle();
-    expect(find.text('무인민원발급기 연습'), findsNWidgets(2));
-    expect(find.text('이 화면은 실제 서류를 발급하지 않는 연습용 화면이에요.'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('따라 해보기'));
-    await tester.tap(find.text('따라 해보기'));
+    expect(find.textContaining('실제 증명서가 발급되지 않고'), findsOneWidget);
+    await tester.tap(find.text('증명서 발급 시작'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('가족관계증명서'));
-    await tester.tap(find.text('가족관계증명서'));
+    await tester.tap(find.text('주민등록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('주민등록표 등본'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('발급 안내를 확인했어요'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('본인 확인 연습 시작'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('지문 인식 시도'));
     await tester.pump();
-    expect(find.text('1 / 5 단계'), findsOneWidget);
-    expect(find.text('이번 연습에서는 주민등록등본을 발급해볼게요.'), findsOneWidget);
-
-    await tester.ensureVisible(find.text('주민등록등본'));
-    await tester.tap(find.text('주민등록등본'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('기본 내용으로 발급할게요'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('한 부'));
+    await tester.tap(find.text('다시 인식하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('4 / 5 단계'), findsOneWidget);
-    expect(find.text('주민등록등본'), findsOneWidget);
-    expect(find.text('기본 내용'), findsOneWidget);
-    expect(find.text('한 부'), findsOneWidget);
-    await tester.tap(find.text('발급 확인'));
+    for (final option in [
+      '주소 변동 사항: 포함 안 함',
+      '세대 구성 사유: 포함 안 함',
+      '주민등록번호 뒷자리: 표시 안 함',
+      '세대원 정보: 전체',
+      '발급 형태: 필요한 내용만',
+    ]) {
+      await tester.scrollUntilVisible(
+        find.text(option),
+        180,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text(option));
+      await tester.pump();
+    }
+    await tester.tap(find.text('옵션 선택 완료'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('서류를 챙길게요'));
+    await tester.tap(find.text('1부'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('신청 내용 확인'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('카드'));
+    await tester.pump();
+    await tester.tap(find.text('가상 결제 연습'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
+    await tester.tap(find.text('카드를 챙겼어요'));
+    await tester.pump();
+    await tester.tap(find.text('증명서 출력으로'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('가상 출력 시작'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+    await tester.tap(find.text('증명서 챙기기').last);
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+    await tester.tap(find.text('증명서 챙기기').last);
+    await tester.pump();
+    await tester.tap(find.text('개인정보 안전 종료'));
+    await tester.pump();
+    await tester.tap(find.text('연습 완료하기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('잘하셨어요!'), findsOneWidget);
-    expect(find.text('무인민원발급기에서 서류를 발급하는 순서를 천천히 잘 따라오셨어요.'), findsOneWidget);
+    expect(find.text('증명서 발급 연습 완료'), findsOneWidget);
     expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(progress.civilDocumentCompletionCount, 1);
+    expect(progress.totalPoints, 10);
+    expect(tester.takeException(), isNull);
   });
-
   test('무인민원발급기 완료 보상과 기록은 재진입해도 한 번만 저장한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
