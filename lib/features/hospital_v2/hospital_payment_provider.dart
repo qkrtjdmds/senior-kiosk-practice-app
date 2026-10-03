@@ -102,6 +102,7 @@ const hospitalPaymentScenarios = <HospitalPaymentScenario>[
 class HospitalPaymentProvider extends ChangeNotifier {
   HospitalPaymentStep step = HospitalPaymentStep.service;
   bool isSolo = false;
+  bool isFreePractice = false;
   int scenarioIndex = 0;
   String patientNumber = '';
   PracticeMedicalBill? selectedBill;
@@ -140,9 +141,17 @@ class HospitalPaymentProvider extends ChangeNotifier {
 
   void begin({required bool solo, int completedCount = 0}) {
     isSolo = solo;
+    isFreePractice = false;
     scenarioIndex = solo ? completedCount % hospitalPaymentScenarios.length : 0;
     reset(notify: false);
     notifyListeners();
+  }
+
+  void beginFreePractice() {
+    isSolo = false;
+    isFreePractice = true;
+    scenarioIndex = 0;
+    reset();
   }
 
   void enterPatientCheck() {
@@ -190,7 +199,7 @@ class HospitalPaymentProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (bill.id != targetBill.id) {
+    if (!isFreePractice && bill.id != targetBill.id) {
       notice = '괜찮아요. 날짜와 진료과, 금액을 다시 확인해 볼까요?';
       notifyListeners();
       return false;
@@ -219,7 +228,7 @@ class HospitalPaymentProvider extends ChangeNotifier {
   }
 
   bool chooseMethod(HospitalPaymentMethod method) {
-    if (method != targetMethod) {
+    if (!isFreePractice && method != targetMethod) {
       notice = '괜찮아요. 연습 목표의 결제 방법을 다시 확인해 볼까요?';
       notifyListeners();
       return false;
@@ -242,7 +251,9 @@ class HospitalPaymentProvider extends ChangeNotifier {
 
   bool chooseReceipt(bool value) {
     if (!practiceComplete) return false;
-    if (scenario.wantsReceipt != null && value != scenario.wantsReceipt) {
+    if (!isFreePractice &&
+        scenario.wantsReceipt != null &&
+        value != scenario.wantsReceipt) {
       notice = '괜찮아요. 연습 목표의 영수증 선택을 다시 확인해 볼까요?';
       notifyListeners();
       return false;

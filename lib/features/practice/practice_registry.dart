@@ -1,0 +1,21 @@
+import '../atm_v2/atm_withdrawal_provider.dart';
+import '../cafe_v2/cafe_order_provider.dart';
+import '../civil_document_v2/civil_document_provider.dart';
+import '../hamburger_v2/burger_order_provider.dart';
+import '../hospital_v2/hospital_document_provider.dart';
+import '../hospital_v2/hospital_payment_provider.dart';
+import '../hospital_v2/hospital_reception_provider.dart';
+import '../hospital_v2/hospital_reservation_provider.dart';
+import '../photo_send_v2/photo_send_provider.dart';
+import '../train_v2/train_booking_provider.dart';
+
+final cafeOrderProvider = CafeOrderProvider();
+final burgerOrderProvider = BurgerOrderProvider();
+final hospitalReceptionProvider = HospitalReceptionProvider();
+final hospitalReservationProvider = HospitalReservationProvider();
+final hospitalPaymentProvider = HospitalPaymentProvider();
+final hospitalDocumentProvider = HospitalDocumentProvider();
+final trainBookingProvider = TrainBookingProvider();
+final atmWithdrawalProvider = AtmWithdrawalProvider();
+final civilDocumentV2Provider = CivilDocumentV2Provider();
+final photoSendProvider = PhotoSendProvider();

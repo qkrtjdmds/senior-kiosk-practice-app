@@ -30,10 +30,10 @@ void main() {
 
   testWidgets('4개 하단 탭이 정상적으로 이동한다', (tester) async {
     await pumpApp(tester);
-    for (final label in ['홈', '연습', '미션', '내 정보']) {
+    for (final label in ['홈', '연습하기', '미션', '내 정보']) {
       expect(find.text(label), findsOneWidget);
     }
-    await tester.tap(find.text('연습'));
+    await tester.tap(find.text('연습하기'));
     await tester.pumpAndSettle();
     expect(appRouter.state.uri.path, AppRoutes.practice);
     await tester.tap(find.text('미션'));

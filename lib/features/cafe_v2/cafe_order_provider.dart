@@ -267,6 +267,7 @@ const cafeMenuItems = <CafeMenuItem>[
 
 class CafeOrderProvider extends ChangeNotifier {
   CafeLearningMode _mode = CafeLearningMode.guided;
+  bool _isFreePractice = false;
   CafeCategory _category = CafeCategory.coffee;
   CafeMenuItem? _selectedMenu;
   CafeTemperature? _temperature;
@@ -279,6 +280,7 @@ class CafeOrderProvider extends ChangeNotifier {
 
   CafeLearningMode get mode => _mode;
   bool get isSolo => _mode == CafeLearningMode.solo;
+  bool get isFreePractice => _isFreePractice;
   CafeCategory get category => _category;
   CafeMenuItem? get selectedMenu => _selectedMenu;
   CafeTemperature? get temperature => _temperature;
@@ -297,6 +299,7 @@ class CafeOrderProvider extends ChangeNotifier {
 
   void start(CafeLearningMode mode) {
     _mode = mode;
+    _isFreePractice = false;
     _category = CafeCategory.coffee;
     _cart.clear();
     _nextCartId = 1;
@@ -306,13 +309,21 @@ class CafeOrderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void startFreePractice() {
+    start(CafeLearningMode.guided);
+    _isFreePractice = true;
+    notifyListeners();
+  }
+
   void selectCategory(CafeCategory value) {
     _category = value;
     notifyListeners();
   }
 
   bool selectMenu(CafeMenuItem value) {
-    if (isSolo && value.id != soloTargetMenu.id) return false;
+    if (!isFreePractice && isSolo && value.id != soloTargetMenu.id) {
+      return false;
+    }
     _selectedMenu = value;
     _temperature = value.temperatures.length == 1
         ? value.temperatures.first
@@ -324,21 +335,27 @@ class CafeOrderProvider extends ChangeNotifier {
   }
 
   bool selectTemperature(CafeTemperature value) {
-    if (isSolo && value != CafeTemperature.iced) return false;
+    if (!isFreePractice && isSolo && value != CafeTemperature.iced) {
+      return false;
+    }
     _temperature = value;
     notifyListeners();
     return true;
   }
 
   bool selectSize(CafeSize value) {
-    if (isSolo && value != CafeSize.regular) return false;
+    if (!isFreePractice && isSolo && value != CafeSize.regular) {
+      return false;
+    }
     _size = value;
     notifyListeners();
     return true;
   }
 
   bool selectDineOption(CafeDineOption value) {
-    if (isSolo && value != CafeDineOption.takeout) return false;
+    if (!isFreePractice && isSolo && value != CafeDineOption.takeout) {
+      return false;
+    }
     _dineOption = value;
     notifyListeners();
     return true;

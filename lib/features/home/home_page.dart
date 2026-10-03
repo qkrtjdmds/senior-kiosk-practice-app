@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../daily_mission/daily_mission_provider.dart';
+import '../practice/practice_launcher.dart';
 
 const _sageSurface = Color(0xFFEDF2EA);
 const _sageBorder = Color(0xFFBAC9B7);
@@ -31,7 +32,7 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '오늘도 천천히 연습해 볼까요?',
+            '원하는 연습을 바로 시작해 보세요',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 18),
@@ -43,7 +44,8 @@ class HomePage extends StatelessWidget {
             title: '카페 키오스크 연습',
             message: '화면을 보며 주문 순서를 연습해요',
             icon: Icons.local_cafe_outlined,
-            onPressed: () => context.go(AppRoutes.cafeStart),
+            onPressed: () =>
+                PracticeLauncher.startFree(context, PracticeContent.cafe),
           ),
           const SizedBox(height: 14),
           _ProgressCard(onPressed: () => context.go(AppRoutes.progress)),
@@ -55,32 +57,44 @@ class HomePage extends StatelessWidget {
               _PracticeItem(
                 title: '병원 접수',
                 icon: Icons.local_hospital_outlined,
-                onPressed: () => context.go(AppRoutes.hospitalStart),
+                onPressed: () => PracticeLauncher.startFree(
+                  context,
+                  PracticeContent.hospital,
+                ),
               ),
               _PracticeItem(
                 title: '사진 보내기',
                 icon: Icons.photo_outlined,
-                onPressed: () => context.go(AppRoutes.photoStart),
+                onPressed: () =>
+                    PracticeLauncher.startFree(context, PracticeContent.photo),
               ),
               _PracticeItem(
                 title: '기차표 예매',
                 icon: Icons.train_outlined,
-                onPressed: () => context.go(AppRoutes.trainStart),
+                onPressed: () =>
+                    PracticeLauncher.startFree(context, PracticeContent.train),
               ),
               _PracticeItem(
                 title: '햄버거 주문',
                 icon: Icons.lunch_dining_outlined,
-                onPressed: () => context.go(AppRoutes.hamburgerStart),
+                onPressed: () => PracticeLauncher.startFree(
+                  context,
+                  PracticeContent.hamburger,
+                ),
               ),
               _PracticeItem(
                 title: 'ATM 출금',
                 icon: Icons.account_balance_outlined,
-                onPressed: () => context.go(AppRoutes.atmStart),
+                onPressed: () =>
+                    PracticeLauncher.startFree(context, PracticeContent.atm),
               ),
               _PracticeItem(
                 title: '서류 발급',
                 icon: Icons.description_outlined,
-                onPressed: () => context.go(AppRoutes.civilDocumentStart),
+                onPressed: () => PracticeLauncher.startFree(
+                  context,
+                  PracticeContent.civilDocument,
+                ),
               ),
             ],
           ),
@@ -229,6 +243,14 @@ class _HomeFeatureCard extends StatelessWidget {
                           : compact
                           ? 20
                           : 22,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '자유 연습',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: _deepGreen,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -445,6 +467,14 @@ class _CompactPracticeCard extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 1.25,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '자유 연습',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: _deepGreen,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

@@ -81,6 +81,7 @@ class BurgerOrderProvider extends ChangeNotifier {
 
   BurgerOrderStep step = BurgerOrderStep.dine;
   HamburgerLearningMode mode = HamburgerLearningMode.guided;
+  bool isFreePractice = false;
   String? dineOption;
   BurgerMenu? selectedMenu;
   BurgerOrderType? orderType;
@@ -99,6 +100,13 @@ class BurgerOrderProvider extends ChangeNotifier {
 
   void begin(HamburgerLearningMode value) {
     mode = value;
+    isFreePractice = false;
+    resetOrder();
+  }
+
+  void beginFreePractice() {
+    mode = HamburgerLearningMode.guided;
+    isFreePractice = true;
     resetOrder();
   }
 
@@ -222,7 +230,7 @@ class BurgerOrderProvider extends ChangeNotifier {
   }
 
   bool validateExtras(Set<String> target) {
-    if (!isSolo || setEquals(extras, target)) return true;
+    if (isFreePractice || !isSolo || setEquals(extras, target)) return true;
     inlineMessage = '괜찮아요. 주문 내용을 다시 살펴볼까요?';
     notifyListeners();
     return false;
@@ -258,7 +266,7 @@ class BurgerOrderProvider extends ChangeNotifier {
   }
 
   bool _accept(bool correct) {
-    if (correct) return true;
+    if (isFreePractice || correct) return true;
     inlineMessage = isSolo
         ? '괜찮아요. 주문 내용을 다시 살펴볼까요?'
         : '괜찮아요. 안내된 선택을 천천히 눌러볼까요?';

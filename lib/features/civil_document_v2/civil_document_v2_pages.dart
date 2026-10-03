@@ -595,6 +595,11 @@ class CivilDocumentV2FlowPage extends StatelessWidget {
               child: TextButton(
                 onPressed: () async {
                   context.read<DailyMissionProvider>().cancelActiveMission();
+                  if (p.isFreePractice) {
+                    p.beginFreePractice();
+                    context.go(AppRoutes.civilDocumentV2Categories);
+                    return;
+                  }
                   await context
                       .read<LearningProgressProvider>()
                       .startCivilDocumentLearning(
@@ -683,6 +688,7 @@ class _CivilDocumentV2CompletePageState
   }
 
   Future<void> _award(CivilDocumentV2Provider p) async {
+    if (p.isFreePractice) return;
     final progress = context.read<LearningProgressProvider>();
     if (p.isSolo) {
       final before = progress.civilDocumentSoloCompletionCount;
@@ -734,7 +740,9 @@ class _CivilDocumentV2CompletePageState
           ),
           const SizedBox(height: 12),
           CivilNotice(
-            p.isSolo
+            p.isFreePractice
+                ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                : p.isSolo
                 ? '용기 포인트 +20점${_daily ? ' · 오늘의 미션 +10점' : ''}'
                 : '한걸음 포인트 +10점',
           ),
@@ -751,6 +759,11 @@ class _CivilDocumentV2CompletePageState
           ),
           const SizedBox(height: 20),
           civilPrimaryButton('다시 연습하기', () async {
+            if (p.isFreePractice) {
+              p.beginFreePractice();
+              context.go(AppRoutes.civilDocumentV2Categories);
+              return;
+            }
             await progress.startCivilDocumentLearning(
               p.isSolo
                   ? CivilDocumentLearningMode.solo

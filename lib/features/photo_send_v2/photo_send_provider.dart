@@ -4,6 +4,7 @@ import 'photo_send_models.dart';
 
 class PhotoSendProvider extends ChangeNotifier {
   PhotoSendMode mode = PhotoSendMode.guided;
+  bool isFreePractice = false;
   PhotoSendStep step = PhotoSendStep.recipient;
   PhotoSendScenario scenario = guidedPhotoScenario;
   PracticeContact? recipient;
@@ -32,9 +33,17 @@ class PhotoSendProvider extends ChangeNotifier {
 
   void begin(PhotoSendMode value, {int completedCount = 0}) {
     mode = value;
+    isFreePractice = false;
     scenario = value == PhotoSendMode.guided
         ? guidedPhotoScenario
         : soloPhotoScenarios[completedCount % soloPhotoScenarios.length];
+    resetSession();
+  }
+
+  void beginFreePractice() {
+    mode = PhotoSendMode.guided;
+    isFreePractice = true;
+    scenario = guidedPhotoScenario;
     resetSession();
   }
 
@@ -59,7 +68,7 @@ class PhotoSendProvider extends ChangeNotifier {
   }
 
   bool chooseRecipient(PracticeContact value) {
-    if (value.id != scenario.contactId) {
+    if (!isFreePractice && value.id != scenario.contactId) {
       return _wrong('괜찮아요. 받을 사람의 이름과 관계를 다시 확인해 볼까요?');
     }
     recipient = value;
@@ -87,7 +96,8 @@ class PhotoSendProvider extends ChangeNotifier {
       permission = value;
       return _wrong('사진을 고르려면 사진 접근을 허용하는 연습을 해볼까요?');
     }
-    if (mode == PhotoSendMode.guided &&
+    if (!isFreePractice &&
+        mode == PhotoSendMode.guided &&
         value != PhotoPermissionChoice.selectedOnly) {
       return _wrong('이번 연습에서는 필요한 사진만 허용해 볼까요?');
     }
@@ -98,7 +108,7 @@ class PhotoSendProvider extends ChangeNotifier {
   }
 
   bool chooseAlbum(String value) {
-    if (value != scenario.album) {
+    if (!isFreePractice && value != scenario.album) {
       return _wrong('괜찮아요. 오늘의 목표에 맞는 앨범을 다시 찾아볼까요?');
     }
     album = value;
@@ -117,8 +127,9 @@ class PhotoSendProvider extends ChangeNotifier {
       return _wrong('사진은 한 번에 최대 3장까지 선택할 수 있어요.');
     }
     final expectedIndex = selectedPhotoIds.length;
-    if (expectedIndex >= scenario.photoIds.length ||
-        scenario.photoIds[expectedIndex] != id) {
+    if (!isFreePractice &&
+        (expectedIndex >= scenario.photoIds.length ||
+            scenario.photoIds[expectedIndex] != id)) {
       return _wrong('괜찮아요. 미션의 사진과 선택 순서를 다시 살펴볼까요?');
     }
     selectedPhotoIds.add(id);
@@ -127,7 +138,7 @@ class PhotoSendProvider extends ChangeNotifier {
   }
 
   bool finishPhotoSelection() {
-    if (!listEquals(selectedPhotoIds, scenario.photoIds)) {
+    if (!isFreePractice && !listEquals(selectedPhotoIds, scenario.photoIds)) {
       return _wrong('선택한 사진과 순서를 한 번 더 확인해 주세요.');
     }
     step = PhotoSendStep.preview;
@@ -142,8 +153,9 @@ class PhotoSendProvider extends ChangeNotifier {
   }
 
   bool confirmReview() {
-    if (recipient?.id != scenario.contactId ||
-        !listEquals(selectedPhotoIds, scenario.photoIds)) {
+    if (!isFreePractice &&
+        (recipient?.id != scenario.contactId ||
+            !listEquals(selectedPhotoIds, scenario.photoIds))) {
       return _wrong('누구에게 어떤 사진을 보내는지 다시 확인해 주세요.');
     }
     reviewConfirmed = true;

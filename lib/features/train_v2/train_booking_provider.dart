@@ -11,6 +11,7 @@ class TrainBookingProvider extends ChangeNotifier {
   final TrainClock _clock;
 
   TrainLearningMode mode = TrainLearningMode.guided;
+  bool isFreePractice = false;
   TrainBookingStep step = TrainBookingStep.tripType;
   TrainBookingScenario scenario = guidedTrainScenario;
   TrainTripType? tripType;
@@ -63,9 +64,17 @@ class TrainBookingProvider extends ChangeNotifier {
 
   void begin(TrainLearningMode value, {int completedCount = 0}) {
     mode = value;
+    isFreePractice = false;
     scenario = value == TrainLearningMode.guided
         ? guidedTrainScenario
         : soloTrainScenarios[completedCount % soloTrainScenarios.length];
+    reset();
+  }
+
+  void beginFreePractice() {
+    mode = TrainLearningMode.guided;
+    isFreePractice = true;
+    scenario = guidedTrainScenario;
     reset();
   }
 
@@ -324,7 +333,9 @@ class TrainBookingProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (mode == TrainLearningMode.guided && value.number != 'H101') {
+    if (!isFreePractice &&
+        mode == TrainLearningMode.guided &&
+        value.number != 'H101') {
       return _wrong();
     }
     if (returning) {
@@ -417,7 +428,8 @@ class TrainBookingProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (mode == TrainLearningMode.guided &&
+    if (!isFreePractice &&
+        mode == TrainLearningMode.guided &&
         !selected.any((seat) => seat.number == '1A')) {
       return _wrong();
     }
@@ -527,7 +539,7 @@ class TrainBookingProvider extends ChangeNotifier {
   TrainStation _station(String id) =>
       trainStations.firstWhere((item) => item.id == id);
   bool _accept(bool correct, VoidCallback apply) {
-    if (!correct) return _wrong();
+    if (!isFreePractice && !correct) return _wrong();
     apply();
     notice = null;
     showHint = false;

@@ -49,7 +49,7 @@ class MainTabScaffold extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.apps_outlined),
             selectedIcon: Icon(Icons.apps_rounded),
-            label: '연습',
+            label: '연습하기',
           ),
           NavigationDestination(
             icon: Icon(Icons.flag_outlined),

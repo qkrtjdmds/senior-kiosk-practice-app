@@ -141,4 +141,35 @@ void main() {
     expect(find.textContaining('실제 결제가 진행되지 않습니다.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('카페 자유 연습 완료는 포인트와 완료 횟수를 늘리지 않는다', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final progress = LearningProgressProvider(
+      await SharedPreferences.getInstance(),
+    );
+    cafeOrderProvider.startFreePractice();
+    final menu = cafeMenuItems.firstWhere((item) => item.id == 'cafe_latte');
+    cafeOrderProvider
+      ..selectMenu(menu)
+      ..selectTemperature(CafeTemperature.hot)
+      ..selectSize(CafeSize.large)
+      ..selectDineOption(CafeDineOption.dineIn)
+      ..addCurrentItem()
+      ..selectPointMethod(CafePointMethod.none)
+      ..selectPaymentMethod(CafePaymentMethod.creditCard);
+    appRouter.go(AppRoutes.cafeV2Complete);
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('자유 연습을 마쳤어요'), findsOneWidget);
+    expect(progress.totalPoints, 0);
+    expect(progress.guidedCompletionCount, 0);
+    expect(progress.soloCompletionCount, 0);
+  });
 }

@@ -64,6 +64,7 @@ const hospitalGuidedScenario = HospitalScenario(
 class HospitalReceptionProvider extends ChangeNotifier {
   HospitalReceptionStep step = HospitalReceptionStep.welcome;
   bool isSolo = false;
+  bool isFreePractice = false;
   HospitalScenario scenario = hospitalGuidedScenario;
   String service = '진료 접수';
   String? visit;
@@ -80,14 +81,23 @@ class HospitalReceptionProvider extends ChangeNotifier {
 
   void beginGuided() {
     isSolo = false;
+    isFreePractice = false;
     scenario = hospitalGuidedScenario;
     _reset();
   }
 
   void beginSolo(int completedCount) {
     isSolo = true;
+    isFreePractice = false;
     scenario =
         hospitalSoloScenarios[completedCount % hospitalSoloScenarios.length];
+    _reset();
+  }
+
+  void beginFreePractice() {
+    isSolo = false;
+    isFreePractice = true;
+    scenario = hospitalGuidedScenario;
     _reset();
   }
 
@@ -158,7 +168,7 @@ class HospitalReceptionProvider extends ChangeNotifier {
       _choose(value == scenario.symptom, () => symptom = value);
 
   bool _choose(bool correct, VoidCallback setValue) {
-    if (!correct) {
+    if (!isFreePractice && !correct) {
       notice = isSolo
           ? '괜찮아요. 오늘의 접수 내용을 다시 살펴볼까요?'
           : '이번 연습의 안내를 다시 확인하고 선택해 볼까요?';

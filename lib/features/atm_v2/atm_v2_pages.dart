@@ -270,8 +270,8 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
         children: [
-          if (!p.isSolo) AtmInlineNotice(p.hint),
-          if (!p.isSolo) const SizedBox(height: 14),
+          if (!p.isSolo && !p.isFreePractice) AtmInlineNotice(p.hint),
+          if (!p.isSolo && !p.isFreePractice) const SizedBox(height: 14),
           ..._body(context, p),
           if (p.notice != null) ...[
             const SizedBox(height: 14),
@@ -326,7 +326,7 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
         label: item.$1,
         subtitle: item.$1 == '현금 출금' ? '현재 연습할 수 있어요' : '준비 중',
         icon: item.$2,
-        emphasized: !p.isSolo && item.$1 == '현금 출금',
+        emphasized: !p.isSolo && !p.isFreePractice && item.$1 == '현금 출금',
         onTap: () {
           p.chooseService(item.$1);
           _sync(p);
@@ -348,7 +348,7 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
       AtmChoiceRow(
         label: item.$1,
         icon: item.$2,
-        emphasized: !p.isSolo && item.$1 == '현금 출금',
+        emphasized: !p.isSolo && !p.isFreePractice && item.$1 == '현금 출금',
         onTap: () {
           p.chooseTransaction(item.$1);
           _sync(p);
@@ -411,7 +411,8 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
         label: a.name,
         subtitle: '${a.practiceName} · 가상 잔액 ${formatAtmWon(a.balance)}',
         icon: Icons.account_balance_wallet_outlined,
-        emphasized: !p.isSolo && a.type == p.scenario.account,
+        emphasized:
+            !p.isSolo && !p.isFreePractice && a.type == p.scenario.account,
         onTap: () {
           p.chooseAccount(a);
           _sync(p);
@@ -429,7 +430,7 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
     const SizedBox(height: 18),
     AtmAmountGrid(
       target: p.scenario.amount,
-      guided: !p.isSolo,
+      guided: !p.isSolo && !p.isFreePractice,
       onSelect: (v) {
         p.chooseAmount(v);
         _sync(p);
@@ -531,7 +532,10 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
     AtmChoiceRow(
       label: '명세표 받기',
       icon: Icons.receipt_long_outlined,
-      emphasized: !p.isSolo && p.scenario.receipt == AtmReceiptChoice.receive,
+      emphasized:
+          !p.isSolo &&
+          !p.isFreePractice &&
+          p.scenario.receipt == AtmReceiptChoice.receive,
       onTap: () {
         p.chooseReceipt(AtmReceiptChoice.receive);
         _sync(p);
@@ -541,7 +545,10 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
     AtmChoiceRow(
       label: '명세표 받지 않기',
       icon: Icons.do_not_disturb_alt_outlined,
-      emphasized: !p.isSolo && p.scenario.receipt == AtmReceiptChoice.skip,
+      emphasized:
+          !p.isSolo &&
+          !p.isFreePractice &&
+          p.scenario.receipt == AtmReceiptChoice.skip,
       onTap: () {
         p.chooseReceipt(AtmReceiptChoice.skip);
         _sync(p);
@@ -674,6 +681,7 @@ class _AtmV2CompletePageState extends State<AtmV2CompletePage> {
 
   Future<void> _award(AtmWithdrawalProvider session) async {
     if (!mounted) return;
+    if (session.isFreePractice) return;
     final progress = context.read<LearningProgressProvider>();
     if (session.isSolo) {
       final before = progress.atmSoloCompletionCount;
@@ -732,7 +740,9 @@ class _AtmV2CompletePageState extends State<AtmV2CompletePage> {
           ),
           const SizedBox(height: 14),
           AtmInlineNotice(
-            p.isSolo
+            p.isFreePractice
+                ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                : p.isSolo
                 ? '용기 포인트 +20점${_daily ? ' · 오늘의 미션 +10점' : ''}'
                 : '한걸음 포인트 +10점',
           ),
@@ -750,6 +760,11 @@ class _AtmV2CompletePageState extends State<AtmV2CompletePage> {
           ),
           const SizedBox(height: 24),
           atmPrimaryButton('다시 연습하기', () async {
+            if (p.isFreePractice) {
+              p.beginFreePractice();
+              context.go(AppRoutes.atmV2Services);
+              return;
+            }
             await progress.startAtmLearning(p.mode);
             if (!context.mounted) return;
             p.begin(p.mode, completedCount: progress.atmSoloCompletionCount);

@@ -271,13 +271,18 @@ class HospitalV2OrderPage extends StatelessWidget {
             () {
               final progress = context.read<LearningProgressProvider>();
               p.clearSensitiveData();
-              progress.startHospitalReservationLearning(solo: p.isSolo);
-              context.read<HospitalReservationProvider>().begin(
-                solo: p.isSolo,
-                completedCount: p.isSolo
-                    ? progress.hospitalReservationSoloCompletionCount
-                    : progress.hospitalReservationCompletionCount,
-              );
+              final provider = context.read<HospitalReservationProvider>();
+              if (p.isFreePractice) {
+                provider.beginFreePractice();
+              } else {
+                progress.startHospitalReservationLearning(solo: p.isSolo);
+                provider.begin(
+                  solo: p.isSolo,
+                  completedCount: p.isSolo
+                      ? progress.hospitalReservationSoloCompletionCount
+                      : progress.hospitalReservationCompletionCount,
+                );
+              }
               context.go(AppRoutes.hospitalReservationPractice);
             },
             false,
@@ -291,13 +296,18 @@ class HospitalV2OrderPage extends StatelessWidget {
               final progress = context.read<LearningProgressProvider>();
               p.clearSensitiveData();
               context.read<HospitalReservationProvider>().reset();
-              progress.startHospitalPaymentLearning(solo: p.isSolo);
-              context.read<HospitalPaymentProvider>().begin(
-                solo: p.isSolo,
-                completedCount: p.isSolo
-                    ? progress.hospitalPaymentSoloCompletionCount
-                    : progress.hospitalPaymentCompletionCount,
-              );
+              final provider = context.read<HospitalPaymentProvider>();
+              if (p.isFreePractice) {
+                provider.beginFreePractice();
+              } else {
+                progress.startHospitalPaymentLearning(solo: p.isSolo);
+                provider.begin(
+                  solo: p.isSolo,
+                  completedCount: p.isSolo
+                      ? progress.hospitalPaymentSoloCompletionCount
+                      : progress.hospitalPaymentCompletionCount,
+                );
+              }
               context.go(AppRoutes.hospitalPaymentPractice);
             },
             false,
@@ -312,13 +322,18 @@ class HospitalV2OrderPage extends StatelessWidget {
               p.clearSensitiveData();
               context.read<HospitalReservationProvider>().reset();
               context.read<HospitalPaymentProvider>().reset();
-              progress.startHospitalDocumentLearning(solo: p.isSolo);
-              context.read<HospitalDocumentProvider>().begin(
-                solo: p.isSolo,
-                completedCount: p.isSolo
-                    ? progress.hospitalDocumentSoloCompletionCount
-                    : progress.hospitalDocumentCompletionCount,
-              );
+              final provider = context.read<HospitalDocumentProvider>();
+              if (p.isFreePractice) {
+                provider.beginFreePractice();
+              } else {
+                progress.startHospitalDocumentLearning(solo: p.isSolo);
+                provider.begin(
+                  solo: p.isSolo,
+                  completedCount: p.isSolo
+                      ? progress.hospitalDocumentSoloCompletionCount
+                      : progress.hospitalDocumentCompletionCount,
+                );
+              }
               context.go(AppRoutes.hospitalDocumentPractice);
             },
             false,
@@ -332,14 +347,16 @@ class HospitalV2OrderPage extends StatelessWidget {
             '처음 방문이에요',
             Icons.person_add_alt_1,
             () => p.chooseVisit('처음 방문이에요'),
-            !p.isSolo && p.scenario.visit == '처음 방문이에요',
+            !p.isFreePractice && !p.isSolo && p.scenario.visit == '처음 방문이에요',
           ),
           _choice(
             p,
             '전에 방문한 적 있어요',
             Icons.history,
             () => p.chooseVisit('전에 방문한 적 있어요'),
-            !p.isSolo && p.scenario.visit == '전에 방문한 적 있어요',
+            !p.isFreePractice &&
+                !p.isSolo &&
+                p.scenario.visit == '전에 방문한 적 있어요',
           ),
         ]);
       case HospitalReceptionStep.patient:
@@ -351,14 +368,16 @@ class HospitalV2OrderPage extends StatelessWidget {
             '예약했어요',
             Icons.event_available,
             () => p.chooseReservation('예약했어요'),
-            !p.isSolo && p.scenario.reservation == '예약했어요',
+            !p.isFreePractice && !p.isSolo && p.scenario.reservation == '예약했어요',
           ),
           _choice(
             p,
             '예약하지 않았어요',
             Icons.event_busy,
             () => p.chooseReservation('예약하지 않았어요'),
-            !p.isSolo && p.scenario.reservation == '예약하지 않았어요',
+            !p.isFreePractice &&
+                !p.isSolo &&
+                p.scenario.reservation == '예약하지 않았어요',
           ),
         ]);
       case HospitalReceptionStep.department:
@@ -376,7 +395,9 @@ class HospitalV2OrderPage extends StatelessWidget {
               item.$1,
               Icons.local_hospital_outlined,
               () => p.chooseDepartment(item.$1),
-              !p.isSolo && p.scenario.department == item.$1,
+              !p.isFreePractice &&
+                  !p.isSolo &&
+                  p.scenario.department == item.$1,
               subtitle: item.$2,
             ),
           _choice(
@@ -404,7 +425,7 @@ class HospitalV2OrderPage extends StatelessWidget {
                   value,
                   Icons.health_and_safety_outlined,
                   () => p.chooseSymptom(value),
-                  !p.isSolo && p.scenario.symptom == value,
+                  !p.isFreePractice && !p.isSolo && p.scenario.symptom == value,
                 ),
             ]),
           ],
@@ -510,7 +531,9 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
       final progress = context.read<LearningProgressProvider>();
       final dailyMissions = context.read<DailyMissionProvider>();
       final reception = context.read<HospitalReceptionProvider>();
-      if (progress.isHospitalSoloMode) {
+      if (reception.isFreePractice) {
+        // 자유 연습은 보상과 완료 기록을 저장하지 않는다.
+      } else if (progress.isHospitalSoloMode) {
         final before = progress.hospitalSoloCompletionCount;
         final badge = await progress.completeHospitalSoloLearning();
         var daily = false;
@@ -552,7 +575,11 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
             ),
             const SizedBox(height: 12),
             Text(
-              progress.isHospitalSoloMode ? '혼자서도 잘하셨어요!' : '진료 접수 연습을 완료했어요!',
+              p.isFreePractice
+                  ? '자유 연습을 마쳤어요'
+                  : progress.isHospitalSoloMode
+                  ? '혼자서도 잘하셨어요!'
+                  : '진료 접수 연습을 완료했어요!',
               textAlign: TextAlign.center,
               softWrap: true,
               style: Theme.of(context).textTheme.headlineMedium,
@@ -573,7 +600,9 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
             ),
             const SizedBox(height: 14),
             HospitalInlineNotice(
-              progress.isHospitalSoloMode
+              p.isFreePractice
+                  ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                  : progress.isHospitalSoloMode
                   ? '용기 포인트 +20점${dailyReward ? ' · 오늘의 미션 +10점' : ''}'
                   : '한걸음 포인트 +10점',
             ),
@@ -590,7 +619,10 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
             const SizedBox(height: 24),
             hospitalPrimaryButton(context, '한 번 더 연습하기', () {
               context.read<LearningProgressProvider>().resetHospitalLearning();
-              if (p.isSolo) {
+              if (p.isFreePractice) {
+                p.beginFreePractice();
+                context.go(AppRoutes.hospitalStepOne);
+              } else if (p.isSolo) {
                 p.beginSolo(progress.hospitalSoloCompletionCount);
                 context.go(AppRoutes.hospitalMission);
               } else {

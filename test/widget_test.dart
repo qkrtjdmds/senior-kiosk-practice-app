@@ -77,7 +77,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('카페 키오스크 연습'));
+    appRouter.go(AppRoutes.cafeStart);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -216,8 +216,7 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('병원 접수'));
-    await tester.tap(find.text('병원 접수'));
+    appRouter.go(AppRoutes.hospitalStart);
     await tester.pumpAndSettle();
     expect(find.text('병원 접수 연습'), findsOneWidget);
 
@@ -272,8 +271,7 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('사진 보내기'));
-    await tester.tap(find.text('사진 보내기'));
+    appRouter.go(AppRoutes.photoStart);
     await tester.pumpAndSettle();
     expect(find.text('사진 보내기 연습'), findsWidgets);
 
@@ -327,8 +325,7 @@ void main() {
         child: const HanGeoleumDigitalApp(),
       ),
     );
-    await tester.ensureVisible(find.text('기차표 예매'));
-    await tester.tap(find.text('기차표 예매'));
+    appRouter.go(AppRoutes.trainStart);
     await tester.pumpAndSettle();
     await tester.tap(find.text('따라 해보기'));
     await tester.pumpAndSettle();
@@ -390,8 +387,7 @@ void main() {
         child: const HanGeoleumDigitalApp(),
       ),
     );
-    await tester.ensureVisible(find.text('기차표 예매'));
-    await tester.tap(find.text('기차표 예매'));
+    appRouter.go(AppRoutes.trainStart);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));
@@ -436,8 +432,7 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('병원 접수'));
-    await tester.tap(find.text('병원 접수'));
+    appRouter.go(AppRoutes.hospitalStart);
     await tester.pumpAndSettle();
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
@@ -507,8 +502,7 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('사진 보내기'));
-    await tester.tap(find.text('사진 보내기'));
+    appRouter.go(AppRoutes.photoStart);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
     await tester.tap(find.text('혼자 해보기'));

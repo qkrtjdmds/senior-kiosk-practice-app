@@ -405,9 +405,11 @@ class _HospitalDocumentCompletePageState
     if (!_saving) {
       _saving = true;
       final document = context.read<HospitalDocumentProvider>();
-      context.read<LearningProgressProvider>().completeHospitalDocumentLearning(
-        solo: document.isSolo,
-      );
+      if (!document.isFreePractice) {
+        context
+            .read<LearningProgressProvider>()
+            .completeHospitalDocumentLearning(solo: document.isSolo);
+      }
     }
   }
 
@@ -444,7 +446,11 @@ class _HospitalDocumentCompletePageState
             _summary('발급 상태', '연습 완료'),
             const SizedBox(height: 14),
             HospitalInlineNotice(
-              provider.isSolo ? '용기 포인트 +20점' : '한걸음 포인트 +10점',
+              provider.isFreePractice
+                  ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                  : provider.isSolo
+                  ? '용기 포인트 +20점'
+                  : '한걸음 포인트 +10점',
             ),
             const SizedBox(height: 14),
             const Text(
@@ -460,6 +466,11 @@ class _HospitalDocumentCompletePageState
             ),
             const SizedBox(height: 24),
             hospitalPrimaryButton(context, '한 번 더 연습하기', () {
+              if (provider.isFreePractice) {
+                provider.beginFreePractice();
+                context.go(AppRoutes.hospitalDocumentPractice);
+                return;
+              }
               progress.startHospitalDocumentLearning(solo: provider.isSolo);
               provider.begin(
                 solo: provider.isSolo,

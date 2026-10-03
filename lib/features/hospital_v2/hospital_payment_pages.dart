@@ -425,6 +425,7 @@ class _HospitalPaymentCompletePageState
       if (_saving) return;
       _saving = true;
       final provider = context.read<HospitalPaymentProvider>();
+      if (provider.isFreePractice) return;
       await context
           .read<LearningProgressProvider>()
           .completeHospitalPaymentLearning(solo: provider.isSolo);
@@ -492,7 +493,11 @@ class _HospitalPaymentCompletePageState
             ],
             const SizedBox(height: 12),
             HospitalInlineNotice(
-              provider.isSolo ? '용기 포인트 +20점' : '한걸음 포인트 +10점',
+              provider.isFreePractice
+                  ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                  : provider.isSolo
+                  ? '용기 포인트 +20점'
+                  : '한걸음 포인트 +10점',
             ),
             const SizedBox(height: 12),
             HospitalInlineNotice(
@@ -504,6 +509,11 @@ class _HospitalPaymentCompletePageState
             ),
             const SizedBox(height: 20),
             hospitalPrimaryButton(context, '한 번 더 연습하기', () {
+              if (provider.isFreePractice) {
+                provider.beginFreePractice();
+                context.go(AppRoutes.hospitalPaymentPractice);
+                return;
+              }
               final progress = context.read<LearningProgressProvider>();
               progress.startHospitalPaymentLearning(solo: provider.isSolo);
               provider.begin(

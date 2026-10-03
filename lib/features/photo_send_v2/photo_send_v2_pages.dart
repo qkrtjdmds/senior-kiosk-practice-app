@@ -145,7 +145,13 @@ class PhotoSendV2FlowPage extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
-          Text(p.isSolo ? '미션을 기억하고 직접 골라보세요.' : '화면 안내를 보며 천천히 선택해 보세요.'),
+          Text(
+            p.isFreePractice
+                ? '보낼 사람과 사진을 자유롭게 골라보세요.'
+                : p.isSolo
+                ? '미션을 기억하고 직접 골라보세요.'
+                : '화면 안내를 보며 천천히 선택해 보세요.',
+          ),
           if (p.notice != null) ...[
             const SizedBox(height: 12),
             PhotoInlineNotice(p.notice!),
@@ -494,6 +500,10 @@ class _PhotoSendV2CompletePageState extends State<PhotoSendV2CompletePage> {
       return;
     }
     _awarded = true;
+    if (p.isFreePractice) {
+      if (mounted) setState(() {});
+      return;
+    }
     final progress = context.read<LearningProgressProvider>();
     if (p.isSolo) {
       final before = progress.photoSoloCompletionCount;
@@ -527,7 +537,7 @@ class _PhotoSendV2CompletePageState extends State<PhotoSendV2CompletePage> {
           const Icon(Icons.check_circle_outline, size: 72, color: photoNavy),
           const SizedBox(height: 12),
           Text(
-            '사진 보내기 연습 완료',
+            p.isFreePractice ? '자유 연습을 마쳤어요' : '사진 보내기 연습 완료',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
@@ -535,7 +545,9 @@ class _PhotoSendV2CompletePageState extends State<PhotoSendV2CompletePage> {
           _completionSummary(context, p),
           const SizedBox(height: 14),
           PhotoInlineNotice(
-            p.isSolo
+            p.isFreePractice
+                ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                : p.isSolo
                 ? '용기 포인트 +20점${_daily ? ' · 오늘의 미션 +10점' : ''}'
                 : '한걸음 포인트 +10점',
           ),
@@ -587,12 +599,15 @@ class _PhotoSendV2CompletePageState extends State<PhotoSendV2CompletePage> {
   void _restart(BuildContext context, PhotoSendMode mode) {
     final progress = context.read<LearningProgressProvider>();
     progress.resetPhotoLearning();
-    context.read<PhotoSendProvider>().begin(
-      mode,
-      completedCount: progress.photoSoloCompletionCount,
-    );
+    final provider = context.read<PhotoSendProvider>();
+    final wasFree = provider.isFreePractice;
+    if (wasFree) {
+      provider.beginFreePractice();
+    } else {
+      provider.begin(mode, completedCount: progress.photoSoloCompletionCount);
+    }
     context.go(
-      mode == PhotoSendMode.solo
+      !wasFree && mode == PhotoSendMode.solo
           ? AppRoutes.photoMission
           : AppRoutes.photoStepOne,
     );

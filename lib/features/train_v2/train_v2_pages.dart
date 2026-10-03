@@ -808,6 +808,10 @@ class _TrainV2TicketPageState extends State<TrainV2TicketPage> {
     _saving = true;
     final progress = context.read<LearningProgressProvider>();
     final dailyMissions = context.read<DailyMissionProvider>();
+    if (context.read<TrainBookingProvider>().isFreePractice) {
+      if (mounted) setState(() {});
+      return;
+    }
     final before = progress.trainSoloCompletionCount;
     if (progress.isTrainSoloMode) {
       _badge = await progress.completeTrainSoloLearning();
@@ -833,7 +837,7 @@ class _TrainV2TicketPageState extends State<TrainV2TicketPage> {
           const Icon(Icons.check_circle_outline, size: 64, color: trainGreen),
           const SizedBox(height: 12),
           Text(
-            '기차표 예매 연습을 완료했어요',
+            p.isFreePractice ? '자유 연습을 마쳤어요' : '기차표 예매 연습을 완료했어요',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
@@ -891,19 +895,27 @@ class _TrainV2TicketPageState extends State<TrainV2TicketPage> {
           ),
           const SizedBox(height: 14),
           TrainInlineNotice(
-            '실제 탑승에는 사용할 수 없습니다.${_daily ? ' 오늘의 미션 추가 포인트 10점을 받았어요.' : ''}${_badge ? ' 새 배지를 받았어요.' : ''}',
+            p.isFreePractice
+                ? '자유 연습을 마쳤어요. 보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                : '실제 탑승에는 사용할 수 없습니다.${_daily ? ' 오늘의 미션 추가 포인트 10점을 받았어요.' : ''}${_badge ? ' 새 배지를 받았어요.' : ''}',
           ),
           const SizedBox(height: 18),
           trainPrimaryButton(context, '한 번 더 연습하기', () {
             context.read<LearningProgressProvider>().resetTrainLearning();
-            p.begin(
-              p.mode,
-              completedCount: context
-                  .read<LearningProgressProvider>()
-                  .trainSoloCompletionCount,
-            );
+            if (p.isFreePractice) {
+              p.beginFreePractice();
+            } else {
+              p.begin(
+                p.mode,
+                completedCount: context
+                    .read<LearningProgressProvider>()
+                    .trainSoloCompletionCount,
+              );
+            }
             context.go(
-              p.isSolo ? AppRoutes.trainMission : AppRoutes.trainV2TripType,
+              !p.isFreePractice && p.isSolo
+                  ? AppRoutes.trainMission
+                  : AppRoutes.trainV2TripType,
             );
           }),
           const SizedBox(height: 10),

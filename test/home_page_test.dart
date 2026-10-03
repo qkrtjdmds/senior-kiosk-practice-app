@@ -38,7 +38,7 @@ void main() {
 
     await pumpHome(tester);
 
-    expect(find.text('오늘도 천천히 연습해 볼까요?'), findsOneWidget);
+    expect(find.text('원하는 연습을 바로 시작해 보세요'), findsOneWidget);
     expect(find.text('한 단계씩 따라 해보세요.'), findsOneWidget);
     expect(find.text('기록과 포인트 보기'), findsOneWidget);
     expect(find.byTooltip('화면 설정'), findsOneWidget);
@@ -71,17 +71,17 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('홈의 모든 카드가 기존 화면으로 이동한다', (tester) async {
+  testWidgets('홈의 모든 콘텐츠가 자유 연습 첫 단계로 이동한다', (tester) async {
     await pumpHome(tester);
 
     final destinations = <String, String>{
-      '카페 키오스크 연습': AppRoutes.cafeStart,
-      '병원 접수': AppRoutes.hospitalStart,
-      '사진 보내기': AppRoutes.photoStart,
-      '기차표 예매': AppRoutes.trainStart,
-      '햄버거 주문': AppRoutes.hamburgerStart,
-      'ATM 출금': AppRoutes.atmStart,
-      '서류 발급': AppRoutes.civilDocumentStart,
+      '카페 키오스크 연습': AppRoutes.cafeV2Menu,
+      '병원 접수': AppRoutes.hospitalStepOne,
+      '사진 보내기': AppRoutes.photoStepOne,
+      '기차표 예매': AppRoutes.trainV2TripType,
+      '햄버거 주문': AppRoutes.hamburgerPractice,
+      'ATM 출금': AppRoutes.atmV2Services,
+      '서류 발급': AppRoutes.civilDocumentV2Categories,
       '나의 디지털 걸음': AppRoutes.progress,
     };
 

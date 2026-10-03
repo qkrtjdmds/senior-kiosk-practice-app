@@ -5,6 +5,7 @@ import 'atm_withdrawal_models.dart';
 
 class AtmWithdrawalProvider extends ChangeNotifier {
   AtmLearningMode mode = AtmLearningMode.guided;
+  bool isFreePractice = false;
   AtmV2Step step = AtmV2Step.services;
   AtmSoloScenario scenario = guidedAtmScenario;
   bool cardInserted = false;
@@ -30,9 +31,17 @@ class AtmWithdrawalProvider extends ChangeNotifier {
 
   void begin(AtmLearningMode value, {int completedCount = 0}) {
     mode = value;
+    isFreePractice = false;
     scenario = value == AtmLearningMode.guided
         ? guidedAtmScenario
         : soloAtmScenarios[completedCount % soloAtmScenarios.length];
+    reset();
+  }
+
+  void beginFreePractice() {
+    mode = AtmLearningMode.guided;
+    isFreePractice = true;
+    scenario = guidedAtmScenario;
     reset();
   }
 
@@ -110,7 +119,9 @@ class AtmWithdrawalProvider extends ChangeNotifier {
   }
 
   bool chooseAccount(AtmPracticeAccount value) {
-    if (value.type != scenario.account) return _wrong('미션의 계좌를 다시 살펴볼까요?');
+    if (!isFreePractice && value.type != scenario.account) {
+      return _wrong('미션의 계좌를 다시 살펴볼까요?');
+    }
     account = value;
     _clearAfterAccount();
     step = AtmV2Step.amount;
@@ -120,7 +131,9 @@ class AtmWithdrawalProvider extends ChangeNotifier {
 
   bool chooseAmount(int value) {
     if (!_validAmount(value)) return false;
-    if (value != scenario.amount) return _wrong('찾을 금액을 다시 살펴볼까요?');
+    if (!isFreePractice && value != scenario.amount) {
+      return _wrong('찾을 금액을 다시 살펴볼까요?');
+    }
     amount = value;
     _clearAfterAmount();
     step = AtmV2Step.review;
@@ -181,7 +194,9 @@ class AtmWithdrawalProvider extends ChangeNotifier {
   }
 
   bool chooseReceipt(AtmReceiptChoice value) {
-    if (value != scenario.receipt) return _wrong('미션의 명세표 선택을 다시 살펴볼까요?');
+    if (!isFreePractice && value != scenario.receipt) {
+      return _wrong('미션의 명세표 선택을 다시 살펴볼까요?');
+    }
     receipt = value;
     step = AtmV2Step.complete;
     _pin = '';

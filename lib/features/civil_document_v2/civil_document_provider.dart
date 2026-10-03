@@ -4,6 +4,7 @@ import 'civil_document_models.dart';
 
 class CivilDocumentV2Provider extends ChangeNotifier {
   CivilDocumentV2Mode mode = CivilDocumentV2Mode.guided;
+  bool isFreePractice = false;
   CivilDocumentV2Step step = CivilDocumentV2Step.categories;
   CivilDocumentScenario scenario = guidedCivilScenario;
   CivilDocumentCategory? category;
@@ -39,9 +40,18 @@ class CivilDocumentV2Provider extends ChangeNotifier {
 
   void begin(CivilDocumentV2Mode value, {int completedCount = 0}) {
     mode = value;
+    isFreePractice = false;
     scenario = value == CivilDocumentV2Mode.guided
         ? guidedCivilScenario
         : soloCivilScenarios[completedCount % soloCivilScenarios.length];
+    _resetTemporary();
+    notifyListeners();
+  }
+
+  void beginFreePractice() {
+    mode = CivilDocumentV2Mode.guided;
+    isFreePractice = true;
+    scenario = guidedCivilScenario;
     _resetTemporary();
     notifyListeners();
   }
@@ -75,10 +85,11 @@ class CivilDocumentV2Provider extends ChangeNotifier {
     final expected = scenario.documentName.contains('가족')
         ? CivilDocumentCategory.family
         : CivilDocumentCategory.resident;
-    if (value != expected) {
+    if (!isFreePractice && value != expected) {
       return _wrong('오늘의 발급 목표에 맞는 분야를 다시 살펴볼까요?');
     }
-    if (value != CivilDocumentCategory.resident &&
+    if (!isFreePractice &&
+        value != CivilDocumentCategory.resident &&
         value != CivilDocumentCategory.family) {
       return _wrong('이 분야는 연습 준비 중이에요. 현재 발급할 서류의 분야를 골라 볼까요?');
     }
@@ -89,7 +100,7 @@ class CivilDocumentV2Provider extends ChangeNotifier {
   }
 
   bool chooseDocument(CivilPracticeDocument value) {
-    if (value.name != scenario.documentName) {
+    if (!isFreePractice && value.name != scenario.documentName) {
       return _wrong('괜찮아요. 이번 연습의 증명서를 다시 확인해 볼까요?');
     }
     document = value;
@@ -124,7 +135,7 @@ class CivilDocumentV2Provider extends ChangeNotifier {
 
   bool chooseOption(String key, String value) {
     final expected = scenario.options[key];
-    if (expected != null && value != expected) {
+    if (!isFreePractice && expected != null && value != expected) {
       return _wrong('괜찮아요. 이번 연습에서는 $key을(를) $expected으로 골라 볼까요?');
     }
     options[key] = value;
@@ -139,7 +150,7 @@ class CivilDocumentV2Provider extends ChangeNotifier {
 
   bool chooseCopies(int value) {
     if (value < 1 || value > 3) return false;
-    if (value != scenario.copies) {
+    if (!isFreePractice && value != scenario.copies) {
       return _wrong('괜찮아요. 오늘은 ${scenario.copies}부를 발급해 볼까요?');
     }
     copies = value;
@@ -155,7 +166,9 @@ class CivilDocumentV2Provider extends ChangeNotifier {
   }
 
   bool choosePayment(CivilPaymentMethod value) {
-    if (value != scenario.payment) return _wrong('이번 연습의 결제 방법을 다시 확인해 볼까요?');
+    if (!isFreePractice && value != scenario.payment) {
+      return _wrong('이번 연습의 결제 방법을 다시 확인해 볼까요?');
+    }
     payment = value;
     _clearAfterPayment();
     return _ok();

@@ -56,6 +56,7 @@ const hospitalPracticeReservations = <PracticeHospitalReservation>[
 class HospitalReservationProvider extends ChangeNotifier {
   HospitalReservationStep step = HospitalReservationStep.service;
   bool isSolo = false;
+  bool isFreePractice = false;
   int scenarioIndex = 0;
   String patientNumber = '';
   PracticeHospitalReservation? selectedReservation;
@@ -70,6 +71,7 @@ class HospitalReservationProvider extends ChangeNotifier {
 
   void begin({required bool solo, int completedCount = 0}) {
     isSolo = solo;
+    isFreePractice = false;
     scenarioIndex = solo
         ? completedCount % hospitalPracticeReservations.length
         : 0;
@@ -79,6 +81,13 @@ class HospitalReservationProvider extends ChangeNotifier {
     notice = null;
     showHint = false;
     notifyListeners();
+  }
+
+  void beginFreePractice() {
+    isSolo = false;
+    isFreePractice = true;
+    scenarioIndex = 0;
+    reset();
   }
 
   void enterPatientCheck() {
@@ -122,7 +131,7 @@ class HospitalReservationProvider extends ChangeNotifier {
   }
 
   bool selectReservation(PracticeHospitalReservation reservation) {
-    if (reservation.id != targetReservation.id) {
+    if (!isFreePractice && reservation.id != targetReservation.id) {
       notice = '괜찮아요. 날짜와 진료과를 다시 확인해 볼까요?';
       notifyListeners();
       return false;

@@ -63,7 +63,11 @@ class _CafeV2MenuPageState extends State<CafeV2MenuPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  order.isSolo ? '미션을 기억하고 메뉴를 골라보세요.' : '커피 탭에서 아메리카노를 골라보세요.',
+                  order.isFreePractice
+                      ? '원하는 카테고리와 메뉴를 자유롭게 골라보세요.'
+                      : order.isSolo
+                      ? '미션을 기억하고 메뉴를 골라보세요.'
+                      : '커피 탭에서 아메리카노를 골라보세요.',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 if (_feedback != null || _showHint) ...[
@@ -110,7 +114,10 @@ class _CafeV2MenuPageState extends State<CafeV2MenuPage> {
                     final item = items[index];
                     return CafeMenuCard(
                       item: item,
-                      recommended: !order.isSolo && item.id == 'americano',
+                      recommended:
+                          !order.isSolo &&
+                          !order.isFreePractice &&
+                          item.id == 'americano',
                       onPressed: () {
                         if (!order.selectMenu(item)) {
                           setState(() {
@@ -147,7 +154,9 @@ class CafeV2TemperaturePage extends StatelessWidget {
       question: options.singleOrNull == CafeTemperature.none
           ? '이 메뉴는 온도를 고르지 않아요.'
           : '온도를 어떻게 할까요?',
-      guidance: order.isSolo
+      guidance: order.isFreePractice
+          ? '원하는 온도를 자유롭게 골라보세요.'
+          : order.isSolo
           ? '미션을 기억하고 직접 골라보세요.'
           : menu.id == 'americano'
           ? '차갑게를 선택해 볼까요?'
@@ -179,7 +188,11 @@ class CafeV2SizePage extends StatelessWidget {
     return _CafeOptionPage<CafeSize>(
       stageLabel: '3 / 7 · 크기 고르기',
       question: '어떤 크기로 주문할까요?',
-      guidance: order.isSolo ? '미션을 기억하고 직접 골라보세요.' : '보통 크기를 선택해 볼까요?',
+      guidance: order.isFreePractice
+          ? '원하는 크기를 자유롭게 골라보세요.'
+          : order.isSolo
+          ? '미션을 기억하고 직접 골라보세요.'
+          : '보통 크기를 선택해 볼까요?',
       helper: '큰 사이즈는 연습용 금액 500원이 추가돼요.',
       order: order,
       values: CafeSize.values,
@@ -206,7 +219,11 @@ class CafeV2DineOptionPage extends StatelessWidget {
     return _CafeOptionPage<CafeDineOption>(
       stageLabel: '4 / 7 · 이용 방법',
       question: '매장에서 드시나요?',
-      guidance: order.isSolo ? '미션을 기억하고 직접 골라보세요.' : '포장을 선택해 볼까요?',
+      guidance: order.isFreePractice
+          ? '매장 이용과 포장 중 원하는 방법을 골라보세요.'
+          : order.isSolo
+          ? '미션을 기억하고 직접 골라보세요.'
+          : '포장을 선택해 볼까요?',
       order: order,
       values: CafeDineOption.values,
       label: (value) => value == CafeDineOption.dineIn ? '매장' : '포장',
@@ -637,6 +654,7 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
       final order = context.read<CafeOrderProvider>();
       final progress = context.read<LearningProgressProvider>();
       final daily = context.read<DailyMissionProvider>();
+      if (order.isFreePractice) return;
       final before = progress.soloCompletionCount;
       final earned = await context
           .read<LearningProgressProvider>()
@@ -685,7 +703,7 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
             ),
             const SizedBox(height: 14),
             Text(
-              '주문 연습을 완료했어요!',
+              order.isFreePractice ? '자유 연습을 마쳤어요' : '주문 연습을 완료했어요!',
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -710,7 +728,11 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
             ),
             const SizedBox(height: 18),
             CafePracticeNotice(
-              message: progress.isSoloMode ? '용기 포인트 +20점' : '한걸음 포인트 +10점',
+              message: order.isFreePractice
+                  ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                  : progress.isSoloMode
+                  ? '용기 포인트 +20점'
+                  : '한걸음 포인트 +10점',
               icon: Icons.stars_outlined,
             ),
             if (_badgeEarned) ...[
@@ -729,6 +751,11 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
             const SizedBox(height: 22),
             FilledButton(
               onPressed: () {
+                if (order.isFreePractice) {
+                  order.startFreePractice();
+                  context.go(AppRoutes.cafeV2Menu);
+                  return;
+                }
                 final mode = progress.mode ?? CafeLearningMode.guided;
                 progress.selectMode(mode);
                 order.start(mode);

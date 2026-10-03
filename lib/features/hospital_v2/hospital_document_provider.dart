@@ -123,6 +123,7 @@ const hospitalDocumentScenarios = <HospitalDocumentScenario>[
 class HospitalDocumentProvider extends ChangeNotifier {
   HospitalDocumentStep step = HospitalDocumentStep.service;
   bool isSolo = false;
+  bool isFreePractice = false;
   int scenarioIndex = 0;
   String patientNumber = '';
   PracticeHospitalDocument? selectedDocument;
@@ -165,11 +166,19 @@ class HospitalDocumentProvider extends ChangeNotifier {
 
   void begin({required bool solo, int completedCount = 0}) {
     isSolo = solo;
+    isFreePractice = false;
     scenarioIndex = solo
         ? completedCount % hospitalDocumentScenarios.length
         : 0;
     reset(notify: false);
     notifyListeners();
+  }
+
+  void beginFreePractice() {
+    isSolo = false;
+    isFreePractice = true;
+    scenarioIndex = 0;
+    reset();
   }
 
   void enterPatientCheck() {
@@ -217,7 +226,7 @@ class HospitalDocumentProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (document.id != targetDocument.id) {
+    if (!isFreePractice && document.id != targetDocument.id) {
       notice = '괜찮아요. 필요한 서류를 다시 확인해 볼까요?';
       notifyListeners();
       return false;
@@ -235,7 +244,7 @@ class HospitalDocumentProvider extends ChangeNotifier {
   }
 
   bool selectPurpose(String value) {
-    if (value != scenario.purpose) {
+    if (!isFreePractice && value != scenario.purpose) {
       notice = '괜찮아요. 제출할 곳을 다시 확인해 볼까요?';
       notifyListeners();
       return false;
@@ -250,7 +259,7 @@ class HospitalDocumentProvider extends ChangeNotifier {
 
   bool selectCopies(int value) {
     if (value < 1 || value > 3) return false;
-    if (value != scenario.copies) {
+    if (!isFreePractice && value != scenario.copies) {
       notice = '괜찮아요. 필요한 발급 부수를 다시 확인해 볼까요?';
       notifyListeners();
       return false;
@@ -276,7 +285,7 @@ class HospitalDocumentProvider extends ChangeNotifier {
   }
 
   bool choosePaymentMethod(HospitalPaymentMethod method) {
-    if (method != scenario.paymentMethod) {
+    if (!isFreePractice && method != scenario.paymentMethod) {
       notice = '괜찮아요. 연습 목표의 결제 방법을 다시 확인해 볼까요?';
       notifyListeners();
       return false;

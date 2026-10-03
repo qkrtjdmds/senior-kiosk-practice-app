@@ -11,13 +11,13 @@ class PracticeTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: '연습',
+      title: '연습하기',
       showBackButton: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '원하는 생활 연습을 골라보세요.',
+            '안내를 보며 연습하거나 스스로 도전해 보세요.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),

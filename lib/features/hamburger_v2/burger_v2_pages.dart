@@ -225,7 +225,11 @@ class BurgerV2OrderPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              order.isSolo ? '미션을 기억하고 직접 골라보세요.' : _guided(order.step),
+              order.isFreePractice
+                  ? '원하는 항목을 자유롭게 골라보세요.'
+                  : order.isSolo
+                  ? '미션을 기억하고 직접 골라보세요.'
+                  : _guided(order.step),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             if (order.inlineMessage != null) ...[
@@ -614,7 +618,9 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
       final progress = context.read<LearningProgressProvider>();
       final daily = context.read<DailyMissionProvider>();
       bool badge = false;
-      if (progress.isHamburgerSoloMode) {
+      if (context.read<BurgerOrderProvider>().isFreePractice) {
+        // 자유 연습은 포인트, 횟수, 배지와 미션 상태를 변경하지 않는다.
+      } else if (progress.isHamburgerSoloMode) {
         final before = progress.hamburgerSoloCompletionCount;
         badge = await progress.completeHamburgerSoloLearning();
         if (progress.hamburgerSoloCompletionCount > before) {
@@ -635,7 +641,9 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
     final progress = context.watch<LearningProgressProvider>();
     return Scaffold(
       backgroundColor: burgerIvory,
-      appBar: AppBar(title: const Text('주문 연습 완료')),
+      appBar: AppBar(
+        title: Text(order.isFreePractice ? '자유 연습 완료' : '주문 연습 완료'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -663,7 +671,9 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
             const BurgerInlineNotice('실제 주문이나 결제가 진행된 것은 아니에요.'),
             const SizedBox(height: 16),
             BurgerInlineNotice(
-              progress.isHamburgerSoloMode
+              order.isFreePractice
+                  ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
+                  : progress.isHamburgerSoloMode
                   ? '용기 포인트 +20점${firstBadge == true ? ' · 새 배지: 혼자 햄버거 주문 첫걸음' : ''}'
                   : '한걸음 포인트 +10점',
             ),
@@ -677,7 +687,10 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
                 minimumSize: const Size.fromHeight(56),
               ),
               onPressed: () async {
-                if (progress.isHamburgerSoloMode) {
+                if (order.isFreePractice) {
+                  order.beginFreePractice();
+                  context.go(AppRoutes.hamburgerPractice);
+                } else if (progress.isHamburgerSoloMode) {
                   await progress.startHamburgerSoloMission();
                   if (!context.mounted) return;
                   order.begin(HamburgerLearningMode.solo);
