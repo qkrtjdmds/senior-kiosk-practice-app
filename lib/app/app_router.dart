@@ -26,13 +26,8 @@ import '../features/hospital_v2/hospital_payment_pages.dart';
 import '../features/hospital_v2/hospital_document_provider.dart';
 import '../features/hospital_v2/hospital_document_pages.dart';
 import '../features/hospital_v2/hospital_v2_pages.dart';
-import '../features/photo/photo_complete_page.dart';
-import '../features/photo/photo_mission_page.dart';
-import '../features/photo/photo_start_page.dart';
-import '../features/photo/photo_step_four_page.dart';
-import '../features/photo/photo_step_one_page.dart';
-import '../features/photo/photo_step_three_page.dart';
-import '../features/photo/photo_step_two_page.dart';
+import '../features/photo_send_v2/photo_send_provider.dart';
+import '../features/photo_send_v2/photo_send_v2_pages.dart';
 import '../features/train/train_complete_page.dart';
 import '../features/train/train_step_five_page.dart';
 import '../features/train/train_step_four_page.dart';
@@ -60,6 +55,7 @@ final hospitalDocumentProvider = HospitalDocumentProvider();
 final trainBookingProvider = TrainBookingProvider();
 final atmWithdrawalProvider = AtmWithdrawalProvider();
 final civilDocumentV2Provider = CivilDocumentV2Provider();
+final photoSendProvider = PhotoSendProvider();
 
 Widget _withCafeOrderProvider(Widget child) {
   return ChangeNotifierProvider.value(value: cafeOrderProvider, child: child);
@@ -88,6 +84,10 @@ Widget _withCivilDocumentV2Provider(Widget child) {
     value: civilDocumentV2Provider,
     child: child,
   );
+}
+
+Widget _withPhotoSendProvider(Widget child) {
+  return ChangeNotifierProvider.value(value: photoSendProvider, child: child);
 }
 
 Widget _withHospitalReceptionProvider(Widget child) {
@@ -271,31 +271,38 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.photoStart,
-      builder: (context, state) => const PhotoStartPage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2StartPage()),
     ),
     GoRoute(
       path: AppRoutes.photoMission,
-      builder: (context, state) => const PhotoMissionPage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2MissionPage()),
     ),
     GoRoute(
       path: AppRoutes.photoStepOne,
-      builder: (context, state) => const PhotoStepOnePage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2FlowPage()),
     ),
     GoRoute(
       path: AppRoutes.photoStepTwo,
-      builder: (context, state) => const PhotoStepTwoPage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2FlowPage()),
     ),
     GoRoute(
       path: AppRoutes.photoStepThree,
-      builder: (context, state) => const PhotoStepThreePage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2FlowPage()),
     ),
     GoRoute(
       path: AppRoutes.photoStepFour,
-      builder: (context, state) => const PhotoStepFourPage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2FlowPage()),
     ),
     GoRoute(
       path: AppRoutes.photoComplete,
-      builder: (context, state) => const PhotoCompletePage(),
+      builder: (context, state) =>
+          _withPhotoSendProvider(const PhotoSendV2CompletePage()),
     ),
     GoRoute(
       path: AppRoutes.trainStart,

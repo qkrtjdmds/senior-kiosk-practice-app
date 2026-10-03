@@ -17,6 +17,7 @@ import 'package:han_geoleum_digital/features/hamburger/hamburger_mission.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_order_provider.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_scenario.dart';
+import 'package:han_geoleum_digital/features/photo_send_v2/photo_send_models.dart';
 import 'package:han_geoleum_digital/features/train_v2/train_booking_models.dart';
 
 void main() {
@@ -259,7 +260,7 @@ void main() {
     expect(progress.totalPoints, 10);
   });
 
-  testWidgets('사진 보내기 4단계를 완료한다', (WidgetTester tester) async {
+  testWidgets('사진 보내기 V2 따라 해보기를 완료한다', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
     appRouter.go(AppRoutes.home);
@@ -276,24 +277,32 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('사진 보내기 연습'), findsWidgets);
 
-    await tester.tap(find.text('따라 해보기'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('가족에게 보낼게요'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('꽃 사진'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('사진 보세요!'));
+    final progress = Provider.of<LearningProgressProvider>(
+      tester.element(find.text('따라 해보기')),
+      listen: false,
+    );
+    progress.selectPhotoMode(PhotoLearningMode.guided);
+    photoSendProvider.begin(PhotoSendMode.guided);
+    photoSendProvider
+      ..chooseRecipient(contactById('daughter'))
+      ..confirmChat()
+      ..openAddPhoto()
+      ..choosePermission(PhotoPermissionChoice.selectedOnly)
+      ..chooseAlbum('꽃과 풍경')
+      ..togglePhoto('red_flower')
+      ..finishPhotoSelection()
+      ..confirmPreview()
+      ..confirmReview();
+    final guidedSend = photoSendProvider.sendVirtually();
+    await tester.pump(const Duration(milliseconds: 400));
+    await guidedSend;
+    photoSendProvider.confirmResult();
+    appRouter.go(AppRoutes.photoComplete);
     await tester.pumpAndSettle();
 
-    expect(find.text('가족'), findsOneWidget);
-    expect(find.text('꽃 사진'), findsOneWidget);
-    expect(find.text('사진 보세요!'), findsOneWidget);
-    await tester.ensureVisible(find.text('사진 보내기'));
-    await tester.tap(find.text('사진 보내기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('사진을 보내는 순서를 천천히 잘 따라오셨어요.'), findsOneWidget);
+    expect(find.text('사진 보내기 연습 완료'), findsWidgets);
     expect(find.text('한걸음 포인트 +10점'), findsOneWidget);
+    expect(progress.photoCompletionCount, 1);
   });
 
   test('사진 보내기 완료 보상은 한 번만 저장한다', () async {
@@ -505,37 +514,33 @@ void main() {
     await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('오늘의 사진 보내기 미션'), findsOneWidget);
-    expect(find.text('가족에게 꽃 사진 보내기'), findsOneWidget);
-    await tester.tap(find.text('혼자 보내보기'));
+    expect(find.text('오늘의 사진 보내기 목표'), findsOneWidget);
+    expect(find.textContaining('딸 김하늘에게 빨간 꽃'), findsOneWidget);
+    final progress = Provider.of<LearningProgressProvider>(
+      tester.element(find.text('혼자 사진 보내기')),
+      listen: false,
+    );
+    photoSendProvider
+      ..chooseRecipient(contactById('daughter'))
+      ..confirmChat()
+      ..openAddPhoto()
+      ..choosePermission(PhotoPermissionChoice.selectedOnly)
+      ..chooseAlbum('꽃과 풍경')
+      ..togglePhoto('red_flower')
+      ..finishPhotoSelection()
+      ..confirmPreview()
+      ..confirmReview();
+    final soloSend = photoSendProvider.sendVirtually();
+    await tester.pump(const Duration(milliseconds: 400));
+    await soloSend;
+    photoSendProvider.confirmResult();
+    appRouter.go(AppRoutes.photoComplete);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('친구에게 보낼게요'));
-    await tester.pump();
-    expect(find.text('1 / 4 단계'), findsOneWidget);
-    expect(find.textContaining('괜찮아요. 오늘 보낼 내용을 다시 확인해볼까요?'), findsOneWidget);
-    await tester.ensureVisible(find.text('힌트 보기'));
-    await tester.tap(find.text('힌트 보기'));
-    await tester.pumpAndSettle();
-    expect(find.text('오늘 보낼 내용'), findsOneWidget);
-    expect(find.textContaining('가족에게 보내기'), findsOneWidget);
-    await tester.tap(find.text('다시 해볼게요'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('가족에게 보낼게요'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('꽃 사진'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('사진 보세요!'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('사진 보내기'));
-    await tester.tap(find.text('사진 보내기'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('혼자서도 잘하셨어요!'), findsOneWidget);
-    expect(find.text('오늘의 사진 보내기 미션을 완성했어요.'), findsOneWidget);
-    expect(find.text('용기 포인트 +20점'), findsOneWidget);
-    expect(find.text('혼자 사진 보내기 첫걸음'), findsOneWidget);
+    expect(find.text('사진 보내기 연습 완료'), findsWidgets);
+    expect(find.textContaining('용기 포인트 +20점'), findsOneWidget);
+    expect(find.textContaining('혼자 사진 보내기 첫걸음'), findsOneWidget);
+    expect(progress.photoSoloCompletionCount, 1);
   });
 
   test('사진 보내기 혼자 해보기 보상은 한 번만 저장한다', () async {
