@@ -12,7 +12,7 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => LearningProgressProvider(preferences),
-      child: const HanGeoleumDigitalApp(),
+      child: const HanGeoleumDigitalApp(enableOnboarding: true),
     ),
   );
 }

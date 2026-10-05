@@ -39,7 +39,7 @@ void main() {
     await tester.tap(find.text('미션'));
     await tester.pumpAndSettle();
     expect(appRouter.state.uri.path, AppRoutes.missions);
-    expect(find.text('오늘 준비된 세 가지 연습에 도전해 보세요.'), findsOneWidget);
+    expect(find.text('오늘 준비된 세 가지 연습에 하나씩 도전해 보세요.'), findsOneWidget);
     expect(find.text('완료하면 추가 포인트 10점'), findsNWidgets(3));
     await tester.tap(find.text('내 정보'));
     await tester.pumpAndSettle();

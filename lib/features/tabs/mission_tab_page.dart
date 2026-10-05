@@ -6,6 +6,8 @@ import '../../shared/widgets/page_scaffold.dart';
 import '../daily_mission/daily_mission.dart';
 import '../daily_mission/daily_mission_provider.dart';
 import '../learning/learning_progress_provider.dart';
+import '../../shared/widgets/app_ui.dart';
+import '../../shared/widgets/han_geoleum_character.dart';
 
 class MissionTabPage extends StatelessWidget {
   const MissionTabPage({super.key});
@@ -19,9 +21,10 @@ class MissionTabPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            '오늘 준비된 세 가지 연습에 도전해 보세요.',
-            style: Theme.of(context).textTheme.bodyLarge,
+          const CharacterMessage(
+            title: '천천히 해도 괜찮아요',
+            message: '오늘 준비된 세 가지 연습에 하나씩 도전해 보세요.',
+            mood: HanGeoleumMood.cheer,
           ),
           const SizedBox(height: 8),
           Text(

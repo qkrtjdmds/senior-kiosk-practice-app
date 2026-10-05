@@ -35,7 +35,7 @@ void main() {
     );
 
     expect(find.text('한걸음 디지털'), findsOneWidget);
-    expect(find.text('카페 키오스크 연습'), findsOneWidget);
+    expect(find.text('카페 주문'), findsOneWidget);
   });
 
   testWidgets('카페 주문 선택값을 4단계 확인 화면에 표시한다', (WidgetTester tester) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/app_routes.dart';
+import '../../app/app_theme.dart';
 
 class PageScaffold extends StatelessWidget {
   const PageScaffold({
@@ -51,7 +52,7 @@ class PageScaffold extends StatelessWidget {
                       ),
                     )
                   : null,
-              titleSpacing: showBackButton ? 0 : 24,
+              titleSpacing: showBackButton ? 0 : AppSpacing.lg,
               title: Text(
                 title!,
                 softWrap: true,
@@ -63,7 +64,12 @@ class PageScaffold extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 36),
+            padding: EdgeInsets.fromLTRB(
+              MediaQuery.sizeOf(context).width <= 340 ? 16 : 20,
+              20,
+              MediaQuery.sizeOf(context).width <= 340 ? 16 : 20,
+              36,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 620),
               child: child,

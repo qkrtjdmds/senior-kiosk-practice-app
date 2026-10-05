@@ -84,6 +84,21 @@ class AccessibilitySettingsPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 28),
+          _SettingsSection(
+            title: '시작 안내',
+            icon: Icons.waving_hand_outlined,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () async {
+                  await settings.showOnboardingAgain();
+                  if (context.mounted) context.go(AppRoutes.home);
+                },
+                icon: const Icon(Icons.replay_rounded),
+                label: const Text('시작 안내 다시 보기', textAlign: TextAlign.center),
+              ),
+            ],
+          ),
+          const SizedBox(height: 28),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -106,6 +121,28 @@ class AccessibilitySettingsPage extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 26),
+          _SettingsSection(
+            title: '개인정보 안내',
+            icon: Icons.privacy_tip_outlined,
+            children: [
+              Text(
+                '이 앱은 실제 계정·연락처·카드·계좌·주민등록번호를 입력하거나 서버로 보내지 않아요.',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          const SizedBox(height: 26),
+          _SettingsSection(
+            title: '앱 정보',
+            icon: Icons.info_outline_rounded,
+            children: [
+              Text(
+                '한걸음 디지털 V2 · 실제 서비스와 연결되지 않는 교육용 연습 앱',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
           ),
           const SizedBox(height: 30),
           const Divider(height: 1),

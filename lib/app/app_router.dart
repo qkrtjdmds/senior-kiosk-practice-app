@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'app_routes.dart';
-import '../features/home/home_page.dart';
+import '../features/home/brand_home_page.dart';
 import '../features/progress/progress_page.dart';
 import '../features/settings/accessibility_settings_page.dart';
 import '../features/tabs/main_tab_scaffold.dart';
@@ -94,7 +94,7 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: AppRoutes.home,
-          builder: (context, state) => const HomePage(),
+          builder: (context, state) => const BrandHomePage(),
         ),
         GoRoute(
           path: AppRoutes.practice,

@@ -25,6 +25,7 @@ enum AccessibilityTextSize { normal, large, extraLarge }
 enum ScreenContrast { comfortable, vivid }
 
 class LearningProgressProvider extends ChangeNotifier {
+  static const onboardingCompletedKey = 'onboarding_completed_v1';
   static const _accessibilityTextSizeKey = 'accessibility_text_size';
   static const _screenContrastKey = 'screen_contrast';
   static const _completionCountKey = 'cafe_learning_completion_count';
@@ -208,6 +209,19 @@ class LearningProgressProvider extends ChangeNotifier {
   };
 
   bool get usesVividContrast => screenContrast == ScreenContrast.vivid;
+
+  bool get onboardingCompleted =>
+      _preferences.getBool(onboardingCompletedKey) ?? false;
+
+  Future<void> completeOnboarding() async {
+    await _preferences.setBool(onboardingCompletedKey, true);
+    notifyListeners();
+  }
+
+  Future<void> showOnboardingAgain() async {
+    await _preferences.setBool(onboardingCompletedKey, false);
+    notifyListeners();
+  }
 
   Future<void> setAccessibilityTextSize(AccessibilityTextSize value) async {
     if (accessibilityTextSize == value) return;

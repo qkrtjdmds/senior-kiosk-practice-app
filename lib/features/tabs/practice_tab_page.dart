@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../app/app_routes.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import 'tab_learning_card.dart';
+import '../../shared/widgets/app_ui.dart';
+import '../../shared/widgets/han_geoleum_character.dart';
 
 class PracticeTabPage extends StatelessWidget {
   const PracticeTabPage({super.key});
@@ -16,9 +18,10 @@ class PracticeTabPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            '안내를 보며 연습하거나 스스로 도전해 보세요.',
-            style: Theme.of(context).textTheme.bodyLarge,
+          const CharacterMessage(
+            title: '안내를 보며 연습하거나 스스로 도전해 보세요',
+            message: '처음에는 따라 해보기로 충분히 익힌 뒤 혼자 해보기에 도전해 보세요.',
+            mood: HanGeoleumMood.guide,
           ),
           const SizedBox(height: 24),
           _card(

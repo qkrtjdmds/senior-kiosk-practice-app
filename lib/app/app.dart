@@ -5,9 +5,12 @@ import 'app_router.dart';
 import 'app_theme.dart';
 import '../features/learning/learning_progress_provider.dart';
 import '../features/daily_mission/daily_mission_provider.dart';
+import '../features/onboarding/onboarding_page.dart';
 
 class HanGeoleumDigitalApp extends StatefulWidget {
-  const HanGeoleumDigitalApp({super.key});
+  const HanGeoleumDigitalApp({this.enableOnboarding = false, super.key});
+
+  final bool enableOnboarding;
 
   @override
   State<HanGeoleumDigitalApp> createState() => _HanGeoleumDigitalAppState();
@@ -45,7 +48,12 @@ class _HanGeoleumDigitalAppState extends State<HanGeoleumDigitalApp> {
             data: mediaQuery.copyWith(
               textScaler: TextScaler.linear(settings.textScaleFactor),
             ),
-            child: child ?? const SizedBox.shrink(),
+            child:
+                widget.enableOnboarding &&
+                    !settings.onboardingCompleted &&
+                    appRouter.routeInformationProvider.value.uri.path == '/'
+                ? const OnboardingPage()
+                : child ?? const SizedBox.shrink(),
           );
         },
       ),

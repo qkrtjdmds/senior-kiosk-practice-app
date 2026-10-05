@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,35 +38,18 @@ void main() {
     await pumpHome(tester);
 
     expect(find.text('원하는 연습을 바로 시작해 보세요'), findsOneWidget);
-    expect(find.text('한 단계씩 따라 해보세요.'), findsOneWidget);
-    expect(find.text('기록과 포인트 보기'), findsOneWidget);
+    expect(find.text('홈에서는 점수 없이 자유롭게 반복할 수 있어요.'), findsOneWidget);
+    expect(find.text('최근 활동'), findsOneWidget);
     expect(find.byTooltip('화면 설정'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     await tester.scrollUntilVisible(
-      find.text('병원 접수'),
+      find.text('병원'),
       300,
       scrollable: find.byType(Scrollable),
     );
-    final hospitalCenter = tester.getCenter(find.text('병원 접수'));
-    final photoCenter = tester.getCenter(find.text('사진 보내기'));
-    expect(hospitalCenter.dy, closeTo(photoCenter.dy, 1));
-    expect(hospitalCenter.dx, lessThan(photoCenter.dx));
-
-    final cafeTitle = tester.widget<Text>(find.text('카페 키오스크 연습'));
-    expect(cafeTitle.maxLines, 1);
-    expect(cafeTitle.overflow, TextOverflow.ellipsis);
-    final titleParagraph = tester.renderObject<RenderParagraph>(
-      find.text('카페 키오스크 연습'),
-    );
-    expect(
-      titleParagraph
-          .getPositionForOffset(
-            Offset(titleParagraph.size.width, titleParagraph.size.height / 2),
-          )
-          .offset,
-      '카페 키오스크 연습'.length,
-    );
+    expect(find.text('병원'), findsOneWidget);
+    expect(find.text('사진 보내기'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -75,14 +57,13 @@ void main() {
     await pumpHome(tester);
 
     final destinations = <String, String>{
-      '카페 키오스크 연습': AppRoutes.cafeV2Menu,
-      '병원 접수': AppRoutes.hospitalStepOne,
+      '카페 주문': AppRoutes.cafeV2Menu,
+      '병원': AppRoutes.hospitalStepOne,
       '사진 보내기': AppRoutes.photoStepOne,
       '기차표 예매': AppRoutes.trainV2TripType,
       '햄버거 주문': AppRoutes.hamburgerPractice,
       'ATM 출금': AppRoutes.atmV2Services,
-      '서류 발급': AppRoutes.civilDocumentV2Categories,
-      '나의 디지털 걸음': AppRoutes.progress,
+      '무인민원발급기': AppRoutes.civilDocumentV2Categories,
     };
 
     for (final entry in destinations.entries) {
@@ -103,7 +84,7 @@ void main() {
     expect(appRouter.state.uri.path, AppRoutes.accessibilitySettings);
   });
 
-  testWidgets('기본 글씨의 넓은 화면에서는 다른 연습을 2열로 표시한다', (tester) async {
+  testWidgets('기본 글씨의 넓은 화면에서도 연습을 읽기 쉬운 한 열로 표시한다', (tester) async {
     tester.view.physicalSize = const Size(800, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -122,10 +103,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final hospitalCenter = tester.getCenter(find.text('병원 접수'));
-    final photoCenter = tester.getCenter(find.text('사진 보내기'));
-    expect(hospitalCenter.dy, closeTo(photoCenter.dy, 1));
-    expect(hospitalCenter.dx, lessThan(photoCenter.dx));
+    final cafeCenter = tester.getCenter(find.text('카페 주문'));
+    final burgerCenter = tester.getCenter(find.text('햄버거 주문'));
+    expect(cafeCenter.dy, lessThan(burgerCenter.dy));
     expect(tester.takeException(), isNull);
   });
 }

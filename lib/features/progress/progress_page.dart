@@ -6,6 +6,8 @@ import '../../app/app_routes.dart';
 import '../learning/learning_progress_provider.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import 'recent_practice_record.dart';
+import '../../shared/widgets/app_ui.dart';
+import '../../shared/widgets/han_geoleum_character.dart';
 
 class ProgressPage extends StatelessWidget {
   const ProgressPage({this.isTabPage = false, super.key});
@@ -22,6 +24,14 @@ class ProgressPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (isTabPage) ...[
+            const CharacterMessage(
+              title: '지금까지 이만큼 연습했어요',
+              message: '반복한 걸음이 차곡차곡 쌓이고 있어요.',
+              mood: HanGeoleumMood.cheer,
+            ),
+            const SizedBox(height: 18),
+          ],
           _PointsCard(points: progress.totalPoints),
           const SizedBox(height: 18),
           _CafeRecordCard(
