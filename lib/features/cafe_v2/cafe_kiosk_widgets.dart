@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
 import '../learning/widgets/learning_widgets.dart';
 import 'cafe_order_provider.dart';
 
@@ -11,6 +13,7 @@ class CafeKioskScaffold extends StatelessWidget {
     required this.onCart,
     required this.child,
     this.orderSummary,
+    this.modeLabel,
     this.bottom,
     super.key,
   });
@@ -20,103 +23,83 @@ class CafeKioskScaffold extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onCart;
   final String? orderSummary;
+  final String? modeLabel;
   final Widget child;
   final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F4),
-      appBar: AppBar(
-        toolbarHeight: 68,
-        automaticallyImplyLeading: false,
+    final stageMatch = RegExp(r'(\d+)\s*/\s*(\d+)').firstMatch(stageLabel);
+    final step = int.tryParse(stageMatch?.group(1) ?? '');
+    final totalSteps = int.tryParse(stageMatch?.group(2) ?? '');
+    final stepName = stageMatch == null
+        ? stageLabel
+        : stageLabel
+              .replaceFirst(stageMatch.group(0)!, '')
+              .replaceFirst(RegExp(r'^\s*[·-]\s*'), '')
+              .trim();
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) onBack();
+      },
+      child: Scaffold(
         backgroundColor: const Color(0xFFFAF9F4),
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        shape: const Border(bottom: BorderSide(color: learningSageBorder)),
-        leading: IconButton(
-          onPressed: onBack,
-          tooltip: '이전 화면으로 돌아가기',
-          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        titleSpacing: 4,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '카페 주문',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: const Color(0xFF23413C),
-                fontWeight: FontWeight.w800,
+        appBar: PracticeAppBar(
+          title: '카페 주문',
+          onBack: onBack,
+          step: step,
+          totalSteps: totalSteps,
+          stepName: stepName.isEmpty ? null : stepName,
+          modeLabel: modeLabel,
+          backgroundColor: const Color(0xFFFAF9F4),
+          actions: [
+            Semantics(
+              label: '장바구니 보기, 현재 $cartCount개',
+              button: true,
+              child: IconButton(
+                onPressed: onCart,
+                tooltip: '장바구니 보기',
+                constraints: const BoxConstraints(minWidth: 56, minHeight: 56),
+                icon: Badge(
+                  isLabelVisible: cartCount > 0,
+                  label: Text('$cartCount'),
+                  backgroundColor: colors.primary,
+                  textColor: colors.onPrimary,
+                  child: const Icon(Icons.shopping_cart_outlined, size: 28),
+                ),
               ),
             ),
-            Text(
-              stageLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            const SizedBox(width: 8),
           ],
         ),
-        actions: [
-          Semantics(
-            label: '장바구니 보기, 현재 $cartCount개',
-            button: true,
-            child: IconButton(
-              onPressed: onCart,
-              tooltip: '장바구니 보기',
-              constraints: const BoxConstraints(minWidth: 56, minHeight: 56),
-              icon: Badge(
-                isLabelVisible: cartCount > 0,
-                label: Text('$cartCount'),
-                backgroundColor: colors.primary,
-                textColor: colors.onPrimary,
-                child: const Icon(Icons.shopping_cart_outlined, size: 28),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            if (orderSummary != null && orderSummary!.isNotEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                color: learningSageSurface.withValues(alpha: 0.55),
-                child: Text(
-                  orderSummary!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: const Color(0xFF23413C),
-                    fontWeight: FontWeight.w700,
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              if (orderSummary != null && orderSummary!.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  color: learningSageSurface.withValues(alpha: 0.55),
+                  child: Text(
+                    orderSummary!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: const Color(0xFF23413C),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-            Expanded(child: child),
-            if (bottom != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAF9F4),
-                  border: Border(top: BorderSide(color: learningSageBorder)),
-                ),
-                child: bottom,
-              ),
-          ],
+              Expanded(child: child),
+              if (bottom != null) PracticeBottomActions(child: bottom!),
+            ],
+          ),
         ),
       ),
     );

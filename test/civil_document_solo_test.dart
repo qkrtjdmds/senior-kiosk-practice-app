@@ -44,10 +44,14 @@ void main() {
     await tester.tap(find.text('다시 인식하기'));
     await tester.pumpAndSettle();
 
+    await tester.drag(find.byType(ListView), const Offset(0, -120));
+    await tester.pump();
     await tester.tap(find.text('주민등록번호 뒷자리: 표시 안 함'));
     await tester.pump();
+    await tester.ensureVisible(find.text('옵션 선택 완료'));
     await tester.tap(find.text('옵션 선택 완료'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('1부'));
     await tester.tap(find.text('1부'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('******-*******'));

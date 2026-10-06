@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
+
 const civilIvory = Color(0xFFFAF9F4);
 const civilNavy = Color(0xFF24364B);
 const civilSage = Color(0xFFE5EDE5);
@@ -13,12 +16,14 @@ class CivilKioskScaffold extends StatelessWidget {
     required this.onBack,
     this.step,
     this.totalSteps = 11,
+    this.modeLabel,
     this.bottom,
   });
   final Widget child;
   final VoidCallback onBack;
   final int? step;
   final int totalSteps;
+  final String? modeLabel;
   final Widget? bottom;
 
   @override
@@ -29,51 +34,18 @@ class CivilKioskScaffold extends StatelessWidget {
     },
     child: Scaffold(
       backgroundColor: civilIvory,
-      appBar: AppBar(
+      appBar: PracticeAppBar(
+        title: '무인민원발급기 연습',
+        onBack: onBack,
+        step: step,
+        totalSteps: step == null ? null : totalSteps,
+        modeLabel: modeLabel,
         backgroundColor: civilIvory,
-        leading: IconButton(
-          tooltip: '이전 화면으로 돌아가기',
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text('무인민원발급기 연습'),
-        bottom: step == null
-            ? null
-            : PreferredSize(
-                preferredSize: const Size.fromHeight(38),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          value: step! / totalSteps,
-                          minHeight: 6,
-                          color: civilNavy,
-                          backgroundColor: civilSage,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text('$step / $totalSteps'),
-                    ],
-                  ),
-                ),
-              ),
       ),
       body: SafeArea(child: child),
       bottomNavigationBar: bottom == null
           ? null
-          : SafeArea(
-              top: false,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-                decoration: const BoxDecoration(
-                  color: civilIvory,
-                  border: Border(top: BorderSide(color: civilBorder)),
-                ),
-                child: bottom,
-              ),
-            ),
+          : PracticeBottomActions(child: bottom!),
     ),
   );
 }
@@ -100,11 +72,9 @@ class CivilNotice extends StatelessWidget {
   final String text;
   final bool warning;
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    color: warning ? civilBeige : civilSage,
-    child: Text(text, softWrap: true),
+  Widget build(BuildContext context) => PracticeInlineNotice(
+    message: text,
+    tone: warning ? PracticeNoticeTone.caution : PracticeNoticeTone.information,
   );
 }
 

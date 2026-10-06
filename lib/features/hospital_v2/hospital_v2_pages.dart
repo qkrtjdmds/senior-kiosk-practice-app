@@ -170,6 +170,10 @@ class HospitalV2OrderPage extends StatelessWidget {
         onBack: back,
         step: reception.stepNumber,
         totalSteps: reception.totalSteps,
+        modeLabel: practiceSessionLabel(
+          isFreePractice: reception.isFreePractice,
+          isSolo: reception.isSolo,
+        ),
         bottom: _bottom(context, reception),
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
@@ -568,21 +572,18 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(
-              Icons.check_circle_outline,
-              size: 70,
-              color: hospitalGreen,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              p.isFreePractice
+            PracticeCompletionHeader(
+              title: p.isFreePractice
                   ? '자유 연습을 마쳤어요'
                   : progress.isHospitalSoloMode
                   ? '혼자서도 잘하셨어요!'
                   : '진료 접수 연습을 완료했어요!',
-              textAlign: TextAlign.center,
-              softWrap: true,
-              style: Theme.of(context).textTheme.headlineMedium,
+              description: '실제 접수가 진행된 것은 아니에요.',
+              modeLabel: practiceSessionLabel(
+                isFreePractice: p.isFreePractice,
+                isSolo: progress.isHospitalSoloMode,
+                dailyMission: dailyReward,
+              ),
             ),
             const SizedBox(height: 20),
             Container(

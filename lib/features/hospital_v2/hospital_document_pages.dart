@@ -33,6 +33,10 @@ class HospitalDocumentPracticePage extends StatelessWidget {
         onBack: back,
         step: provider.stepNumber,
         totalSteps: provider.totalSteps,
+        modeLabel: practiceSessionLabel(
+          isFreePractice: provider.isFreePractice,
+          isSolo: provider.isSolo,
+        ),
         bottom: provider.step == HospitalDocumentStep.service
             ? hospitalPrimaryButton(
                 context,

@@ -32,6 +32,10 @@ class HospitalPaymentPracticePage extends StatelessWidget {
         onBack: back,
         step: provider.stepNumber,
         totalSteps: provider.totalSteps,
+        modeLabel: practiceSessionLabel(
+          isFreePractice: provider.isFreePractice,
+          isSolo: provider.isSolo,
+        ),
         bottom: provider.step == HospitalPaymentStep.service
             ? hospitalPrimaryButton(
                 context,

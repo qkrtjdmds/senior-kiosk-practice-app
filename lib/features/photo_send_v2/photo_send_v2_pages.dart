@@ -135,6 +135,10 @@ class PhotoSendV2FlowPage extends StatelessWidget {
     final p = context.watch<PhotoSendProvider>();
     return PhotoSendScaffold(
       step: p.step.index + 1,
+      modeLabel: practiceSessionLabel(
+        isFreePractice: p.isFreePractice,
+        isSolo: p.isSolo,
+      ),
       onBack: () => _back(context, p),
       bottom: _bottom(context, p),
       child: ListView(
@@ -534,12 +538,14 @@ class _PhotoSendV2CompletePageState extends State<PhotoSendV2CompletePage> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Icon(Icons.check_circle_outline, size: 72, color: photoNavy),
-          const SizedBox(height: 12),
-          Text(
-            p.isFreePractice ? '자유 연습을 마쳤어요' : '사진 보내기 연습 완료',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium,
+          PracticeCompletionHeader(
+            title: p.isFreePractice ? '자유 연습을 마쳤어요' : '사진 보내기 연습 완료',
+            description: '실제 사진이 전송된 것은 아니에요.',
+            modeLabel: practiceSessionLabel(
+              isFreePractice: p.isFreePractice,
+              isSolo: p.isSolo,
+              dailyMission: _daily,
+            ),
           ),
           const SizedBox(height: 20),
           _completionSummary(context, p),

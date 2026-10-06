@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
+
 const hospitalIvory = Color(0xFFFAF9F4);
 const hospitalGreen = Color(0xFF23413C);
 const hospitalSage = Color(0xFFE5EDE5);
@@ -13,6 +16,7 @@ class HospitalKioskScaffold extends StatelessWidget {
     required this.onBack,
     this.step,
     this.totalSteps,
+    this.modeLabel,
     this.bottom,
   });
 
@@ -20,54 +24,30 @@ class HospitalKioskScaffold extends StatelessWidget {
   final VoidCallback onBack;
   final int? step;
   final int? totalSteps;
+  final String? modeLabel;
   final Widget? bottom;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: hospitalIvory,
-    appBar: AppBar(
-      leading: IconButton(
-        tooltip: '이전 화면으로 돌아가기',
-        onPressed: onBack,
-        icon: const Icon(Icons.arrow_back),
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (!didPop) onBack();
+    },
+    child: Scaffold(
+      backgroundColor: hospitalIvory,
+      appBar: PracticeAppBar(
+        title: '병원 무인 접수',
+        onBack: onBack,
+        step: step,
+        totalSteps: totalSteps,
+        modeLabel: modeLabel,
+        backgroundColor: hospitalIvory,
       ),
-      title: const Text('병원 무인 접수'),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(step == null ? 1 : 34),
-        child: Column(
-          children: [
-            if (step != null && totalSteps != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: LinearProgressIndicator(
-                        value: step! / totalSteps!,
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text('$step / $totalSteps 단계'),
-                  ],
-                ),
-              ),
-            const Divider(height: 1),
-          ],
-        ),
-      ),
+      body: SafeArea(child: child),
+      bottomNavigationBar: bottom == null
+          ? null
+          : PracticeBottomActions(child: bottom!),
     ),
-    body: SafeArea(child: child),
-    bottomNavigationBar: bottom == null
-        ? null
-        : SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-              child: bottom,
-            ),
-          ),
   );
 }
 
@@ -143,18 +123,9 @@ class HospitalInlineNotice extends StatelessWidget {
   final bool urgent;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: urgent ? hospitalOrange : hospitalSage,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Text(
-      text,
-      softWrap: true,
-      style: Theme.of(context).textTheme.bodyLarge,
-    ),
+  Widget build(BuildContext context) => PracticeInlineNotice(
+    message: text,
+    tone: urgent ? PracticeNoticeTone.caution : PracticeNoticeTone.information,
   );
 }
 

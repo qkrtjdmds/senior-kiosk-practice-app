@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
+
 const atmIvory = Color(0xFFFAF9F4);
 const atmNavy = Color(0xFF24364B);
 const atmSage = Color(0xFFE4ECE5);
@@ -15,6 +18,7 @@ class AtmKioskScaffold extends StatelessWidget {
     this.totalSteps = 10,
     this.bottom,
     this.summary,
+    this.modeLabel,
   });
 
   final Widget child;
@@ -23,6 +27,7 @@ class AtmKioskScaffold extends StatelessWidget {
   final int totalSteps;
   final Widget? bottom;
   final String? summary;
+  final String? modeLabel;
 
   @override
   Widget build(BuildContext context) => PopScope(
@@ -32,73 +37,40 @@ class AtmKioskScaffold extends StatelessWidget {
     },
     child: Scaffold(
       backgroundColor: atmIvory,
-      appBar: AppBar(
+      appBar: PracticeAppBar(
+        title: 'ATM 출금 연습',
+        onBack: onBack,
+        step: step,
+        totalSteps: step == null ? null : totalSteps,
+        modeLabel: modeLabel,
         backgroundColor: atmIvory,
-        leading: IconButton(
-          tooltip: '이전 화면으로 돌아가기',
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text('ATM 출금 연습'),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(
-            (step == null ? 0 : 34) +
-                ((summary?.isNotEmpty ?? false) ? 34 : 0) +
-                1,
-          ),
-          child: Column(
-            children: [
-              if (step != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 9),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          value: step! / totalSteps,
-                          minHeight: 6,
-                          borderRadius: BorderRadius.circular(3),
-                          color: atmNavy,
-                          backgroundColor: atmSage,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text('$step / $totalSteps 단계'),
-                    ],
-                  ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (summary?.isNotEmpty ?? false)
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(minHeight: 34),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 7,
                 ),
-              if (summary?.isNotEmpty ?? false)
-                Container(
-                  width: double.infinity,
-                  height: 34,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  color: atmSage,
-                  child: Text(
-                    summary!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                color: atmSage,
+                child: Text(
+                  summary!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              const Divider(height: 1),
-            ],
-          ),
+              ),
+            Expanded(child: child),
+          ],
         ),
       ),
-      body: SafeArea(child: child),
       bottomNavigationBar: bottom == null
           ? null
-          : SafeArea(
-              top: false,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-                decoration: const BoxDecoration(
-                  color: atmIvory,
-                  border: Border(top: BorderSide(color: atmBorder)),
-                ),
-                child: bottom,
-              ),
-            ),
+          : PracticeBottomActions(child: bottom!),
     ),
   );
 }
@@ -135,18 +107,9 @@ class AtmInlineNotice extends StatelessWidget {
   final bool warning;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: warning ? atmNotice : atmSage,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Text(
-      text,
-      softWrap: true,
-      style: Theme.of(context).textTheme.bodyLarge,
-    ),
+  Widget build(BuildContext context) => PracticeInlineNotice(
+    message: text,
+    tone: warning ? PracticeNoticeTone.caution : PracticeNoticeTone.information,
   );
 }
 

@@ -33,6 +33,10 @@ class HospitalReservationPracticePage extends StatelessWidget {
         onBack: back,
         step: provider.stepNumber,
         totalSteps: provider.totalSteps,
+        modeLabel: practiceSessionLabel(
+          isFreePractice: provider.isFreePractice,
+          isSolo: provider.isSolo,
+        ),
         bottom: _bottom(context, provider),
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),

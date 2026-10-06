@@ -137,6 +137,10 @@ class TrainV2FlowPage extends StatelessWidget {
     return TrainBookingScaffold(
       step: pageStep.index + 1,
       total: p.totalSteps,
+      modeLabel: practiceSessionLabel(
+        isFreePractice: p.isFreePractice,
+        isSolo: p.isSolo,
+      ),
       summary: p.summary,
       onBack: () => _back(context, p),
       bottom: _bottom(context, p),
@@ -834,12 +838,14 @@ class _TrainV2TicketPageState extends State<TrainV2TicketPage> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Icon(Icons.check_circle_outline, size: 64, color: trainGreen),
-          const SizedBox(height: 12),
-          Text(
-            p.isFreePractice ? '자유 연습을 마쳤어요' : '기차표 예매 연습을 완료했어요',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium,
+          PracticeCompletionHeader(
+            title: p.isFreePractice ? '자유 연습을 마쳤어요' : '기차표 예매 연습을 완료했어요',
+            description: '연습용 승차권은 실제 탑승에 사용할 수 없어요.',
+            modeLabel: practiceSessionLabel(
+              isFreePractice: p.isFreePractice,
+              isSolo: p.isSolo,
+              dailyMission: _daily,
+            ),
           ),
           const SizedBox(height: 20),
           Container(

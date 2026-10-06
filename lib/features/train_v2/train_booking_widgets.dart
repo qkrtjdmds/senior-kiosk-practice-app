@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
+
 const trainIvory = Color(0xFFFAF9F4);
 const trainGreen = Color(0xFF23413C);
 const trainSage = Color(0xFFE5EDE5);
@@ -14,6 +17,7 @@ class TrainBookingScaffold extends StatelessWidget {
     this.step,
     this.total,
     this.summary,
+    this.modeLabel,
     this.bottom,
   });
   final Widget child;
@@ -21,6 +25,7 @@ class TrainBookingScaffold extends StatelessWidget {
   final int? step;
   final int? total;
   final String? summary;
+  final String? modeLabel;
   final Widget? bottom;
 
   @override
@@ -31,66 +36,39 @@ class TrainBookingScaffold extends StatelessWidget {
     },
     child: Scaffold(
       backgroundColor: trainIvory,
-      appBar: AppBar(
-        leading: IconButton(
-          tooltip: '이전 화면으로 돌아가기',
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text('기차표 예매'),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(
-            step == null ? 1 : (summary?.isNotEmpty == true ? 62 : 36),
-          ),
-          child: Column(
-            children: [
-              if (step != null && total != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          value: step! / total!,
-                          minHeight: 6,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text('$step / $total 단계'),
-                    ],
-                  ),
+      appBar: PracticeAppBar(
+        title: '기차표 예매',
+        onBack: onBack,
+        step: step,
+        totalSteps: total,
+        modeLabel: modeLabel,
+        backgroundColor: trainIvory,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (summary?.isNotEmpty == true)
+              Container(
+                width: double.infinity,
+                color: trainSage,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 7,
                 ),
-              if (summary?.isNotEmpty == true)
-                Container(
-                  width: double.infinity,
-                  color: trainSage,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 7,
-                  ),
-                  child: Text(
-                    summary!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                  ),
+                child: Text(
+                  summary!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                 ),
-              const Divider(height: 1),
-            ],
-          ),
+              ),
+            Expanded(child: child),
+          ],
         ),
       ),
-      body: SafeArea(child: child),
       bottomNavigationBar: bottom == null
           ? null
-          : SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-                child: bottom,
-              ),
-            ),
+          : PracticeBottomActions(child: bottom!),
     ),
   );
 }

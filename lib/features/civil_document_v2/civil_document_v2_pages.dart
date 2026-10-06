@@ -188,10 +188,14 @@ class CivilDocumentV2FlowPage extends StatelessWidget {
     final p = context.watch<CivilDocumentV2Provider>();
     return CivilKioskScaffold(
       step: pageStep.index + 1,
+      modeLabel: practiceSessionLabel(
+        isFreePractice: p.isFreePractice,
+        isSolo: p.isSolo,
+      ),
       onBack: () => _back(context, p),
       bottom: _bottom(context, p),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 180),
         children: [
           if (p.isSolo) ...[_hint(context, p), const SizedBox(height: 12)],
           if (p.notice != null) ...[
@@ -719,12 +723,14 @@ class _CivilDocumentV2CompletePageState
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Icon(Icons.check_circle_outline, size: 72, color: civilNavy),
-          const SizedBox(height: 12),
-          Text(
-            '증명서 발급 연습 완료',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium,
+          PracticeCompletionHeader(
+            title: '증명서 발급 연습 완료',
+            description: '실제 증명서가 발급된 것은 아니에요.',
+            modeLabel: practiceSessionLabel(
+              isFreePractice: p.isFreePractice,
+              isSolo: p.isSolo,
+              dailyMission: _daily,
+            ),
           ),
           const SizedBox(height: 18),
           CivilSummary(

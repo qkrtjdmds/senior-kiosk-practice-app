@@ -199,6 +199,12 @@ class BurgerV2OrderPage extends StatelessWidget {
         onBack: goBack,
         summary: order.summary,
         cartCount: order.cartCount,
+        step: order.step.index + 1,
+        totalSteps: BurgerOrderStep.values.length,
+        modeLabel: practiceSessionLabel(
+          isFreePractice: order.isFreePractice,
+          isSolo: order.isSolo,
+        ),
         bottom: _bottom(context, order),
         child: _body(context, order),
       ),
@@ -211,14 +217,6 @@ class BurgerV2OrderPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              _stepLabel(order.step),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: burgerOrange,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
             Text(
               _question(order.step),
               style: Theme.of(context).textTheme.headlineSmall,
@@ -573,7 +571,6 @@ class BurgerV2OrderPage extends StatelessWidget {
     );
   }
 
-  String _stepLabel(BurgerOrderStep step) => '${step.index + 1} / 9 단계';
   String _question(BurgerOrderStep step) => const [
     '어디에서 드시나요?',
     '어떤 햄버거를 고를까요?',
@@ -648,16 +645,14 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            const Icon(
-              Icons.check_circle_outline,
-              color: burgerGreen,
-              size: 66,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '햄버거 주문 연습을 완료했어요!',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall,
+            PracticeCompletionHeader(
+              title: order.isFreePractice ? '자유 연습을 마쳤어요' : '햄버거 주문 연습을 완료했어요!',
+              description: '실제 주문이나 결제가 진행된 것은 아니에요.',
+              modeLabel: practiceSessionLabel(
+                isFreePractice: order.isFreePractice,
+                isSolo: progress.isHamburgerSoloMode,
+                dailyMission: dailyMissionRewarded,
+              ),
             ),
             const SizedBox(height: 24),
             const Divider(),

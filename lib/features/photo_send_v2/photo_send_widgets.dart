@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
 import 'photo_send_models.dart';
 
 const photoIvory = Color(0xFFFAF9F4);
@@ -13,12 +15,14 @@ class PhotoSendScaffold extends StatelessWidget {
     required this.child,
     required this.onBack,
     this.step,
+    this.modeLabel,
     this.bottom,
   });
 
   final Widget child;
   final VoidCallback onBack;
   final int? step;
+  final String? modeLabel;
   final Widget? bottom;
 
   @override
@@ -29,51 +33,18 @@ class PhotoSendScaffold extends StatelessWidget {
     },
     child: Scaffold(
       backgroundColor: photoIvory,
-      appBar: AppBar(
+      appBar: PracticeAppBar(
+        title: '사진 보내기 연습',
+        onBack: onBack,
+        step: step,
+        totalSteps: step == null ? null : 10,
+        modeLabel: modeLabel,
         backgroundColor: photoIvory,
-        leading: IconButton(
-          tooltip: '이전 화면으로 돌아가기',
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text('사진 보내기 연습'),
-        bottom: step == null
-            ? null
-            : PreferredSize(
-                preferredSize: const Size.fromHeight(36),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          value: step! / 10,
-                          minHeight: 6,
-                          color: photoNavy,
-                          backgroundColor: photoSage,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text('$step / 10'),
-                    ],
-                  ),
-                ),
-              ),
       ),
       body: SafeArea(child: child),
       bottomNavigationBar: bottom == null
           ? null
-          : SafeArea(
-              top: false,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-                decoration: const BoxDecoration(
-                  color: photoIvory,
-                  border: Border(top: BorderSide(color: photoBorder)),
-                ),
-                child: bottom,
-              ),
-            ),
+          : PracticeBottomActions(child: bottom!),
     ),
   );
 }
@@ -82,12 +53,7 @@ class PhotoInlineNotice extends StatelessWidget {
   const PhotoInlineNotice(this.text, {super.key});
   final String text;
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    color: photoSage,
-    child: Text(text, softWrap: true),
-  );
+  Widget build(BuildContext context) => PracticeInlineNotice(message: text);
 }
 
 class PhotoChoiceRow extends StatelessWidget {

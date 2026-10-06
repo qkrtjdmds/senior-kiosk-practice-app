@@ -42,6 +42,10 @@ class _CafeV2MenuPageState extends State<CafeV2MenuPage> {
     final items = order.visibleMenuItems.toList();
     return CafeKioskScaffold(
       stageLabel: '1 / 7 · 메뉴 고르기',
+      modeLabel: practiceSessionLabel(
+        isFreePractice: order.isFreePractice,
+        isSolo: order.isSolo,
+      ),
       cartCount: order.cartCount,
       onBack: () => context.go(AppRoutes.cafeStart),
       onCart: () {
@@ -283,6 +287,10 @@ class _CafeOptionPageState<T> extends State<_CafeOptionPage<T>> {
   Widget build(BuildContext context) {
     return CafeKioskScaffold(
       stageLabel: widget.stageLabel,
+      modeLabel: practiceSessionLabel(
+        isFreePractice: widget.order.isFreePractice,
+        isSolo: widget.order.isSolo,
+      ),
       cartCount: widget.order.cartCount,
       orderSummary: _currentSummary(widget.order),
       onBack: widget.onBack,
@@ -392,6 +400,10 @@ class CafeV2CartPage extends StatelessWidget {
     final order = context.watch<CafeOrderProvider>();
     return CafeKioskScaffold(
       stageLabel: '5 / 7 · 장바구니',
+      modeLabel: practiceSessionLabel(
+        isFreePractice: order.isFreePractice,
+        isSolo: order.isSolo,
+      ),
       cartCount: order.cartCount,
       onBack: () => context.go(AppRoutes.cafeV2Menu),
       onCart: () {},
@@ -602,6 +614,10 @@ class _SimpleSelectionPageState<T> extends State<_SimpleSelectionPage<T>> {
   Widget build(BuildContext context) {
     return CafeKioskScaffold(
       stageLabel: widget.stageLabel,
+      modeLabel: practiceSessionLabel(
+        isFreePractice: widget.order.isFreePractice,
+        isSolo: widget.order.isSolo,
+      ),
       cartCount: widget.order.cartCount,
       onBack: widget.onBack,
       onCart: () => context.go(AppRoutes.cafeV2Cart),
@@ -696,18 +712,13 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
           children: [
-            const Icon(
-              Icons.check_circle_outline,
-              size: 62,
-              color: Color(0xFF23413C),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              order.isFreePractice ? '자유 연습을 마쳤어요' : '주문 연습을 완료했어요!',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900),
+            PracticeCompletionHeader(
+              title: order.isFreePractice ? '자유 연습을 마쳤어요' : '주문 연습을 완료했어요!',
+              description: '실제 주문이나 결제가 진행된 것은 아니에요.',
+              modeLabel: practiceSessionLabel(
+                isFreePractice: order.isFreePractice,
+                isSolo: order.isSolo,
+              ),
             ),
             const SizedBox(height: 24),
             Text('연습 주문서', style: Theme.of(context).textTheme.titleLarge),
@@ -727,13 +738,17 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
               strong: true,
             ),
             const SizedBox(height: 18),
-            CafePracticeNotice(
+            PracticeRewardSummary(
               message: order.isFreePractice
                   ? '보상 없이 자유롭게 반복할 수 있는 연습이에요.'
                   : progress.isSoloMode
-                  ? '용기 포인트 +20점'
-                  : '한걸음 포인트 +10점',
-              icon: Icons.stars_outlined,
+                  ? '용기 포인트'
+                  : '한걸음 포인트',
+              points: order.isFreePractice
+                  ? null
+                  : progress.isSoloMode
+                  ? 20
+                  : 10,
             ),
             if (_badgeEarned) ...[
               const SizedBox(height: 10),

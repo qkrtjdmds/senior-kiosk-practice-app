@@ -771,8 +771,11 @@ void main() {
     await tester.tap(find.text('가상 결제 연습'));
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump();
+    await tester.drag(find.byType(ListView), const Offset(0, -160));
+    await tester.pump();
     await tester.tap(find.text('카드를 챙겼어요'));
     await tester.pump();
+    await tester.ensureVisible(find.text('증명서 출력으로'));
     await tester.tap(find.text('증명서 출력으로'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('가상 출력 시작'));

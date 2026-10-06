@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/practice_ui.dart';
+export '../../shared/widgets/practice_ui.dart';
+
 const burgerIvory = Color(0xFFFAF9F4);
 const burgerGreen = Color(0xFF23413C);
 const burgerBeige = Color(0xFFF1E9DC);
@@ -12,65 +15,76 @@ class BurgerKioskScaffold extends StatelessWidget {
     required this.onBack,
     this.summary,
     this.cartCount = 0,
+    this.step,
+    this.totalSteps,
+    this.stepName,
+    this.modeLabel,
     this.bottom,
   });
   final Widget child;
   final VoidCallback onBack;
   final String? summary;
   final int cartCount;
+  final int? step;
+  final int? totalSteps;
+  final String? stepName;
+  final String? modeLabel;
   final Widget? bottom;
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: burgerIvory,
-    appBar: AppBar(
-      leading: IconButton(
-        tooltip: '이전 화면으로 돌아가기',
-        onPressed: onBack,
-        icon: const Icon(Icons.arrow_back),
-      ),
-      title: const Text('햄버거 주문'),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: Badge(
-            label: Text('$cartCount'),
-            isLabelVisible: cartCount > 0,
-            child: const Icon(Icons.shopping_cart_outlined),
-          ),
-        ),
-      ],
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Divider(height: 1),
-      ),
-    ),
-    body: SafeArea(
-      child: Column(
-        children: [
-          if (summary?.isNotEmpty == true)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              color: burgerBeige,
-              child: Text(
-                summary!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (!didPop) onBack();
+    },
+    child: Scaffold(
+      backgroundColor: burgerIvory,
+      appBar: PracticeAppBar(
+        title: '햄버거 주문',
+        onBack: onBack,
+        step: step,
+        totalSteps: totalSteps,
+        stepName: stepName,
+        modeLabel: modeLabel,
+        backgroundColor: burgerIvory,
+        actions: [
+          Semantics(
+            label: '장바구니에 담긴 메뉴 $cartCount개',
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Badge(
+                label: Text('$cartCount'),
+                isLabelVisible: cartCount > 0,
+                child: const Icon(Icons.shopping_cart_outlined),
               ),
             ),
-          Expanded(child: child),
+          ),
         ],
       ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (summary?.isNotEmpty == true)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                color: burgerBeige,
+                child: Text(
+                  summary!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            Expanded(child: child),
+          ],
+        ),
+      ),
+      bottomNavigationBar: bottom == null
+          ? null
+          : PracticeBottomActions(child: bottom!),
     ),
-    bottomNavigationBar: bottom == null
-        ? null
-        : SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-              child: bottom,
-            ),
-          ),
   );
 }
 

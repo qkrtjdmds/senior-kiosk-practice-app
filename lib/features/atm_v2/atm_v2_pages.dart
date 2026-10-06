@@ -115,6 +115,10 @@ class _AtmV2MissionPageState extends State<AtmV2MissionPage> {
         ? '입출금 계좌'
         : '생활비 계좌';
     return AtmKioskScaffold(
+      modeLabel: practiceSessionLabel(
+        isFreePractice: provider.isFreePractice,
+        isSolo: provider.isSolo,
+      ),
       onBack: () {
         context.read<DailyMissionProvider>().cancelActiveMission();
         context.go(AppRoutes.atmStart);
@@ -252,6 +256,10 @@ class _AtmV2FlowPageState extends State<AtmV2FlowPage>
   Widget build(BuildContext context) {
     final p = context.watch<AtmWithdrawalProvider>();
     return AtmKioskScaffold(
+      modeLabel: practiceSessionLabel(
+        isFreePractice: p.isFreePractice,
+        isSolo: p.isSolo,
+      ),
       onBack: () {
         if (widget.pageStep == AtmV2Step.services) {
           p.clearSensitiveState();
@@ -712,12 +720,14 @@ class _AtmV2CompletePageState extends State<AtmV2CompletePage> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
         children: [
-          const Icon(Icons.check_circle_outline, size: 70, color: atmNavy),
-          const SizedBox(height: 14),
-          Text(
-            '출금 연습 완료',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium,
+          PracticeCompletionHeader(
+            title: '출금 연습 완료',
+            description: '실제 금융 거래가 진행된 것은 아니에요.',
+            modeLabel: practiceSessionLabel(
+              isFreePractice: p.isFreePractice,
+              isSolo: p.isSolo,
+              dailyMission: _daily,
+            ),
           ),
           const SizedBox(height: 20),
           Container(
