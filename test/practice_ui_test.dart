@@ -68,6 +68,12 @@ void main() {
     expect(find.text('무인민원발급기 연습'), findsOneWidget);
     expect(find.text('3 / 11 · 발급 내용을 선택해요'), findsOneWidget);
     expect(find.text('혼자 해보기'), findsOneWidget);
+    final progressSemantics = tester.getSemantics(
+      find.text('3 / 11 · 발급 내용을 선택해요'),
+    );
+    expect(progressSemantics.label, '3 / 11 · 발급 내용을 선택해요');
+    expect(progressSemantics.value, '27%');
+    expect(find.bySemanticsLabel('연습 모드: 혼자 해보기'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

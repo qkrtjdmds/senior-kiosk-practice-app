@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +23,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('오늘의 ATM 출금 미션'), findsOneWidget);
-    expect(find.text('혼자 출금해 보기'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '혼자 해보기'), findsOneWidget);
     expect(find.textContaining('가상 수수료'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

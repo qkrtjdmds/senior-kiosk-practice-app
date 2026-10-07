@@ -196,7 +196,7 @@ class AccessibilitySettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           LargeActionButton(
-            label: '홈으로 돌아가기',
+            label: '홈으로',
             icon: Icons.home_outlined,
             onPressed: () => context.go(AppRoutes.home),
           ),

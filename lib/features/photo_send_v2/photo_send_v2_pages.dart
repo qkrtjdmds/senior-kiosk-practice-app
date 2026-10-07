@@ -101,7 +101,7 @@ class _PhotoSendV2MissionPageState extends State<PhotoSendV2MissionPage> {
             '사진: ${p.scenario.photoIds.map((id) => photoById(id).name).join(' → ')}',
           ),
           const SizedBox(height: 24),
-          photoPrimaryButton('혼자 사진 보내기', () {
+          photoPrimaryButton('혼자 해보기', () {
             final daily = context.read<DailyMissionProvider>();
             if (daily.activeMissionId != 'photo_solo_complete') {
               context.read<LearningProgressProvider>().selectPhotoMode(

@@ -27,7 +27,7 @@ void main() {
 
     expect(find.text('오늘의 서류 발급 미션'), findsOneWidget);
     expect(find.textContaining('주민등록표 등본'), findsWidgets);
-    await tester.tap(find.text('혼자 발급해 보기'));
+    await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('주민등록'));
     await tester.pumpAndSettle();

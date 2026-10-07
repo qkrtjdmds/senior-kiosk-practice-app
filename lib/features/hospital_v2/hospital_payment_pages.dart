@@ -541,7 +541,7 @@ class _HospitalPaymentCompletePageState
                 provider.reset();
                 context.go(AppRoutes.home);
               },
-              child: const Text('홈으로 가기'),
+              child: const Text('홈으로'),
             ),
           ],
         ),

@@ -74,7 +74,7 @@ class AtmV2StartPage extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: () => context.go(AppRoutes.home),
           icon: const Icon(Icons.home_outlined),
-          label: const Text('홈으로 돌아가기'),
+          label: const Text('홈으로'),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size.fromHeight(56),
           ),
@@ -161,7 +161,7 @@ class _AtmV2MissionPageState extends State<AtmV2MissionPage> {
           const SizedBox(height: 14),
           const AtmInlineNotice('힌트가 필요하면 각 화면에서 언제든 확인할 수 있어요.'),
           const SizedBox(height: 24),
-          atmPrimaryButton('혼자 출금해 보기', () async {
+          atmPrimaryButton('혼자 해보기', () async {
             final progress = context.read<LearningProgressProvider>();
             final daily = context.read<DailyMissionProvider>();
             if (daily.activeMissionId != 'atm_solo_complete') {

@@ -119,7 +119,7 @@ class _TrainV2MissionPageState extends State<TrainV2MissionPage> {
           const SizedBox(height: 24),
           trainPrimaryButton(
             context,
-            '혼자 예매해보기',
+            '혼자 해보기',
             () => context.go(AppRoutes.trainV2TripType),
           ),
         ],
@@ -930,7 +930,7 @@ class _TrainV2TicketPageState extends State<TrainV2TicketPage> {
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(58),
             ),
-            child: const Text('홈으로 가기'),
+            child: const Text('홈으로'),
           ),
         ],
       ),

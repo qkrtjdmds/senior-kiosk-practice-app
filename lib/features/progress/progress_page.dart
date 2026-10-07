@@ -169,7 +169,7 @@ class ProgressPage extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () => context.go(AppRoutes.home),
               icon: const Icon(Icons.home_outlined),
-              label: const Text('홈으로 돌아가기'),
+              label: const Text('홈으로'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(66),
               ),

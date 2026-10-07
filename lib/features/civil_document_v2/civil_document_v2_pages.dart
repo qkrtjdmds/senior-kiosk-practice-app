@@ -45,7 +45,7 @@ class CivilDocumentV2StartPage extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         CivilChoiceRow(
-          label: '증명서 발급 시작',
+          label: '따라 해보기',
           subtitle: '처음 이용하시나요? 안내를 보며 따라 해보세요.',
           icon: Icons.touch_app_outlined,
           emphasized: true,
@@ -53,7 +53,7 @@ class CivilDocumentV2StartPage extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         CivilChoiceRow(
-          label: '혼자 발급해 보기',
+          label: '혼자 해보기',
           subtitle: '오늘의 발급 목표를 기억하고 직접 골라요.',
           icon: Icons.psychology_alt_outlined,
           onTap: () => context.go(AppRoutes.civilDocumentMission),
@@ -158,7 +158,7 @@ class _CivilDocumentV2MissionPageState
           const SizedBox(height: 14),
           const CivilNotice('힌트가 필요하면 각 화면에서 언제든지 확인할 수 있어요.'),
           const SizedBox(height: 22),
-          civilPrimaryButton('혼자 발급해 보기', () async {
+          civilPrimaryButton('혼자 해보기', () async {
             final progress = context.read<LearningProgressProvider>();
             final daily = context.read<DailyMissionProvider>();
             if (daily.activeMissionId != 'civil_document_solo_complete') {

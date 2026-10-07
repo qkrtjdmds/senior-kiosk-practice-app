@@ -499,7 +499,7 @@ class _HospitalDocumentCompletePageState
             TextButton.icon(
               onPressed: () => context.go(AppRoutes.home),
               icon: const Icon(Icons.home_outlined),
-              label: const Text('홈으로 가기'),
+              label: const Text('홈으로'),
             ),
           ],
         ),

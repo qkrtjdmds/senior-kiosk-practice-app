@@ -394,7 +394,7 @@ class _HospitalReservationCompletePageState
                 provider.reset();
                 context.go(AppRoutes.home);
               },
-              child: const Text('홈으로 가기'),
+              child: const Text('홈으로'),
             ),
           ],
         ),

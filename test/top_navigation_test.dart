@@ -72,6 +72,37 @@ void main() {
     }
   });
 
+  testWidgets('모든 학습 시작 화면의 시스템 뒤로가기가 홈으로 이동한다', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final progress = LearningProgressProvider(
+      await SharedPreferences.getInstance(),
+    );
+    appRouter.go(AppRoutes.home);
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: progress,
+        child: const HanGeoleumDigitalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final route in [
+      AppRoutes.cafeStart,
+      AppRoutes.hospitalStart,
+      AppRoutes.photoStart,
+      AppRoutes.trainStart,
+      AppRoutes.hamburgerStart,
+      AppRoutes.atmStart,
+      AppRoutes.civilDocumentStart,
+    ]) {
+      appRouter.go(route);
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('한걸음 디지털'), findsOneWidget, reason: route);
+    }
+  });
+
   testWidgets('단계 화면 뒤로가기와 좁은 상단 영역이 안전하다', (tester) async {
     tester.view.physicalSize = const Size(320, 700);
     tester.view.devicePixelRatio = 1;
@@ -132,7 +163,7 @@ void main() {
 
     expect(find.text('이 화면을 열 수 없어요.'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await tester.tap(find.text('홈으로 돌아가기'));
+    await tester.tap(find.text('홈으로'));
     await tester.pumpAndSettle();
     expect(find.text('한걸음 디지털'), findsOneWidget);
     expect(tester.takeException(), isNull);

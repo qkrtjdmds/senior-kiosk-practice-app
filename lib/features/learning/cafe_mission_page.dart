@@ -57,7 +57,7 @@ class CafeMissionPage extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           LargeActionButton(
-            label: '혼자 주문해보기',
+            label: '혼자 해보기',
             icon: Icons.play_arrow_rounded,
             onPressed: () {
               context.read<CafeOrderProvider>().start(CafeLearningMode.solo);

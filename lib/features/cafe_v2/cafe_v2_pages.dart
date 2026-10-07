@@ -787,7 +787,7 @@ class _CafeV2CompletePageState extends State<CafeV2CompletePage> {
               style: TextButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
               ),
-              child: const Text('홈으로 가기'),
+              child: const Text('홈으로'),
             ),
           ],
         ),

@@ -141,6 +141,7 @@ class PracticeProgressHeader extends StatelessWidget {
     return Semantics(
       label: semanticsLabel,
       value: '${(value * 100).round()}%',
+      excludeSemantics: true,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
@@ -198,6 +199,7 @@ class PracticeModeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     label: '연습 모드: $label',
+    excludeSemantics: true,
     child: Container(
       constraints: const BoxConstraints(minHeight: 36),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

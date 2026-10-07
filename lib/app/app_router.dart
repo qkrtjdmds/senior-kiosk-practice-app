@@ -493,7 +493,7 @@ class _RouteNotFoundPage extends StatelessWidget {
                     ),
                     icon: const Icon(Icons.home_outlined),
                     label: const Text(
-                      '홈으로 돌아가기',
+                      '홈으로',
                       textAlign: TextAlign.center,
                       softWrap: true,
                     ),

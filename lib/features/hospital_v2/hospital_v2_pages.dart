@@ -64,7 +64,7 @@ class HospitalV2StartPage extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => context.go(AppRoutes.home),
             icon: const Icon(Icons.home_outlined),
-            label: const Text('홈으로 돌아가기'),
+            label: const Text('홈으로'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(58),
             ),
@@ -96,7 +96,7 @@ class HospitalV2MissionPage extends StatelessWidget {
         onBack: leave,
         bottom: hospitalPrimaryButton(
           context,
-          '혼자 접수해보기',
+          '혼자 해보기',
           () => context.go(AppRoutes.hospitalStepOne),
         ),
         child: SingleChildScrollView(
@@ -460,7 +460,7 @@ class HospitalV2OrderPage extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: p.requestHelp,
               icon: const Icon(Icons.support_agent),
-              label: const Text('직원 도움 안내'),
+              label: const Text('직원에게 도움 요청'),
             ),
           ],
         );
@@ -635,7 +635,7 @@ class _HospitalV2CompletePageState extends State<HospitalV2CompletePage> {
             OutlinedButton.icon(
               onPressed: () => context.go(AppRoutes.home),
               icon: const Icon(Icons.home_outlined),
-              label: const Text('홈으로 가기'),
+              label: const Text('홈으로'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(58),
               ),

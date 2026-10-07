@@ -13,71 +13,77 @@ import 'burger_scenario.dart';
 class BurgerV2StartPage extends StatelessWidget {
   const BurgerV2StartPage({super.key});
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: burgerIvory,
-    appBar: AppBar(
-      leading: IconButton(
-        tooltip: '이전 화면으로 돌아가기',
-        onPressed: () => context.go(AppRoutes.home),
-        icon: const Icon(Icons.arrow_back),
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) context.go(AppRoutes.home);
+    },
+    child: Scaffold(
+      backgroundColor: burgerIvory,
+      appBar: AppBar(
+        leading: IconButton(
+          tooltip: '이전 화면으로 돌아가기',
+          onPressed: () => context.go(AppRoutes.home),
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: const Text('햄버거 주문 연습'),
       ),
-      title: const Text('햄버거 주문 연습'),
-    ),
-    body: SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Icon(
-              Icons.lunch_dining_outlined,
-              size: 72,
-              color: burgerGreen,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '가상 키오스크로 주문 순서를 천천히 연습해요.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 28),
-            BurgerChoice(
-              label: '따라 해보기',
-              subtitle: '화면의 안내를 보며 하나씩 주문해요.',
-              icon: Icons.menu_book_outlined,
-              onTap: () {
-                context.read<LearningProgressProvider>().selectHamburgerMode(
-                  HamburgerLearningMode.guided,
-                );
-                context.read<BurgerOrderProvider>().begin(
-                  HamburgerLearningMode.guided,
-                );
-                context.go(AppRoutes.hamburgerPractice);
-              },
-            ),
-            const SizedBox(height: 16),
-            BurgerChoice(
-              label: '혼자 해보기',
-              subtitle: '오늘의 주문 미션을 기억하고 직접 해봐요.',
-              icon: Icons.self_improvement_outlined,
-              onTap: () async {
-                await context
-                    .read<LearningProgressProvider>()
-                    .startHamburgerSoloMission();
-                if (!context.mounted) return;
-                context.read<BurgerOrderProvider>().begin(
-                  HamburgerLearningMode.solo,
-                );
-                context.go(AppRoutes.hamburgerMission);
-              },
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: () => context.go(AppRoutes.home),
-              icon: const Icon(Icons.home_outlined),
-              label: const Text('홈으로 돌아가기'),
-            ),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Icon(
+                Icons.lunch_dining_outlined,
+                size: 72,
+                color: burgerGreen,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '가상 키오스크로 주문 순서를 천천히 연습해요.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 28),
+              BurgerChoice(
+                label: '따라 해보기',
+                subtitle: '화면의 안내를 보며 하나씩 주문해요.',
+                icon: Icons.menu_book_outlined,
+                onTap: () {
+                  context.read<LearningProgressProvider>().selectHamburgerMode(
+                    HamburgerLearningMode.guided,
+                  );
+                  context.read<BurgerOrderProvider>().begin(
+                    HamburgerLearningMode.guided,
+                  );
+                  context.go(AppRoutes.hamburgerPractice);
+                },
+              ),
+              const SizedBox(height: 16),
+              BurgerChoice(
+                label: '혼자 해보기',
+                subtitle: '오늘의 주문 미션을 기억하고 직접 해봐요.',
+                icon: Icons.self_improvement_outlined,
+                onTap: () async {
+                  await context
+                      .read<LearningProgressProvider>()
+                      .startHamburgerSoloMission();
+                  if (!context.mounted) return;
+                  context.read<BurgerOrderProvider>().begin(
+                    HamburgerLearningMode.solo,
+                  );
+                  context.go(AppRoutes.hamburgerMission);
+                },
+              ),
+              const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: () => context.go(AppRoutes.home),
+                icon: const Icon(Icons.home_outlined),
+                label: const Text('홈으로'),
+              ),
+            ],
+          ),
         ),
       ),
     ),
@@ -159,7 +165,7 @@ class BurgerV2MissionPage extends StatelessWidget {
                     context.go(AppRoutes.hamburgerPractice);
                   },
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('혼자 주문해보기'),
+                  label: const Text('혼자 해보기'),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
@@ -704,7 +710,7 @@ class _BurgerV2CompletePageState extends State<BurgerV2CompletePage> {
                 minimumSize: const Size.fromHeight(56),
               ),
               onPressed: () => context.go(AppRoutes.home),
-              child: const Text('홈으로 가기'),
+              child: const Text('홈으로'),
             ),
           ],
         ),

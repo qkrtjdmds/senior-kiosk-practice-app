@@ -15,10 +15,12 @@ import 'package:han_geoleum_digital/app/app_router.dart';
 import 'package:han_geoleum_digital/app/app_routes.dart';
 import 'package:han_geoleum_digital/features/hamburger/hamburger_mission.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
+import 'package:han_geoleum_digital/features/learning/widgets/learning_widgets.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_order_provider.dart';
 import 'package:han_geoleum_digital/features/hamburger_v2/burger_scenario.dart';
 import 'package:han_geoleum_digital/features/photo_send_v2/photo_send_models.dart';
 import 'package:han_geoleum_digital/features/train_v2/train_booking_models.dart';
+import 'package:han_geoleum_digital/shared/widgets/large_action_button.dart';
 
 void main() {
   testWidgets('홈 화면을 표시한다', (WidgetTester tester) async {
@@ -80,12 +82,16 @@ void main() {
     appRouter.go(AppRoutes.cafeStart);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('혼자 해보기'));
-    await tester.tap(find.text('혼자 해보기'));
+    final soloButton = find.widgetWithText(LearningModeCard, '혼자 해보기');
+    expect(soloButton, findsOneWidget);
+    await tester.tap(soloButton);
     await tester.pumpAndSettle();
     expect(find.text('오늘의 주문 미션'), findsOneWidget);
     expect(find.text('포장 · 차가운 아메리카노 · 보통 크기 1잔'), findsOneWidget);
 
-    await tester.tap(find.text('혼자 주문해보기'));
+    final missionStartButton = find.widgetWithText(LargeActionButton, '혼자 해보기');
+    expect(missionStartButton, findsOneWidget);
+    await tester.tap(missionStartButton);
     await tester.pumpAndSettle();
     await tester.tap(find.text('디카페인 아메리카노'));
     await tester.pump();
@@ -395,7 +401,7 @@ void main() {
 
     expect(find.text('오늘의 기차표 예매 목표'), findsOneWidget);
     expect(find.textContaining('서울에서 부산'), findsNWidgets(2));
-    await tester.tap(find.text('혼자 예매해보기'));
+    await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('왕복'));
     await tester.pump();
@@ -439,7 +445,7 @@ void main() {
 
     expect(find.text('오늘의 병원 접수 미션'), findsOneWidget);
     expect(find.text('처음 방문 접수'), findsOneWidget);
-    await tester.tap(find.text('혼자 접수해보기'));
+    await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('접수 시작하기'));
     await tester.pumpAndSettle();
@@ -511,7 +517,7 @@ void main() {
     expect(find.text('오늘의 사진 보내기 목표'), findsOneWidget);
     expect(find.textContaining('딸 김하늘에게 빨간 꽃'), findsOneWidget);
     final progress = Provider.of<LearningProgressProvider>(
-      tester.element(find.text('혼자 사진 보내기')),
+      tester.element(find.text('혼자 해보기')),
       listen: false,
     );
     photoSendProvider
@@ -622,7 +628,7 @@ void main() {
       find.text(BurgerScenario.fromMissionId(mission.id).title),
       findsOneWidget,
     );
-    await tester.tap(find.text('혼자 주문해보기'));
+    await tester.tap(find.text('혼자 해보기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('힌트 보기'));
     await tester.pump();
@@ -730,7 +736,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('실제 증명서가 발급되지 않고'), findsOneWidget);
-    await tester.tap(find.text('증명서 발급 시작'));
+    await tester.tap(find.text('따라 해보기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('주민등록'));
     await tester.pumpAndSettle();

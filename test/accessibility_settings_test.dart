@@ -69,8 +69,8 @@ void main() {
     );
     expect(find.text('설정한 내용은 앱을 다시 열어도 그대로 유지돼요.'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('홈으로 돌아가기'));
-    await tester.tap(find.text('홈으로 돌아가기'));
+    await tester.ensureVisible(find.text('홈으로'));
+    await tester.tap(find.text('홈으로'));
     await tester.pumpAndSettle();
     expect(find.text('한걸음 디지털'), findsOneWidget);
     expect(find.byTooltip('화면 설정'), findsOneWidget);
