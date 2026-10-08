@@ -39,8 +39,8 @@ void main() {
     await tester.tap(find.text('미션'));
     await tester.pumpAndSettle();
     expect(appRouter.state.uri.path, AppRoutes.missions);
-    expect(find.text('오늘 준비된 세 가지 연습에 하나씩 도전해 보세요.'), findsOneWidget);
-    expect(find.text('완료하면 추가 포인트 10점'), findsNWidgets(3));
+    expect(find.text('오늘도 한 걸음 해볼까요?'), findsOneWidget);
+    expect(find.text('미션 보상 +10점'), findsNWidgets(3));
     await tester.tap(find.text('내 정보'));
     await tester.pumpAndSettle();
     expect(appRouter.state.uri.path, AppRoutes.progress);
@@ -72,10 +72,10 @@ void main() {
     }
     appRouter.go(AppRoutes.missions);
     await tester.pumpAndSettle();
-    final reward = find.text('완료하면 추가 포인트 10점');
-    expect(reward, findsNWidgets(3));
-    await tester.ensureVisible(reward.first);
-    await tester.tap(reward.first);
+    final action = find.text('연습 시작하기');
+    expect(action, findsNWidgets(3));
+    await tester.ensureVisible(action.first);
+    await tester.tap(action.first);
     await tester.pumpAndSettle();
     expect(<String>[
       AppRoutes.cafeMission,
@@ -115,6 +115,13 @@ void main() {
     }
     appRouter.go(AppRoutes.missions);
     await tester.pumpAndSettle();
-    expect(find.text('완료하면 추가 포인트 10점'), findsNWidgets(3));
+    final actions = find.text('연습 시작하기');
+    expect(actions, findsNWidgets(3));
+    await tester.ensureVisible(actions.last);
+    await tester.pumpAndSettle();
+    final navigationTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
+    final buttonBottom = tester.getBottomLeft(actions.last).dy;
+    expect(buttonBottom, lessThanOrEqualTo(navigationTop));
+    expect(tester.takeException(), isNull);
   });
 }

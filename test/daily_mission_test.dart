@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:han_geoleum_digital/app/app_theme.dart';
 import 'package:han_geoleum_digital/features/daily_mission/daily_mission.dart';
 import 'package:han_geoleum_digital/features/daily_mission/daily_mission_provider.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
@@ -193,12 +195,75 @@ void main() {
           ChangeNotifierProvider.value(value: progress),
           ChangeNotifierProvider.value(value: daily),
         ],
-        child: const MaterialApp(home: MissionTabPage()),
+        child: MaterialApp(
+          theme: buildAppTheme(highContrast: true),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.35)),
+            child: child!,
+          ),
+          home: const MissionTabPage(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('0 / 3 완료'), findsOneWidget);
-    expect(find.text('완료하면 추가 포인트 10점'), findsNWidgets(3));
+    expect(find.text('미션 보상 +10점'), findsNWidgets(3));
+    expect(find.textContaining('완성하기'), findsNothing);
+    final lastMission = daily.missions.last;
+    await tester.ensureVisible(
+      find.byKey(Key('daily-mission-card-${lastMission.definition.id}')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(Key('daily-mission-card-${lastMission.definition.id}')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('미완료 미션은 요약, 보상 배지와 명확한 실행 버튼을 표시한다', (tester) async {
+    final (progress, daily) = await createProviders(
+      clock: () => DateTime.utc(2026, 9, 25, 3),
+    );
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: progress),
+          ChangeNotifierProvider.value(value: daily),
+        ],
+        child: MaterialApp(
+          theme: buildAppTheme(),
+          home: const MissionTabPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('daily-mission-summary')), findsOneWidget);
+    expect(find.text('9월 25일 오늘의 미션'), findsOneWidget);
+    expect(find.text('0 / 3 완료'), findsOneWidget);
+    expect(find.text('모두 완료하면 추가 포인트를 최대 30점 받을 수 있어요.'), findsOneWidget);
+    expect(find.text('미션 보상 +10점'), findsNWidgets(3));
+    expect(find.text('연습 시작하기'), findsNWidgets(3));
+    expect(find.bySemanticsLabel('오늘의 미션 3개 중 0개 완료'), findsOneWidget);
+
+    for (final mission in daily.missions) {
+      final card = find.byKey(
+        Key('daily-mission-card-${mission.definition.id}'),
+      );
+      final semantics = tester.getSemantics(card);
+      expect(
+        semantics.getSemanticsData().hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      expect(
+        semantics.label,
+        allOf(contains('미완료'), contains('미션 보상 10점'), contains('연습 시작하기')),
+      );
+    }
+    expect(find.bySemanticsLabel('연습 시작하기'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -231,8 +296,19 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('3 / 3 완료'), findsOneWidget);
-    expect(find.text('완료 · 추가 보상 지급 완료'), findsNWidgets(3));
-    expect(find.byIcon(Icons.check_circle_rounded), findsNWidgets(3));
+    expect(find.text('추가 보상 10점 지급 완료'), findsNWidgets(3));
+    expect(find.text('완료'), findsNWidgets(3));
+    expect(find.text('연습 시작하기'), findsNothing);
+    for (final mission in daily.missions) {
+      final semantics = tester.getSemantics(
+        find.byKey(Key('daily-mission-card-${mission.definition.id}')),
+      );
+      expect(
+        semantics.getSemanticsData().hasAction(SemanticsAction.tap),
+        isFalse,
+      );
+      expect(semantics.label, contains('완료. 추가 보상 10점 지급 완료'));
+    }
     expect(tester.takeException(), isNull);
   });
 }
