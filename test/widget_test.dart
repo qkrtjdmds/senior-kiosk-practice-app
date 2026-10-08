@@ -203,11 +203,14 @@ void main() {
 
     expect(find.text('내 정보'), findsWidgets);
     expect(find.text('70점'), findsOneWidget);
-    expect(find.text('따라 해보기'), findsNWidgets(7));
-    expect(find.text('3회'), findsNWidgets(2));
+    expect(find.text('6회'), findsWidgets);
+    expect(find.byKey(const Key('content-progress-section')), findsOneWidget);
+    expect(find.text('카페 주문'), findsOneWidget);
+    expect(find.text('병원 무인접수'), findsOneWidget);
     expect(find.text('혼자 주문 첫걸음'), findsOneWidget);
     expect(find.text('카페 주문 익숙해졌어요'), findsOneWidget);
-    expect(find.text('달성했어요'), findsOneWidget);
+    expect(find.text('획득'), findsNWidgets(2));
+    expect(find.text('아직 획득 전'), findsNWidgets(6));
   });
 
   testWidgets('홈에서 병원 접수 V2를 완료한다', (WidgetTester tester) async {
@@ -843,7 +846,7 @@ void main() {
     );
 
     expect(find.text('아직 완료한 연습이 없어요.'), findsOneWidget);
-    expect(find.text('홈에서 연습 시작하기'), findsOneWidget);
+    expect(find.text('연습하러 가기'), findsOneWidget);
   });
 
   testWidgets('320dp 기본 글씨에서 삭제 키 문구를 온전히 한 줄로 표시한다', (
