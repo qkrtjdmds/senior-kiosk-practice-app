@@ -13,6 +13,14 @@ import 'civil_document_widgets.dart';
 class CivilDocumentV2StartPage extends StatelessWidget {
   const CivilDocumentV2StartPage({super.key});
 
+  void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   Future<void> _start(BuildContext context, CivilDocumentV2Mode mode) async {
     final progress = context.read<LearningProgressProvider>();
     await progress.startCivilDocumentLearning(
@@ -30,7 +38,7 @@ class CivilDocumentV2StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CivilKioskScaffold(
-    onBack: () => context.go(AppRoutes.home),
+    onBack: () => _goBack(context),
     child: ListView(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 36),
       children: [

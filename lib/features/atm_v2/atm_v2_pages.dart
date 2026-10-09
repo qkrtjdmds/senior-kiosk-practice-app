@@ -14,6 +14,14 @@ import 'atm_withdrawal_provider.dart';
 class AtmV2StartPage extends StatelessWidget {
   const AtmV2StartPage({super.key});
 
+  void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   Future<void> _start(BuildContext context, AtmLearningMode mode) async {
     final progress = context.read<LearningProgressProvider>();
     await progress.startAtmLearning(mode);
@@ -27,7 +35,7 @@ class AtmV2StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AtmKioskScaffold(
-    onBack: () => context.go(AppRoutes.home),
+    onBack: () => _goBack(context),
     child: ListView(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 36),
       children: [

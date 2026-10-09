@@ -12,18 +12,27 @@ import 'burger_scenario.dart';
 
 class BurgerV2StartPage extends StatelessWidget {
   const BurgerV2StartPage({super.key});
+
+  void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: false,
     onPopInvokedWithResult: (didPop, _) {
-      if (!didPop) context.go(AppRoutes.home);
+      if (!didPop) _goBack(context);
     },
     child: Scaffold(
       backgroundColor: burgerIvory,
       appBar: AppBar(
         leading: IconButton(
           tooltip: '이전 화면으로 돌아가기',
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: () => _goBack(context),
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text('햄버거 주문 연습'),

@@ -12,9 +12,18 @@ import 'train_booking_widgets.dart';
 
 class TrainV2StartPage extends StatelessWidget {
   const TrainV2StartPage({super.key});
+
+  void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => TrainBookingScaffold(
-    onBack: () => context.go(AppRoutes.home),
+    onBack: () => _goBack(context),
     child: ListView(
       padding: const EdgeInsets.all(20),
       children: [

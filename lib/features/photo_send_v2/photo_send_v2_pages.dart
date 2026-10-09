@@ -13,9 +13,17 @@ import 'photo_send_widgets.dart';
 class PhotoSendV2StartPage extends StatelessWidget {
   const PhotoSendV2StartPage({super.key});
 
+  void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => PhotoSendScaffold(
-    onBack: () => context.go(AppRoutes.home),
+    onBack: () => _goBack(context),
     child: ListView(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 36),
       children: [

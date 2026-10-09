@@ -97,10 +97,25 @@ class _MissionEncouragement extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '오늘도 한 걸음 해볼까요?',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+                Semantics(
+                  label: '오늘도 한 걸음 해볼까요?',
+                  header: true,
+                  child: ExcludeSemantics(
+                    child: Wrap(
+                      spacing: AppSpacing.xs,
+                      children: [
+                        Text(
+                          '오늘도 한 걸음',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        Text(
+                          '해볼까요?',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xxs),

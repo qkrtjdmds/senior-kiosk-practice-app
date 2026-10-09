@@ -64,6 +64,7 @@ class AppListRow extends StatelessWidget {
     required this.description,
     required this.onTap,
     this.label,
+    this.compact = false,
     super.key,
   });
   final IconData icon;
@@ -71,61 +72,82 @@ class AppListRow extends StatelessWidget {
   final String description;
   final String? label;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppRadius.medium),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.medium),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: AppSizes.choiceHeight),
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.outlineVariant),
+    final semantics = [title, description, label].whereType<String>().join(' ');
+    final iconSize = compact ? 44.0 : 48.0;
+    return Semantics(
+      button: true,
+      label: semantics,
+      onTap: onTap,
+      child: ExcludeSemantics(
+        child: Material(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.medium),
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(AppRadius.medium),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: colors.secondaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: colors.primary, size: 28),
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: compact ? 64 : AppSizes.choiceHeight,
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodyMedium,
+              padding: EdgeInsets.all(compact ? AppSpacing.sm : AppSpacing.md),
+              decoration: BoxDecoration(
+                border: Border.all(color: colors.outlineVariant),
+                borderRadius: BorderRadius.circular(AppRadius.medium),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: iconSize,
+                    height: iconSize,
+                    decoration: BoxDecoration(
+                      color: colors.secondaryContainer,
+                      borderRadius: BorderRadius.circular(AppRadius.small),
                     ),
-                    if (label != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        label!,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
+                    child: Icon(
+                      icon,
+                      color: colors.primary,
+                      size: compact ? 26 : 28,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      ),
-                    ],
-                  ],
-                ),
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          description,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        if (label != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            label!,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: colors.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Icon(Icons.chevron_right_rounded, color: colors.primary),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right_rounded, color: colors.primary),
-            ],
+            ),
           ),
         ),
       ),
