@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/data_migration/preference_keys.dart';
 import '../learning/learning_progress_provider.dart';
 import 'daily_mission.dart';
 
@@ -22,24 +23,15 @@ class DailyMissionProvider extends ChangeNotifier {
     _loadOrCreateForToday();
   }
 
-  static const dateKey = 'daily_mission_date';
-  static const selectedIdsKey = 'daily_mission_selected_ids';
-  static const completedIdsKey = 'daily_mission_completed_ids';
-  static const rewardedIdsKey = 'daily_mission_rewarded_ids';
-  static const completedAtKey = 'daily_mission_completed_at';
-  static const previousIdsKey = 'daily_mission_previous_ids';
-  static const frequencyKey = 'daily_mission_frequency';
-  static const activeMissionIdKey = 'daily_mission_active_id';
-  static const preferenceKeys = <String>[
-    dateKey,
-    selectedIdsKey,
-    completedIdsKey,
-    rewardedIdsKey,
-    completedAtKey,
-    previousIdsKey,
-    frequencyKey,
-    activeMissionIdKey,
-  ];
+  static const dateKey = V2PreferenceKeys.dailyMissionDate;
+  static const selectedIdsKey = V2PreferenceKeys.dailyMissionSelectedIds;
+  static const completedIdsKey = V2PreferenceKeys.dailyMissionCompletedIds;
+  static const rewardedIdsKey = V2PreferenceKeys.dailyMissionRewardedIds;
+  static const completedAtKey = V2PreferenceKeys.dailyMissionCompletedAt;
+  static const previousIdsKey = V2PreferenceKeys.dailyMissionPreviousIds;
+  static const frequencyKey = V2PreferenceKeys.dailyMissionFrequency;
+  static const activeMissionIdKey = V2PreferenceKeys.dailyMissionActiveId;
+  static const preferenceKeys = V2PreferenceKeys.dailyMissionKeys;
 
   final SharedPreferences _preferences;
   final LearningProgressProvider _progress;

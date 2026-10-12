@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/data_migration/preference_keys.dart';
 import '../hamburger/hamburger_mission.dart';
 import '../progress/recent_practice_record.dart';
 
@@ -25,157 +26,117 @@ enum AccessibilityTextSize { normal, large, extraLarge }
 enum ScreenContrast { comfortable, vivid }
 
 class LearningProgressProvider extends ChangeNotifier {
-  static const onboardingCompletedKey = 'onboarding_completed_v1';
-  static const _accessibilityTextSizeKey = 'accessibility_text_size';
-  static const _screenContrastKey = 'screen_contrast';
-  static const _completionCountKey = 'cafe_learning_completion_count';
-  static const _guidedCompletionCountKey = 'cafe_guided_completion_count';
-  static const _soloCompletionCountKey = 'cafe_solo_completion_count';
-  static const _pointsKey = 'digital_confidence_points';
-  static const _dailyMissionRewardTokensKey = 'daily_mission_reward_tokens';
-  static const _soloFirstBadgeKey = 'cafe_solo_first_badge_earned';
-  static const _cafeFamiliarBadgeKey = 'cafe_familiar_badge_earned';
-  static const _cafeModeKey = 'cafe_learning_mode';
-  static const _cafeGuidedSessionAwardedKey = 'cafe_guided_session_awarded';
-  static const _cafeSoloSessionAwardedKey = 'cafe_solo_session_awarded';
-  static const _hospitalCompletionCountKey = 'hospital_guided_completion_count';
+  static const onboardingCompletedKey = V2PreferenceKeys.onboardingCompleted;
+  static const _accessibilityTextSizeKey =
+      V2PreferenceKeys.accessibilityTextSize;
+  static const _screenContrastKey = V2PreferenceKeys.screenContrast;
+  static const _completionCountKey = V2PreferenceKeys.cafeLegacyCompletionCount;
+  static const _guidedCompletionCountKey =
+      V2PreferenceKeys.cafeGuidedCompletionCount;
+  static const _soloCompletionCountKey =
+      V2PreferenceKeys.cafeSoloCompletionCount;
+  static const _pointsKey = V2PreferenceKeys.points;
+  static const _dailyMissionRewardTokensKey =
+      V2PreferenceKeys.dailyMissionRewardTokens;
+  static const _soloFirstBadgeKey = V2PreferenceKeys.cafeSoloFirstBadge;
+  static const _cafeFamiliarBadgeKey = V2PreferenceKeys.cafeFamiliarBadge;
+  static const _cafeModeKey = V2PreferenceKeys.cafeMode;
+  static const _cafeGuidedSessionAwardedKey =
+      V2PreferenceKeys.cafeGuidedSessionAwarded;
+  static const _cafeSoloSessionAwardedKey =
+      V2PreferenceKeys.cafeSoloSessionAwarded;
+  static const _hospitalCompletionCountKey =
+      V2PreferenceKeys.hospitalGuidedCompletionCount;
   static const _hospitalSoloCompletionCountKey =
-      'hospital_solo_completion_count';
-  static const _hospitalSoloFirstBadgeKey = 'hospital_solo_first_badge_earned';
-  static const _hospitalModeKey = 'hospital_learning_mode';
+      V2PreferenceKeys.hospitalSoloCompletionCount;
+  static const _hospitalSoloFirstBadgeKey =
+      V2PreferenceKeys.hospitalSoloFirstBadge;
+  static const _hospitalModeKey = V2PreferenceKeys.hospitalMode;
   static const _hospitalGuidedSessionAwardedKey =
-      'hospital_guided_session_awarded';
-  static const _hospitalSoloSessionAwardedKey = 'hospital_solo_session_awarded';
+      V2PreferenceKeys.hospitalGuidedSessionAwarded;
+  static const _hospitalSoloSessionAwardedKey =
+      V2PreferenceKeys.hospitalSoloSessionAwarded;
   static const _hospitalReservationCompletionCountKey =
-      'hospital_reservation_guided_completion_count';
+      V2PreferenceKeys.hospitalReservationGuidedCompletionCount;
   static const _hospitalReservationSoloCompletionCountKey =
-      'hospital_reservation_solo_completion_count';
+      V2PreferenceKeys.hospitalReservationSoloCompletionCount;
   static const _hospitalReservationGuidedSessionAwardedKey =
-      'hospital_reservation_guided_session_awarded';
+      V2PreferenceKeys.hospitalReservationGuidedSessionAwarded;
   static const _hospitalReservationSoloSessionAwardedKey =
-      'hospital_reservation_solo_session_awarded';
+      V2PreferenceKeys.hospitalReservationSoloSessionAwarded;
   static const _hospitalPaymentCompletionCountKey =
-      'hospital_payment_guided_completion_count';
+      V2PreferenceKeys.hospitalPaymentGuidedCompletionCount;
   static const _hospitalPaymentSoloCompletionCountKey =
-      'hospital_payment_solo_completion_count';
+      V2PreferenceKeys.hospitalPaymentSoloCompletionCount;
   static const _hospitalPaymentGuidedSessionAwardedKey =
-      'hospital_payment_guided_session_awarded';
+      V2PreferenceKeys.hospitalPaymentGuidedSessionAwarded;
   static const _hospitalPaymentSoloSessionAwardedKey =
-      'hospital_payment_solo_session_awarded';
+      V2PreferenceKeys.hospitalPaymentSoloSessionAwarded;
   static const _hospitalDocumentCompletionCountKey =
-      'hospital_document_guided_completion_count';
+      V2PreferenceKeys.hospitalDocumentGuidedCompletionCount;
   static const _hospitalDocumentSoloCompletionCountKey =
-      'hospital_document_solo_completion_count';
+      V2PreferenceKeys.hospitalDocumentSoloCompletionCount;
   static const _hospitalDocumentGuidedSessionAwardedKey =
-      'hospital_document_guided_session_awarded';
+      V2PreferenceKeys.hospitalDocumentGuidedSessionAwarded;
   static const _hospitalDocumentSoloSessionAwardedKey =
-      'hospital_document_solo_session_awarded';
-  static const _photoCompletionCountKey = 'photo_guided_completion_count';
-  static const _photoSoloCompletionCountKey = 'photo_solo_completion_count';
-  static const _photoSoloFirstBadgeKey = 'photo_solo_first_badge_earned';
-  static const _photoModeKey = 'photo_learning_mode';
-  static const _photoGuidedSessionAwardedKey = 'photo_guided_session_awarded';
-  static const _photoSoloSessionAwardedKey = 'photo_solo_session_awarded';
-  static const _trainCompletionCountKey = 'train_guided_completion_count';
-  static const _trainSoloCompletionCountKey = 'train_solo_completion_count';
-  static const _trainSoloFirstBadgeKey = 'train_solo_first_badge_earned';
-  static const _trainModeKey = 'train_learning_mode';
-  static const _trainGuidedSessionAwardedKey = 'train_guided_session_awarded';
-  static const _trainSoloSessionAwardedKey = 'train_solo_session_awarded';
-  static const _recentPracticeRecordsKey = 'recent_practice_records';
+      V2PreferenceKeys.hospitalDocumentSoloSessionAwarded;
+  static const _photoCompletionCountKey =
+      V2PreferenceKeys.photoGuidedCompletionCount;
+  static const _photoSoloCompletionCountKey =
+      V2PreferenceKeys.photoSoloCompletionCount;
+  static const _photoSoloFirstBadgeKey = V2PreferenceKeys.photoSoloFirstBadge;
+  static const _photoModeKey = V2PreferenceKeys.photoMode;
+  static const _photoGuidedSessionAwardedKey =
+      V2PreferenceKeys.photoGuidedSessionAwarded;
+  static const _photoSoloSessionAwardedKey =
+      V2PreferenceKeys.photoSoloSessionAwarded;
+  static const _trainCompletionCountKey =
+      V2PreferenceKeys.trainGuidedCompletionCount;
+  static const _trainSoloCompletionCountKey =
+      V2PreferenceKeys.trainSoloCompletionCount;
+  static const _trainSoloFirstBadgeKey = V2PreferenceKeys.trainSoloFirstBadge;
+  static const _trainModeKey = V2PreferenceKeys.trainMode;
+  static const _trainGuidedSessionAwardedKey =
+      V2PreferenceKeys.trainGuidedSessionAwarded;
+  static const _trainSoloSessionAwardedKey =
+      V2PreferenceKeys.trainSoloSessionAwarded;
+  static const _recentPracticeRecordsKey =
+      V2PreferenceKeys.recentPracticeRecords;
   static const _hamburgerCompletionCountKey =
-      'hamburger_guided_completion_count';
+      V2PreferenceKeys.hamburgerGuidedCompletionCount;
   static const _hamburgerSoloCompletionCountKey =
-      'hamburger_solo_completion_count';
+      V2PreferenceKeys.hamburgerSoloCompletionCount;
   static const _hamburgerSoloFirstBadgeKey =
-      'hamburger_solo_first_badge_earned';
-  static const _hamburgerModeKey = 'hamburger_learning_mode';
-  static const _hamburgerCurrentMissionKey = 'hamburger_current_mission_id';
-  static const _hamburgerLastMissionKey = 'hamburger_last_mission_id';
+      V2PreferenceKeys.hamburgerSoloFirstBadge;
+  static const _hamburgerModeKey = V2PreferenceKeys.hamburgerMode;
+  static const _hamburgerCurrentMissionKey =
+      V2PreferenceKeys.hamburgerCurrentMission;
+  static const _hamburgerLastMissionKey = V2PreferenceKeys.hamburgerLastMission;
   static const _hamburgerSoloSessionAwardedKey =
-      'hamburger_solo_session_awarded';
+      V2PreferenceKeys.hamburgerSoloSessionAwarded;
   static const _hamburgerGuidedSessionAwardedKey =
-      'hamburger_guided_session_awarded';
-  static const _atmCompletionCountKey = 'atm_guided_completion_count';
-  static const _atmSessionAwardedKey = 'atm_guided_session_awarded';
-  static const _atmSoloCompletionCountKey = 'atm_solo_completion_count';
-  static const _atmSoloFirstBadgeKey = 'atm_solo_first_badge_earned';
-  static const _atmSoloSessionAwardedKey = 'atm_solo_session_awarded';
-  static const _atmModeKey = 'atm_learning_mode';
+      V2PreferenceKeys.hamburgerGuidedSessionAwarded;
+  static const _atmCompletionCountKey =
+      V2PreferenceKeys.atmGuidedCompletionCount;
+  static const _atmSessionAwardedKey = V2PreferenceKeys.atmGuidedSessionAwarded;
+  static const _atmSoloCompletionCountKey =
+      V2PreferenceKeys.atmSoloCompletionCount;
+  static const _atmSoloFirstBadgeKey = V2PreferenceKeys.atmSoloFirstBadge;
+  static const _atmSoloSessionAwardedKey =
+      V2PreferenceKeys.atmSoloSessionAwarded;
+  static const _atmModeKey = V2PreferenceKeys.atmMode;
   static const _civilDocumentCompletionCountKey =
-      'civil_document_guided_completion_count';
+      V2PreferenceKeys.civilDocumentGuidedCompletionCount;
   static const _civilDocumentSessionAwardedKey =
-      'civil_document_guided_session_awarded';
+      V2PreferenceKeys.civilDocumentGuidedSessionAwarded;
   static const _civilDocumentSoloCompletionCountKey =
-      'civil_document_solo_completion_count';
+      V2PreferenceKeys.civilDocumentSoloCompletionCount;
   static const _civilDocumentSoloFirstBadgeKey =
-      'civil_document_solo_first_badge_earned';
+      V2PreferenceKeys.civilDocumentSoloFirstBadge;
   static const _civilDocumentSoloSessionAwardedKey =
-      'civil_document_solo_session_awarded';
-  static const _civilDocumentModeKey = 'civil_document_learning_mode';
-  static const _practiceRecordKeys = <String>[
-    _completionCountKey,
-    _guidedCompletionCountKey,
-    _soloCompletionCountKey,
-    _pointsKey,
-    _dailyMissionRewardTokensKey,
-    _soloFirstBadgeKey,
-    _cafeFamiliarBadgeKey,
-    _cafeModeKey,
-    _cafeGuidedSessionAwardedKey,
-    _cafeSoloSessionAwardedKey,
-    _hospitalCompletionCountKey,
-    _hospitalSoloCompletionCountKey,
-    _hospitalSoloFirstBadgeKey,
-    _hospitalModeKey,
-    _hospitalGuidedSessionAwardedKey,
-    _hospitalSoloSessionAwardedKey,
-    _hospitalReservationCompletionCountKey,
-    _hospitalReservationSoloCompletionCountKey,
-    _hospitalReservationGuidedSessionAwardedKey,
-    _hospitalReservationSoloSessionAwardedKey,
-    _hospitalPaymentCompletionCountKey,
-    _hospitalPaymentSoloCompletionCountKey,
-    _hospitalPaymentGuidedSessionAwardedKey,
-    _hospitalPaymentSoloSessionAwardedKey,
-    _hospitalDocumentCompletionCountKey,
-    _hospitalDocumentSoloCompletionCountKey,
-    _hospitalDocumentGuidedSessionAwardedKey,
-    _hospitalDocumentSoloSessionAwardedKey,
-    _photoCompletionCountKey,
-    _photoSoloCompletionCountKey,
-    _photoSoloFirstBadgeKey,
-    _photoModeKey,
-    _photoGuidedSessionAwardedKey,
-    _photoSoloSessionAwardedKey,
-    _trainCompletionCountKey,
-    _trainSoloCompletionCountKey,
-    _trainSoloFirstBadgeKey,
-    _trainModeKey,
-    _trainGuidedSessionAwardedKey,
-    _trainSoloSessionAwardedKey,
-    _recentPracticeRecordsKey,
-    _hamburgerCompletionCountKey,
-    _hamburgerSoloCompletionCountKey,
-    _hamburgerSoloFirstBadgeKey,
-    _hamburgerModeKey,
-    _hamburgerCurrentMissionKey,
-    _hamburgerLastMissionKey,
-    _hamburgerSoloSessionAwardedKey,
-    _hamburgerGuidedSessionAwardedKey,
-    _atmCompletionCountKey,
-    _atmSessionAwardedKey,
-    _atmSoloCompletionCountKey,
-    _atmSoloFirstBadgeKey,
-    _atmSoloSessionAwardedKey,
-    _atmModeKey,
-    _civilDocumentCompletionCountKey,
-    _civilDocumentSessionAwardedKey,
-    _civilDocumentSoloCompletionCountKey,
-    _civilDocumentSoloFirstBadgeKey,
-    _civilDocumentSoloSessionAwardedKey,
-    _civilDocumentModeKey,
-  ];
+      V2PreferenceKeys.civilDocumentSoloSessionAwarded;
+  static const _civilDocumentModeKey = V2PreferenceKeys.civilDocumentMode;
+  static const _practiceRecordKeys = V2PreferenceKeys.practiceRecordKeys;
   final SharedPreferences _preferences;
   final List<Future<void> Function()> _practiceResetHandlers = [];
   final List<VoidCallback> _practiceStartHandlers = [];
