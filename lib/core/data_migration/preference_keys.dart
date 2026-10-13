@@ -240,3 +240,31 @@ abstract final class V3DataKeys {
   static const lastSuccessRevision = 'v3_migration_last_success_revision';
   static const lastOutcome = 'v3_migration_last_outcome';
 }
+
+abstract final class V3RewardKeys {
+  static const dataVersion = 'v3_reward_data_version';
+  static const catalogVersion = 'v3_reward_catalog_version';
+  static const unlockedIds = 'v3_reward_unlocked_ids';
+  static const unlockedAtJson = 'v3_reward_unlocked_at_json';
+  static const celebratedIds = 'v3_reward_celebrated_ids';
+  static const selectedTitleId = 'v3_reward_selected_title_id';
+  static const selectedAccessoryIds = 'v3_reward_selected_accessory_ids';
+  static const selectedThemeId = 'v3_reward_selected_theme_id';
+  static const retroactiveGrantVersion = 'v3_reward_retroactive_grant_version';
+  static const migrationVersion = 'v3_reward_migration_version';
+  static const pendingStateJson = 'v3_reward_state_pending_json';
+
+  static const stateKeys = <String>{
+    dataVersion,
+    catalogVersion,
+    unlockedIds,
+    unlockedAtJson,
+    celebratedIds,
+    selectedTitleId,
+    selectedAccessoryIds,
+    selectedThemeId,
+    retroactiveGrantVersion,
+    migrationVersion,
+    pendingStateJson,
+  };
+}

@@ -136,7 +136,10 @@ class LearningProgressProvider extends ChangeNotifier {
   static const _civilDocumentSoloSessionAwardedKey =
       V2PreferenceKeys.civilDocumentSoloSessionAwarded;
   static const _civilDocumentModeKey = V2PreferenceKeys.civilDocumentMode;
-  static const _practiceRecordKeys = V2PreferenceKeys.practiceRecordKeys;
+  static const _practiceRecordKeys = <String>{
+    ...V2PreferenceKeys.practiceRecordKeys,
+    ...V3RewardKeys.stateKeys,
+  };
   final SharedPreferences _preferences;
   final List<Future<void> Function()> _practiceResetHandlers = [];
   final List<VoidCallback> _practiceStartHandlers = [];
