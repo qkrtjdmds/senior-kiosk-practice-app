@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/data_migration/preference_keys.dart';
 import '../hamburger/hamburger_mission.dart';
 import '../progress/recent_practice_record.dart';
+import '../rewards/reward_repository.dart';
+import '../rewards/reward_unlock_service.dart';
 
 enum CafeLearningMode { guided, solo }
 
@@ -141,12 +143,19 @@ class LearningProgressProvider extends ChangeNotifier {
     ...V3RewardKeys.stateKeys,
   };
   final SharedPreferences _preferences;
+  late final RewardUnlockService _rewardUnlockService;
   final List<Future<void> Function()> _practiceResetHandlers = [];
   final List<VoidCallback> _practiceStartHandlers = [];
   final Set<String> _awardingDailyMissionTokens = {};
   SharedPreferences get preferences => _preferences;
 
-  LearningProgressProvider(this._preferences) {
+  LearningProgressProvider(
+    this._preferences, {
+    RewardUnlockService? rewardUnlockService,
+  }) {
+    _rewardUnlockService =
+        rewardUnlockService ??
+        RewardUnlockService(RewardRepository(_preferences));
     _syncFamiliarBadge();
   }
 
@@ -275,7 +284,7 @@ class LearningProgressProvider extends ChangeNotifier {
         ...tokens,
         token,
       ]);
-      await _preferences.setInt(_pointsKey, totalPoints + 10);
+      await _awardPoints(10);
       notifyListeners();
       return true;
     } finally {
@@ -514,10 +523,15 @@ class LearningProgressProvider extends ChangeNotifier {
     );
   }
 
+  Future<void> _awardPoints(int points) async {
+    if (points <= 0) return;
+    final updatedTotal = totalPoints + points;
+    await _preferences.setInt(_pointsKey, updatedTotal);
+    await _rewardUnlockService.reconcile(updatedTotal);
+  }
+
   Future<void> _recordCompletion(CafeLearningMode completedMode) async {
-    final points =
-        totalPoints + (completedMode == CafeLearningMode.solo ? 20 : 10);
-    await _preferences.setInt(_pointsKey, points);
+    await _awardPoints(completedMode == CafeLearningMode.solo ? 20 : 10);
 
     if (completedMode == CafeLearningMode.solo) {
       final completedCount = soloCompletionCount + 1;
@@ -592,7 +606,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _hospitalCompletionAwarded = true;
     await _preferences.setBool(_hospitalGuidedSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(
       _hospitalCompletionCountKey,
       hospitalCompletionCount + 1,
@@ -628,7 +642,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !hospitalSoloFirstBadgeEarned;
     _hospitalSoloCompletionAwarded = true;
     await _preferences.setBool(_hospitalSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _hospitalSoloCompletionCountKey,
       hospitalSoloCompletionCount + 1,
@@ -668,7 +682,7 @@ class LearningProgressProvider extends ChangeNotifier {
     }
     await _preferences.setBool(key, true);
     final points = solo ? 20 : 10;
-    await _preferences.setInt(_pointsKey, totalPoints + points);
+    await _awardPoints(points);
     final countKey = solo
         ? _hospitalReservationSoloCompletionCountKey
         : _hospitalReservationCompletionCountKey;
@@ -707,7 +721,7 @@ class LearningProgressProvider extends ChangeNotifier {
     }
     await _preferences.setBool(key, true);
     final points = solo ? 20 : 10;
-    await _preferences.setInt(_pointsKey, totalPoints + points);
+    await _awardPoints(points);
     final countKey = solo
         ? _hospitalPaymentSoloCompletionCountKey
         : _hospitalPaymentCompletionCountKey;
@@ -746,7 +760,7 @@ class LearningProgressProvider extends ChangeNotifier {
     }
     await _preferences.setBool(key, true);
     final points = solo ? 20 : 10;
-    await _preferences.setInt(_pointsKey, totalPoints + points);
+    await _awardPoints(points);
     final countKey = solo
         ? _hospitalDocumentSoloCompletionCountKey
         : _hospitalDocumentCompletionCountKey;
@@ -789,7 +803,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _photoCompletionAwarded = true;
     await _preferences.setBool(_photoGuidedSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(
       _photoCompletionCountKey,
       photoCompletionCount + 1,
@@ -825,7 +839,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !photoSoloFirstBadgeEarned;
     _photoSoloCompletionAwarded = true;
     await _preferences.setBool(_photoSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _photoSoloCompletionCountKey,
       photoSoloCompletionCount + 1,
@@ -873,7 +887,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _trainCompletionAwarded = true;
     await _preferences.setBool(_trainGuidedSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(
       _trainCompletionCountKey,
       trainCompletionCount + 1,
@@ -891,7 +905,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !trainSoloFirstBadgeEarned;
     _trainSoloCompletionAwarded = true;
     await _preferences.setBool(_trainSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _trainSoloCompletionCountKey,
       trainSoloCompletionCount + 1,
@@ -983,7 +997,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _hamburgerCompletionAwarded = true;
     await _preferences.setBool(_hamburgerGuidedSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(
       _hamburgerCompletionCountKey,
       hamburgerCompletionCount + 1,
@@ -1001,7 +1015,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !hamburgerSoloFirstBadgeEarned;
     _hamburgerSoloCompletionAwarded = true;
     await _preferences.setBool(_hamburgerSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _hamburgerSoloCompletionCountKey,
       hamburgerSoloCompletionCount + 1,
@@ -1074,7 +1088,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _atmCompletionAwarded = true;
     await _preferences.setBool(_atmSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(_atmCompletionCountKey, atmCompletionCount + 1);
     await _saveRecentPractice('ATM 출금', '따라 해보기', 10);
     notifyListeners();
@@ -1089,7 +1103,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !atmSoloFirstBadgeEarned;
     _atmSoloCompletionAwarded = true;
     await _preferences.setBool(_atmSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _atmSoloCompletionCountKey,
       atmSoloCompletionCount + 1,
@@ -1142,7 +1156,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     _civilDocumentCompletionAwarded = true;
     await _preferences.setBool(_civilDocumentSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 10);
+    await _awardPoints(10);
     await _preferences.setInt(
       _civilDocumentCompletionCountKey,
       civilDocumentCompletionCount + 1,
@@ -1160,7 +1174,7 @@ class LearningProgressProvider extends ChangeNotifier {
     final shouldAwardBadge = !civilDocumentSoloFirstBadgeEarned;
     _civilDocumentSoloCompletionAwarded = true;
     await _preferences.setBool(_civilDocumentSoloSessionAwardedKey, true);
-    await _preferences.setInt(_pointsKey, totalPoints + 20);
+    await _awardPoints(20);
     await _preferences.setInt(
       _civilDocumentSoloCompletionCountKey,
       civilDocumentSoloCompletionCount + 1,

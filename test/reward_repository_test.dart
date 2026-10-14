@@ -289,7 +289,7 @@ void main() {
     expect(preferences.getBool(V2PreferenceKeys.onboardingCompleted), isTrue);
   });
 
-  test('앱 초기 migration은 160점 사용자에게 보상을 지급하거나 키를 만들지 않는다', () async {
+  test('앱 초기 migration은 160점 사용자에게 첫 보상만 소급 지급한다', () async {
     SharedPreferences.setMockInitialValues({
       V2PreferenceKeys.points: 160,
       V2PreferenceKeys.cafeSoloFirstBadge: true,
@@ -300,14 +300,14 @@ void main() {
 
     expect(preferences.getInt(V2PreferenceKeys.points), 160);
     expect(preferences.getBool(V2PreferenceKeys.cafeSoloFirstBadge), isTrue);
-    expect(preferences.getInt(V3DataKeys.schemaVersion), 1);
+    expect(preferences.getInt(V3DataKeys.schemaVersion), 2);
     expect(preferences.getStringList(V3DataKeys.completedRevisions), [
       'v3_foundation_1',
+      'v3_reward_backfill_2',
     ]);
-    expect(
-      preferences.getKeys().where((key) => key.startsWith('v3_reward_')),
-      isEmpty,
-    );
+    final state = await RewardRepository(preferences).load();
+    expect(state.unlockedRewardIds, {'title_first_step'});
+    expect(state.retroactiveGrantCompleted, isTrue);
   });
 }
 

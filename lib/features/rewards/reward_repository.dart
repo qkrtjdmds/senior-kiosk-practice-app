@@ -72,7 +72,7 @@ class RewardRepository {
     : catalog = catalog ?? RewardCatalog.v3Initial();
 
   static const currentDataVersion = 1;
-  static const currentMigrationVersion = 1;
+  static const currentMigrationVersion = 2;
 
   final RewardStore _store;
   final RewardCatalog catalog;

@@ -4,6 +4,7 @@ import 'data_migration_models.dart';
 import 'migration_store.dart';
 import 'preference_keys.dart';
 import 'v3_foundation_revision.dart';
+import 'v3_reward_backfill_revision.dart';
 
 class DataMigrationCoordinator {
   DataMigrationCoordinator(
@@ -22,11 +23,18 @@ class DataMigrationCoordinator {
     List<DataMigrationRevision>? revisions,
   }) : _checkpointHook = checkpointHook,
        _revisions = List.unmodifiable(
-         revisions ?? const <DataMigrationRevision>[V3FoundationRevision()],
+         revisions ??
+             <DataMigrationRevision>[
+               const V3FoundationRevision(),
+               V3RewardBackfillRevision(),
+             ],
        );
 
-  static const currentSchemaVersion = V3FoundationRevision.versionValue;
-  static const supportedRevisionIds = <String>[V3FoundationRevision.idValue];
+  static const currentSchemaVersion = V3RewardBackfillRevision.versionValue;
+  static const supportedRevisionIds = <String>[
+    V3FoundationRevision.idValue,
+    V3RewardBackfillRevision.idValue,
+  ];
 
   final MigrationStore _store;
   final MigrationCheckpointHook? _checkpointHook;

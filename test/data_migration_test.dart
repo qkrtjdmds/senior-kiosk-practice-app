@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:han_geoleum_digital/core/data_migration/data_migration_coordinator.dart';
 import 'package:han_geoleum_digital/core/data_migration/data_migration_models.dart';
 import 'package:han_geoleum_digital/core/data_migration/preference_keys.dart';
+import 'package:han_geoleum_digital/core/data_migration/v3_foundation_revision.dart';
 import 'package:han_geoleum_digital/features/daily_mission/daily_mission_provider.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
+import 'package:han_geoleum_digital/features/rewards/reward_repository.dart';
 
 void main() {
   const missionIds = <String>[
@@ -81,7 +83,7 @@ void main() {
     };
   }
 
-  test('신규 설치는 V2 키 없이 schema version과 revision만 기록한다', () async {
+  test('신규 설치는 0점 빈 보상 상태로 schema version 2를 완료한다', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
 
@@ -104,17 +106,16 @@ void main() {
       preferences.getKeys().where(V2PreferenceKeys.practiceRecordKeys.contains),
       isEmpty,
     );
-    expect(
-      preferences.getKeys().where((key) => key.startsWith('v3_reward_')),
-      isEmpty,
-    );
+    final rewards = await RewardRepository(preferences).load();
+    expect(rewards.unlockedRewardIds, isEmpty);
+    expect(rewards.retroactiveGrantCompleted, isTrue);
 
     final second = await DataMigrationCoordinator(preferences).migrate();
     expect(second.status, DataMigrationStatus.alreadyCurrent);
     expect(second.appliedRevisions, isEmpty);
   });
 
-  test('V2 사용자의 160점과 모든 기록·설정·미션을 그대로 보존한다', () async {
+  test('V2 사용자의 160점과 기록을 보존하고 첫 보상만 소급 지급한다', () async {
     SharedPreferences.setMockInitialValues(v2Fixture());
     final preferences = await SharedPreferences.getInstance();
     final before = snapshotV2(preferences);
@@ -131,10 +132,9 @@ void main() {
       preferences.getStringList(V2PreferenceKeys.recentPracticeRecords),
       before[V2PreferenceKeys.recentPracticeRecords],
     );
-    expect(
-      preferences.getKeys().where((key) => key.startsWith('v3_reward_')),
-      isEmpty,
-    );
+    final rewards = await RewardRepository(preferences).load();
+    expect(rewards.unlockedRewardIds, {'title_first_step'});
+    expect(rewards.retroactiveGrantCompleted, isTrue);
   });
 
   for (final checkpoint in MigrationCheckpoint.values) {
@@ -156,7 +156,7 @@ void main() {
       expect(first.status, DataMigrationStatus.failed);
       expect(
         preferences.getInt(V3DataKeys.pendingRevision),
-        DataMigrationCoordinator.currentSchemaVersion,
+        V3FoundationRevision.versionValue,
       );
 
       final recovered = await DataMigrationCoordinator(preferences).migrate();
@@ -266,7 +266,7 @@ void main() {
       preferences.getStringList(V3DataKeys.completedRevisions),
       DataMigrationCoordinator.supportedRevisionIds,
     );
-    expect(result.appliedRevisions, isEmpty);
+    expect(result.appliedRevisions, [2]);
   });
 
   test('지원 버전보다 높은 schema는 수정하거나 다운그레이드하지 않는다', () async {
