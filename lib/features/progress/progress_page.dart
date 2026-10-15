@@ -8,6 +8,8 @@ import '../learning/learning_progress_provider.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import 'recent_practice_record.dart';
 import '../../shared/widgets/han_geoleum_character.dart';
+import '../rewards/reward_progress_provider.dart';
+import '../rewards/reward_widgets.dart';
 
 class ProgressPage extends StatelessWidget {
   const ProgressPage({this.isTabPage = false, super.key});
@@ -17,6 +19,7 @@ class ProgressPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = context.watch<LearningProgressProvider>();
+    final rewards = context.watch<RewardProgressProvider>();
 
     return PageScaffold(
       title: isTabPage ? '내 정보' : '나의 디지털 걸음',
@@ -27,6 +30,18 @@ class ProgressPage extends StatelessWidget {
           const _LocalRecordIntro(),
           const SizedBox(height: AppSpacing.md),
           _GrowthSummary(progress: progress),
+          const SizedBox(height: AppSpacing.lg),
+          const _SectionHeading(
+            title: '나의 보상',
+            description: '연습 포인트로 자동 해제된 성장 보상을 확인해요.',
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          RewardSummaryPanel(
+            rewards: rewards,
+            actionLabel: '전체 보상 보기',
+            showRewardCount: true,
+            onPressed: () => context.push(AppRoutes.rewards),
+          ),
           const SizedBox(height: AppSpacing.lg),
           const _SectionHeading(
             title: '콘텐츠별 연습 현황',
@@ -83,6 +98,7 @@ class ProgressPage extends StatelessWidget {
         title: const Text('연습 기록을 초기화할까요?', softWrap: true),
         content: const Text(
           '연습 포인트, 완료 횟수, 배지와 최근 기록이 처음 상태로 돌아가요. '
+          '획득한 칭호·꾸미기·홈 테마도 삭제됩니다. '
           '글씨 크기, 화면 대비와 시작 안내 완료 상태는 유지돼요.',
           softWrap: true,
         ),
@@ -115,7 +131,10 @@ class ProgressPage extends StatelessWidget {
     );
     if (shouldReset != true || !context.mounted) return;
 
-    await context.read<LearningProgressProvider>().resetPracticeRecords();
+    final progress = context.read<LearningProgressProvider>();
+    final rewards = context.read<RewardProgressProvider>();
+    await progress.resetPracticeRecords();
+    await rewards.refresh();
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
@@ -225,7 +244,7 @@ class _RecordManagement extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxs),
                     Text(
-                      '포인트, 완료 횟수, 배지와 최근 기록을 처음 상태로 되돌려요.',
+                      '포인트, 배지, 기록과 획득한 칭호·꾸미기·홈 테마를 처음 상태로 되돌려요.',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -237,7 +256,8 @@ class _RecordManagement extends StatelessWidget {
           Semantics(
             button: true,
             label:
-                '연습 기록 초기화. 포인트, 완료 횟수, 배지와 최근 기록을 '
+                '연습 기록 초기화. 포인트, 완료 횟수, 배지, 최근 기록과 '
+                '획득한 칭호, 꾸미기, 홈 테마를 '
                 '처음 상태로 되돌리는 위험 동작입니다. 확인 창이 열립니다.',
             child: ExcludeSemantics(
               child: OutlinedButton.icon(

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'app_routes.dart';
 import '../features/home/brand_home_page.dart';
 import '../features/progress/progress_page.dart';
+import '../features/rewards/rewards_page.dart';
 import '../features/settings/accessibility_settings_page.dart';
 import '../features/tabs/main_tab_scaffold.dart';
 import '../features/tabs/mission_tab_page.dart';
@@ -109,6 +110,10 @@ final appRouter = GoRouter(
           builder: (context, state) => const ProgressPage(isTabPage: true),
         ),
       ],
+    ),
+    GoRoute(
+      path: AppRoutes.rewards,
+      builder: (context, state) => const RewardsPage(),
     ),
     GoRoute(
       path: AppRoutes.accessibilitySettings,

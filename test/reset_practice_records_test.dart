@@ -145,7 +145,7 @@ void main() {
 
     appRouter.go(AppRoutes.progress);
     await tester.pumpAndSettle();
-    expect(find.text('0점'), findsOneWidget);
+    expect(find.text('0점'), findsWidgets);
     expect(find.text('아직 완료한 연습이 없어요.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

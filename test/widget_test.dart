@@ -202,7 +202,7 @@ void main() {
     );
 
     expect(find.text('내 정보'), findsWidgets);
-    expect(find.text('70점'), findsOneWidget);
+    expect(find.text('70점'), findsWidgets);
     expect(find.text('6회'), findsWidgets);
     expect(find.byKey(const Key('content-progress-section')), findsOneWidget);
     expect(find.text('카페 주문'), findsOneWidget);

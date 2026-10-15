@@ -11,6 +11,8 @@ import 'package:han_geoleum_digital/app/app_router.dart';
 import 'package:han_geoleum_digital/app/app_routes.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
 import 'package:han_geoleum_digital/features/progress/recent_practice_record.dart';
+import 'package:han_geoleum_digital/features/rewards/reward_repository.dart';
+import 'package:han_geoleum_digital/features/rewards/reward_unlock_service.dart';
 
 void main() {
   Future<LearningProgressProvider> pumpProgress(
@@ -23,9 +25,11 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     SharedPreferences.setMockInitialValues(values);
-    final progress = LearningProgressProvider(
-      await SharedPreferences.getInstance(),
-    );
+    final preferences = await SharedPreferences.getInstance();
+    await RewardUnlockService(
+      RewardRepository(preferences),
+    ).reconcile(preferences.getInt('digital_confidence_points') ?? 0);
+    final progress = LearningProgressProvider(preferences);
     appRouter.go(AppRoutes.progress);
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -40,7 +44,9 @@ void main() {
   testWidgets('성장 요약과 콘텐츠별 완료 현황은 기존 Provider 값을 사용한다', (tester) async {
     await pumpProgress(tester, values: _sampleValues());
 
-    expect(find.text('1234점'), findsOneWidget);
+    expect(find.text('1234점'), findsWidgets);
+    expect(find.text('전체 보상 보기'), findsOneWidget);
+    expect(find.text('획득한 보상 5 / 12'), findsOneWidget);
     expect(find.text('14회'), findsWidgets);
     expect(find.text('3개'), findsOneWidget);
     expect(find.byKey(const Key('content-progress-section')), findsOneWidget);
@@ -127,6 +133,7 @@ void main() {
     await tester.tap(reset);
     await tester.pumpAndSettle();
     expect(find.text('연습 기록을 초기화할까요?'), findsOneWidget);
+    expect(find.textContaining('획득한 칭호·꾸미기·홈 테마도 삭제됩니다'), findsOneWidget);
     await tester.tap(find.text('취소'));
     await tester.pumpAndSettle();
     expect(progress.totalPoints, 1234);
@@ -140,7 +147,12 @@ void main() {
     expect(progress.accessibilityTextSize, AccessibilityTextSize.extraLarge);
     expect(progress.screenContrast, ScreenContrast.vivid);
     expect(progress.onboardingCompleted, isTrue);
-    expect(find.text('0점'), findsOneWidget);
+    expect(find.text('0점'), findsWidgets);
+    expect(find.text('다음 보상: 첫걸음 시작'), findsOneWidget);
+    expect(
+      (await RewardRepository(progress.preferences).load()).unlockedRewardIds,
+      isEmpty,
+    );
     expect(tester.takeException(), isNull);
   });
 }

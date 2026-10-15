@@ -6,6 +6,7 @@ import '../../app/app_routes.dart';
 import '../../shared/widgets/large_action_button.dart';
 import '../../shared/widgets/page_scaffold.dart';
 import '../learning/learning_progress_provider.dart';
+import '../rewards/reward_progress_provider.dart';
 
 class AccessibilitySettingsPage extends StatelessWidget {
   const AccessibilitySettingsPage({super.key});
@@ -212,7 +213,8 @@ class AccessibilitySettingsPage extends StatelessWidget {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         title: const Text('연습 기록을 초기화할까요?', softWrap: true),
         content: const Text(
-          '모은 포인트, 완료 횟수, 배지, 최근 연습 기록이 처음 상태로 돌아가요.',
+          '모은 포인트, 완료 횟수, 배지, 최근 연습 기록이 처음 상태로 돌아가요. '
+          '획득한 칭호·꾸미기·홈 테마도 삭제됩니다.',
           softWrap: true,
         ),
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -252,7 +254,10 @@ class AccessibilitySettingsPage extends StatelessWidget {
     );
     if (shouldReset != true || !context.mounted) return;
 
-    await context.read<LearningProgressProvider>().resetPracticeRecords();
+    final progress = context.read<LearningProgressProvider>();
+    final rewards = context.read<RewardProgressProvider>();
+    await progress.resetPracticeRecords();
+    await rewards.refresh();
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,

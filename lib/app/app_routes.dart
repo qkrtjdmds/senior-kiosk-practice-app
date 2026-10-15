@@ -3,6 +3,7 @@ abstract final class AppRoutes {
   static const practice = '/practice';
   static const missions = '/missions';
   static const progress = '/progress';
+  static const rewards = '/rewards';
   static const accessibilitySettings = '/settings/display';
   static const cafeStart = '/cafe';
   static const cafeMission = '/cafe/mission';

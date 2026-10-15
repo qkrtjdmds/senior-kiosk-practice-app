@@ -9,6 +9,8 @@ import '../../shared/widgets/han_geoleum_character.dart';
 import '../daily_mission/daily_mission_provider.dart';
 import '../learning/learning_progress_provider.dart';
 import '../practice/practice_launcher.dart';
+import '../rewards/reward_progress_provider.dart';
+import '../rewards/reward_widgets.dart';
 
 class BrandHomePage extends StatelessWidget {
   const BrandHomePage({super.key});
@@ -70,6 +72,7 @@ class BrandHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final daily = context.watch<DailyMissionProvider>();
     final progress = context.watch<LearningProgressProvider>();
+    final rewards = context.watch<RewardProgressProvider>();
     final horizontal = MediaQuery.sizeOf(context).width <= 340 ? 16.0 : 20.0;
     return Scaffold(
       appBar: AppBar(
@@ -101,6 +104,13 @@ class BrandHomePage extends StatelessWidget {
                 progress: daily.progress,
                 allCompleted: daily.allCompleted,
                 onTap: () => context.go(AppRoutes.missions),
+              ),
+              const SizedBox(height: 16),
+              RewardSummaryPanel(
+                rewards: rewards,
+                actionLabel: '나의 보상 보기',
+                onPressed: () => context.push(AppRoutes.rewards),
+                compact: true,
               ),
               const SizedBox(height: 28),
               Text(
