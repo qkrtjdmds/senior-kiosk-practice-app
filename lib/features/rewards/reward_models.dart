@@ -22,6 +22,16 @@ enum RewardType {
   }
 }
 
+enum RewardAccessorySlot { head, face, neck, side }
+
+RewardAccessorySlot? rewardAccessorySlot(String rewardId) => switch (rewardId) {
+  'accessory_hat' => RewardAccessorySlot.head,
+  'accessory_glasses' => RewardAccessorySlot.face,
+  'accessory_scarf' => RewardAccessorySlot.neck,
+  'accessory_bag' => RewardAccessorySlot.side,
+  _ => null,
+};
+
 class RewardDefinition {
   RewardDefinition({
     required this.rewardId,

@@ -4,6 +4,51 @@ import '../../app/app_theme.dart';
 import 'reward_models.dart';
 import 'reward_progress_provider.dart';
 
+class RewardHomePalette {
+  const RewardHomePalette({
+    required this.background,
+    required this.welcome,
+    required this.accent,
+  });
+
+  final Color background;
+  final Color welcome;
+  final Color accent;
+
+  static RewardHomePalette of(BuildContext context, String? themeId) {
+    final highContrast = Theme.of(context).colorScheme.surface == Colors.white;
+    if (highContrast) {
+      return const RewardHomePalette(
+        background: Colors.white,
+        welcome: Color(0xFFF2F2F2),
+        accent: Color(0xFF23413C),
+      );
+    }
+    return switch (themeId) {
+      'theme_sage' => const RewardHomePalette(
+        background: Color(0xFFF3F6F0),
+        welcome: Color(0xFFDDE8D9),
+        accent: Color(0xFF71866F),
+      ),
+      'theme_sky' => const RewardHomePalette(
+        background: Color(0xFFF2F7F8),
+        welcome: Color(0xFFDDECEF),
+        accent: Color(0xFF668591),
+      ),
+      'theme_peach' => const RewardHomePalette(
+        background: Color(0xFFFAF4EF),
+        welcome: Color(0xFFF3E1D6),
+        accent: Color(0xFF9A7565),
+      ),
+      _ => const RewardHomePalette(
+        background: AppColors.background,
+        welcome: AppColors.sageContainer,
+        accent: AppColors.sage,
+      ),
+    };
+  }
+}
+
 class RewardSummaryPanel extends StatelessWidget {
   const RewardSummaryPanel({
     required this.rewards,
@@ -83,6 +128,16 @@ class RewardSummaryPanel extends StatelessWidget {
               ),
             ),
           ],
+          if (rewards.selectedTitle != null) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '사용 중인 칭호: ${rewards.selectedTitle!.title}',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Text(
             target == null
@@ -129,6 +184,7 @@ class RewardListRow extends StatelessWidget {
     required this.status,
     required this.unlocked,
     required this.applied,
+    this.onTap,
     super.key,
   });
 
@@ -136,6 +192,7 @@ class RewardListRow extends StatelessWidget {
   final String status;
   final bool unlocked;
   final bool applied;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -147,68 +204,87 @@ class RewardListRow extends StatelessWidget {
 
     return Semantics(
       container: true,
+      button: onTap != null,
+      selected: onTap != null ? applied : null,
       label: semanticLabel,
+      onTap: onTap,
       child: ExcludeSemantics(
-        child: Container(
-          constraints: const BoxConstraints(minHeight: AppSizes.choiceHeight),
-          padding: const EdgeInsets.all(AppSpacing.md),
+        child: Material(
           color: applied
               ? colors.secondaryContainer.withValues(alpha: 0.65)
               : Colors.transparent,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: unlocked
-                      ? colors.secondaryContainer
-                      : colors.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(AppRadius.small),
-                ),
-                child: Icon(
-                  rewardIcon(reward.rewardType),
-                  color: statusColor,
-                  size: 27,
-                ),
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(
+                minHeight: AppSizes.choiceHeight,
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      reward.title,
-                      softWrap: true,
-                      style: Theme.of(context).textTheme.titleMedium,
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: unlocked
+                          ? colors.secondaryContainer
+                          : colors.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(AppRadius.small),
                     ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Text(
-                      reward.description,
-                      softWrap: true,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    child: Icon(
+                      rewardIcon(reward.rewardType),
+                      color: statusColor,
+                      size: 27,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Wrap(
-                      spacing: AppSpacing.xs,
-                      runSpacing: AppSpacing.xxs,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _StatusLabel(
-                          text: rewardTypeLabel(reward.rewardType),
-                          emphasized: false,
+                        Text(
+                          reward.title,
+                          softWrap: true,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        _StatusLabel(
-                          text: '누적 ${reward.requiredPoints}점',
-                          emphasized: false,
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          reward.description,
+                          softWrap: true,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        _StatusLabel(text: status, emphasized: unlocked),
+                        const SizedBox(height: AppSpacing.xs),
+                        Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xxs,
+                          children: [
+                            _StatusLabel(
+                              text: rewardTypeLabel(reward.rewardType),
+                              emphasized: false,
+                            ),
+                            _StatusLabel(
+                              text: '누적 ${reward.requiredPoints}점',
+                              emphasized: false,
+                            ),
+                            _StatusLabel(text: status, emphasized: unlocked),
+                          ],
+                        ),
                       ],
                     ),
+                  ),
+                  if (onTap != null) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    Icon(
+                      applied
+                          ? Icons.check_circle_rounded
+                          : Icons.touch_app_outlined,
+                      color: colors.primary,
+                    ),
                   ],
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

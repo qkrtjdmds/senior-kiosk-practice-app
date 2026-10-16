@@ -147,4 +147,67 @@ void main() {
     expect(second.state.celebratedRewardIds, isEmpty);
     second.dispose();
   });
+
+  test('획득한 칭호와 테마를 선택하고 기본 상태로 되돌린다', () async {
+    final provider = await createProvider(1600);
+    final before = provider.state;
+
+    expect(await provider.selectTitle('title_first_step'), isTrue);
+    expect(await provider.selectTheme('theme_sky'), isTrue);
+    expect(await provider.selectTitle(null), isTrue);
+    expect(await provider.selectTheme(null), isTrue);
+
+    expect(provider.state.selectedTitleId, isNull);
+    expect(provider.state.selectedThemeId, isNull);
+    expect(provider.state.unlockedRewardIds, before.unlockedRewardIds);
+    expect(provider.state.celebratedRewardIds, before.celebratedRewardIds);
+    expect(provider.currentPoints, 1600);
+  });
+
+  test('서로 다른 네 슬롯의 장식을 동시에 착용하고 모두 벗는다', () async {
+    final provider = await createProvider(5000);
+    for (final id in const [
+      'accessory_scarf',
+      'accessory_hat',
+      'accessory_glasses',
+      'accessory_bag',
+    ]) {
+      expect(await provider.toggleAccessory(id), isTrue);
+    }
+
+    expect(provider.selectedAccessoryIds, {
+      'accessory_scarf',
+      'accessory_hat',
+      'accessory_glasses',
+      'accessory_bag',
+    });
+    expect(await provider.clearAccessories(), isTrue);
+    expect(provider.selectedAccessoryIds, isEmpty);
+  });
+
+  test('잠긴 보상과 미래 ID 선택을 차단하고 기존 상태를 유지한다', () async {
+    final provider = await createProvider(100);
+    final before = provider.state;
+
+    expect(await provider.selectTheme('theme_sky'), isFalse);
+    expect(await provider.toggleAccessory('future_accessory'), isFalse);
+
+    expect(provider.state, before);
+    expect(provider.selectionMessage, contains('이전 상태'));
+  });
+
+  test('빠른 연속 선택 요청을 순서대로 저장한다', () async {
+    final provider = await createProvider(5000);
+
+    final results = await Future.wait([
+      provider.selectTitle('title_first_step'),
+      provider.selectTitle('title_digital_confidence'),
+      provider.selectTheme('theme_sage'),
+      provider.selectTheme('theme_peach'),
+    ]);
+
+    expect(results, everyElement(isTrue));
+    expect(provider.state.selectedTitleId, 'title_digital_confidence');
+    expect(provider.state.selectedThemeId, 'theme_peach');
+  });
 }

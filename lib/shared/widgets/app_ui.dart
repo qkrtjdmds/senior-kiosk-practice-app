@@ -8,17 +8,25 @@ class CharacterMessage extends StatelessWidget {
     required this.title,
     required this.message,
     this.mood = HanGeoleumMood.guide,
+    this.accessoryIds = const {},
+    this.backgroundColor,
     super.key,
   });
   final String title;
   final String message;
   final HanGeoleumMood mood;
+  final Set<String> accessoryIds;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final narrow = constraints.maxWidth < 330;
-      final character = HanGeoleumCharacter(mood: mood, size: 76);
+      final character = HanGeoleumCharacter(
+        mood: mood,
+        size: 76,
+        accessoryIds: accessoryIds,
+      );
       final copy = Column(
         crossAxisAlignment: narrow
             ? CrossAxisAlignment.center
@@ -40,7 +48,9 @@ class CharacterMessage extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
+          color:
+              backgroundColor ??
+              Theme.of(context).colorScheme.secondaryContainer,
           borderRadius: BorderRadius.circular(AppRadius.large),
         ),
         child: narrow

@@ -73,8 +73,13 @@ class BrandHomePage extends StatelessWidget {
     final daily = context.watch<DailyMissionProvider>();
     final progress = context.watch<LearningProgressProvider>();
     final rewards = context.watch<RewardProgressProvider>();
+    final homePalette = RewardHomePalette.of(
+      context,
+      rewards.state.selectedThemeId,
+    );
     final horizontal = MediaQuery.sizeOf(context).width <= 340 ? 16.0 : 20.0;
     return Scaffold(
+      backgroundColor: homePalette.background,
       appBar: AppBar(
         title: const Text('한걸음 디지털'),
         actions: [
@@ -93,11 +98,24 @@ class BrandHomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const CharacterMessage(
+              CharacterMessage(
                 title: '오늘도 한 걸음씩 연습해요',
                 message: '실수해도 괜찮아요. 원하는 연습부터 편하게 시작해 보세요.',
                 mood: HanGeoleumMood.welcome,
+                accessoryIds: rewards.selectedAccessoryIds,
+                backgroundColor: homePalette.welcome,
               ),
+              if (rewards.selectedTitle != null) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '나의 칭호 · ${rewards.selectedTitle!.title}',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
               _MissionSummary(
                 completed: daily.completedCount,

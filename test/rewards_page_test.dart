@@ -11,6 +11,7 @@ import 'package:han_geoleum_digital/core/data_migration/preference_keys.dart';
 import 'package:han_geoleum_digital/features/learning/learning_progress_provider.dart';
 import 'package:han_geoleum_digital/features/rewards/reward_repository.dart';
 import 'package:han_geoleum_digital/features/rewards/reward_unlock_service.dart';
+import 'package:han_geoleum_digital/shared/widgets/han_geoleum_character.dart';
 
 void main() {
   Future<SharedPreferences> pumpRewardsApp(
@@ -20,6 +21,8 @@ void main() {
     Size size = const Size(360, 760),
     bool extraLarge = false,
     String? selectedTitleId,
+    Set<String> selectedAccessoryIds = const {},
+    String? selectedThemeId,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -35,6 +38,12 @@ void main() {
     await RewardUnlockService(repository).reconcile(points);
     if (selectedTitleId != null) {
       await repository.selectTitle(selectedTitleId);
+    }
+    if (selectedAccessoryIds.isNotEmpty) {
+      await repository.selectAccessories(selectedAccessoryIds);
+    }
+    if (selectedThemeId != null) {
+      await repository.selectTheme(selectedThemeId);
     }
     final progress = LearningProgressProvider(preferences);
     appRouter.go(route);
@@ -102,7 +111,9 @@ void main() {
     final applied = tester.getSemantics(
       find.bySemanticsLabel(RegExp('첫걸음 시작.*적용 중')),
     );
-    expect(applied.getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
+    expect(applied.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+    // ignore: deprecated_member_use
+    expect(applied.getSemanticsData().hasFlag(SemanticsFlag.isSelected), isTrue);
     expect(
       find.bySemanticsLabel(RegExp('한걸음이 목도리.*140점 더 필요')),
       findsOneWidget,
@@ -155,5 +166,60 @@ void main() {
     await tester.tap(find.byTooltip('이전 화면으로 돌아가기'));
     await tester.pumpAndSettle();
     expect(appRouter.state.uri.path, AppRoutes.home);
+  });
+
+  testWidgets('보상 화면에서 칭호 장식 테마를 선택하고 미리보기에 반영한다', (tester) async {
+    await pumpRewardsApp(tester, points: 5000, route: AppRoutes.rewards);
+
+    expect(find.byKey(const Key('reward-preview')), findsOneWidget);
+    await tester.ensureVisible(find.text('첫걸음 시작').last);
+    await tester.tap(find.text('첫걸음 시작').last);
+    await tester.pumpAndSettle();
+    expect(find.text('칭호를 바꿨어요'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('한걸음이 목도리').last);
+    await tester.tap(find.text('한걸음이 목도리').last);
+    await tester.pumpAndSettle();
+    expect(find.text('목도리를 착용했어요'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('편안한 세이지').last);
+    await tester.tap(find.text('편안한 세이지').last);
+    await tester.pumpAndSettle();
+    expect(find.text('홈 테마를 바꿨어요'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('잠긴 보상과 특별 표현에는 탭 동작이 없다', (tester) async {
+    await pumpRewardsApp(tester, points: 160, route: AppRoutes.rewards);
+
+    final locked = tester.getSemantics(
+      find.bySemanticsLabel(RegExp('한걸음이 목도리.*140점 더 필요')),
+    );
+    expect(locked.getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
+    final expression = tester.getSemantics(
+      find.bySemanticsLabel(RegExp('특별 축하 표정')),
+    );
+    expect(
+      expression.getSemanticsData().hasAction(SemanticsAction.tap),
+      isFalse,
+    );
+  });
+
+  testWidgets('홈은 선택한 칭호 장식 테마를 복원해 표시한다', (tester) async {
+    await pumpRewardsApp(
+      tester,
+      points: 1600,
+      selectedTitleId: 'title_steady_learner',
+      selectedAccessoryIds: const {
+        'accessory_scarf',
+        'accessory_hat',
+        'accessory_glasses',
+      },
+      selectedThemeId: 'theme_sky',
+    );
+
+    expect(find.text('나의 칭호 · 꾸준한 연습생'), findsOneWidget);
+    expect(find.byType(HanGeoleumCharacter), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }

@@ -100,7 +100,7 @@ class RewardRepository {
     final state = await load();
     _validateSelection(state, rewardId, RewardType.title);
     final updated = state.copyWith(selectedTitleId: rewardId);
-    await save(updated);
+    await _saveSelection(updated, state);
     return updated.copyWith(
       dataVersion: currentDataVersion,
       catalogVersion: catalog.version,
@@ -109,11 +109,16 @@ class RewardRepository {
 
   Future<RewardState> selectAccessories(Set<String> rewardIds) async {
     final state = await load();
+    final occupiedSlots = <RewardAccessorySlot>{};
     for (final rewardId in rewardIds) {
       _validateSelection(state, rewardId, RewardType.accessory);
+      final slot = rewardAccessorySlot(rewardId);
+      if (slot == null || !occupiedSlots.add(slot)) {
+        throw StateError('Only one accessory can be selected per slot.');
+      }
     }
     final updated = state.copyWith(selectedAccessoryIds: rewardIds);
-    await save(updated);
+    await _saveSelection(updated, state);
     return updated.copyWith(
       dataVersion: currentDataVersion,
       catalogVersion: catalog.version,
@@ -124,7 +129,7 @@ class RewardRepository {
     final state = await load();
     _validateSelection(state, rewardId, RewardType.theme);
     final updated = state.copyWith(selectedThemeId: rewardId);
-    await save(updated);
+    await _saveSelection(updated, state);
     return updated.copyWith(
       dataVersion: currentDataVersion,
       catalogVersion: catalog.version,
@@ -147,6 +152,19 @@ class RewardRepository {
     );
   }
 
+  Future<void> _saveSelection(RewardState updated, RewardState previous) async {
+    try {
+      await save(updated);
+    } catch (_) {
+      try {
+        await save(previous);
+      } catch (_) {
+        // The original write error remains the useful failure for the caller.
+      }
+      rethrow;
+    }
+  }
+
   Future<void> clear() async {
     for (final key in V3RewardKeys.stateKeys) {
       await _store.remove(key);
@@ -165,7 +183,9 @@ class RewardRepository {
       );
     }
     final definition = catalog.byId(rewardId);
-    if (definition == null || definition.rewardType != expectedType) {
+    if (definition == null ||
+        !definition.isActive ||
+        definition.rewardType != expectedType) {
       throw ArgumentError.value(
         rewardId,
         'rewardId',
